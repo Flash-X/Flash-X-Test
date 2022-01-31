@@ -1,0 +1,20 @@
+New syntax for compariosn test on the test.info level
+
+<platform>
+  <Composite>
+    <test_name_goes_here>
+      
+      setupName:
+      setupOptions:
+      numProcs:
+      parfiles:
+      transfers:
+      restartParfile:
+      sfocuCompOptions:
+      sfocuRestartOptions:
+      comparisonBenchmark:
+      restartBenchmark:
+   
+      ?restartNumProcs:
+   (errTol and partErrTol still supported, though depricated)
+</appropriate_closure>

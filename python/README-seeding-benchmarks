@@ -1,0 +1,80 @@
+SEEDING BENCHMARKS
+
+This is the process of automatically approving benchmarks for one platform if,
+for the same problem, they are within tolerance to those that were manually
+approved for a master "seed" platform.
+
+To enable benchmark seeding in flashTest, add these to the config file:
+
+# example or informative values given
+benchmarkSeedSite: code
+benchmarkSeedInfo: [optional-host:]/abs/path/to/test.info
+benchmarkSeedArchive: [optional-host:]/abs/path/to/archive (points to directory that contains directories named after sites)
+benchmarkSeedErrTol: 1.e-12
+benchmarkSeedPartErrTol: 1.e-12
+
+How it works:  when a composite test is encountered that doesn't have
+comparisonBenchmark or restartBenchmark entries in its node of the .info file,
+then the files pointed to by the node of benchmarkSeedInfo for the same problem
+will be brought in.  If the checkpoints generated locally match those of the
+remote platform within the tolerances specified, then they will automatically
+be promoted to be the benchmarks for the problem on this platform.
+
+EXAMPLE:
+
+Node in local.info, notice it doesn't contain comparisonBenchmark or restartBenchmark:
+
+<localsite>
+  <Composite>
+    <UnsplitHydro>
+      <2Blast>
+        <UG>
+          <hdf5>
+            <serial>
+              <1d>
+                setupName: Blast2
+                setupOptions: -1d -auto +ug +hdf5 +serialIO -nxb=400 --unit=Particles +unsplitHydro -site=<flashSite>
+                numProcs: 4
+                parfiles: <pathToSimulations>/<setupName>/coldstart_ug_4p_1d.par
+                restartParfiles: <pathToSimulations>/<setupName>/restart_ug_4p_1d.par
+                checkpointBasename: 2blast_hdf5_chk_
+                comparisonNumber: 0010
+                restartNumber: 0019
+              </1d>
+
+Corresponding node in seed.info:
+
+<seedsite>
+  <Composite>
+    <UnsplitHydro>
+      <2Blast>
+        <UG>
+          <hdf5>
+            <serial>
+              <1d>
+                setupName: Blast2
+                setupOptions: -1d -auto +ug +hdf5 +serialIO -nxb=400 --unit=Particles +unsplitHydro -site=<flashSite>
+                numProcs: 4
+                parfiles: <pathToSimulations>/<setupName>/coldstart_ug_4p_1d.par
+                restartParfiles: <pathToSimulations>/<setupName>/restart_ug_4p_1d.par
+                checkpointBasename: 2blast_hdf5_chk_
+                comparisonNumber: 0010
+                restartNumber: 0019
+                comparisonBenchmark: <siteDir>/2011-09-27/<buildDir>/<runDir>/<checkpointBasename><comparisonNumber>
+                restartBenchmark: <siteDir>/2011-09-27/<buildDir>/<runDir>/<checkpointBasename><restartNumber>
+              </1d>
+
+When the test suite runs on the local platform for this problem it will see that
+there aren't any benchmarks given.  So it will reach into seed.info, and evaluate
+the benchmark paths within the local variable context except with the site name
+of the seed site, giving the values:
+
+  comparisonBenchmark: seedsite/2011-09-27/Composite_UnsplitHydro_2Blast_UG_hdf5_serial_1d/coldstart_ug_2p_1d/2blast_hdf5_chk_0010
+  restartBenchmark: seedsite/2011-09-27/Composite_UnsplitHydro_2Blast_UG_hdf5_serial_1d/coldstart_ug_2p_1d/2blast_hdf5_chk_0019
+
+It will then concatenate those paths to the one given in benchmarkSeedArchive to use
+as absolute paths (possibly on a remote host) to the seed benchmarks.  Those files
+will be used to automatically promote the local checkpoints to benchmarks if they
+compare (via sfocu) to be within the given benchmark seed tolerance values.  If
+this happens, local.info will be rewritten to contain values for comparisonBenchmark
+and restartBenchmark that point to this invocations datestamp in the local archive.
