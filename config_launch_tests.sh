@@ -50,6 +50,7 @@ $FLASHTEST_BASE/flashTest.py \
                 -c "${CONFIG_PATH}" \
                 -i "${INFO_PATH}" \
                 -v \
+		-nt \
                 -t \
                 -s $SITE \
                 UnitTest/Grid/AMR/AMReX/2d/Init \

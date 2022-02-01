@@ -284,7 +284,7 @@ def main():
     # options to FlashTest which take no arguments
     # DEV should be able to adjust this in Config
     # especially now that "-u" is a custom option
-    standAloneOpts = ["-t", "-u", "-v", "-vv", "-L", "--force"]
+    standAloneOpts = ["-nt", "-t", "-u", "-v", "-vv", "-L", "--force"]
 
     # Retrieve a two-tuple for this invocation where the first element is
     # a dictionary of options (with arguments, if applicable) to FlashTest,
@@ -1061,9 +1061,10 @@ def main():
                 ############
                 ##  TEST  ##
                 ############
-                log.info("** testing phase **")
-                if testObject.test() == False:
-                    __incErrors(3)
+                if "-nt" not in flashTestOpts:
+                    log.info("** testing phase **")
+                    if testObject.test() == False:
+                        __incErrors(3)
 
                 # +-------------------------------------+
                 # COPY COMPLETED TEST TO VIEW ARCHIVE  +
