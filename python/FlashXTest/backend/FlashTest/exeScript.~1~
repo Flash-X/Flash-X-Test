@@ -1,0 +1,1 @@
+mpirun -np <numProcs> <pathToFlashExe> -par_file <parfile>

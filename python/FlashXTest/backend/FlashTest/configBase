@@ -1,0 +1,7 @@
+
+useModule:  flashModule
+entryPoint: FlashEntryPoint
+setupper:   SiteSetupper
+compiler:   FlashCompiler
+executer:   FlashExecuter
+

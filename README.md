@@ -1,12 +1,9 @@
-This repository contains:
+## Flash-X-Test 
 
-A. FlashTest in the python directory 
+### python
 
-B. files needed to
-   1) specify FlashTest test suites for any site.
-   2) build and run the suites.
+Python package to install testing tools on your system
 
-C. FlashTestView
+### tests
 
-D. A utility test.py for running tests on any site:
-   Example usage: python test.py setsite jain /home/jain/projects/Flash-X
+Example folder to organize tests
