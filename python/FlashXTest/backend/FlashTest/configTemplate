@@ -1,0 +1,20 @@
+# Configuration for flashTest
+# 
+#
+# All keywords should be assigned values according to the pattern:
+#
+#   keyword: value
+#
+# Each variable/value pair must be on its own line, but otherwise
+# whitespace does not matter.
+#
+# Comments begin with a '#'
+
+pathToLocalArchive:
+baselineDir:
+pathToOutdir:
+pathToFlash:
+pathToGmake:        make
+defaultParfile:     <pathToFlash>/object/flash.par
+pathToSimulations:  <pathToFlash>/source/Simulation/SimulationMain
+flashSite:

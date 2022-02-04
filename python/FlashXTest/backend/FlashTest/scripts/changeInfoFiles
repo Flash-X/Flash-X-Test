@@ -1,0 +1,786 @@
+#!/usr/bin/env python3
+# File Name: testInfoAddTestOption.py
+#
+# Date Created: Oct 26,2012
+#
+# Last Modified:
+#
+# Author: sam
+#
+# Description:	
+#
+##################################################################
+
+import sys
+import optparse
+import glob
+from collections import deque
+
+
+
+
+
+##################EMBEDDED xmlNode.py SO ENTIRE SCRIPT IS ONE FILE AND DOESN'T REQUIRE SEPARATE xmlNode.py############
+
+import re, os
+
+class NodeError(Exception):
+  pass
+
+class ParseError(Exception):
+  pass
+
+class XmlNode:
+  """
+  Represents a single element in a multi-element categorization
+  of a "test.info" description. For example, a single "path" to
+  a "test.info" node might look like:
+
+    Sod/pm3/hdf5/parallel/1d
+
+  Each element in this path would be represented by a single
+  node object. The node whose name was "parallel" would have
+  a sub-node with the name "1d". The "1d" node would in turn
+  have no sub-nodes, but its "text" member would contain the
+  information necessary to run a FLASH simulation of type "Sod",
+  using paramesh3, etc.
+
+  Nodes are typically constructed by parsing an xml file with
+  this modules "parseXml()" method. For example, a text file
+  that contained the following:
+
+    <Sod>
+      <pm3>
+        <hdf5>
+          <parallel>
+            <1d>
+              setupName: Sod
+              numProcs: 1
+              parfiles: flash.par
+            </1d>
+          </parallel>
+        </hdf5>
+      </pm3>
+    </Sod>
+
+  would produce the nodes described above when parsed.
+
+  Calling the "Sod" node's "getXml()" method would reproduce the
+  above xml source again. Thus a node's sub-nodes and/or text can
+  be easily manipulated in memory and re-converted into xml.
+
+  I considered using pickled objects and avoiding xml altogether,
+  but decided that the usefulness of having the ultimate source
+  of the data encoded in a human-readable form was more important
+  than the degree of inefficiency introduced by parsing the xml
+  file into node objects and back again.
+  """
+
+  ########################
+  ##  python functions  ##
+  ########################
+  
+  def __init__(self, name):
+    self.name     = name
+    self.parent   = None
+    self.depth    = 0
+    self.subNodes = []
+    self.text     = []
+    self.dirty = False
+
+  def __iter__(self):
+    # NB: this method returns a generator
+    # object that can be iterated over
+    return self.__nodeGenerator()
+
+  def __str__(self):
+    return self.name
+
+  def __repr__(self):
+    return self.name
+
+
+  #########################
+  ##  private functions  ##
+  #########################
+
+  def __adjustDepth(self):
+    """
+    Make sure the depth values of this
+    node and all its children are correct
+    """
+    self.depth = self.parent.depth + 1
+    for subNode in self.subNodes:
+      subNode.__adjustDepth()
+
+  def __adopt(self, child):
+    """
+    Give this node a new child-node, adjusting
+    the child's parent and depth properties
+    """
+    # make sure the incoming child's name isn't
+    # the same as an already present child's
+    for subNode in self.subNodes:
+      if subNode.name == child.name:
+        msg = ("new node's name \"%s\" already used by sub-node of " % child.name +
+               "parent \"%s\"" % self.getPathBelowRoot())
+        raise NodeError(msg)
+
+    # This node passes any text to its new child, assuming
+    # the child has no text of its own. This can happen if
+    # user tries an "add_node" command on a leaf node.
+    if len(child.text) == 0:
+      child.text = self.text[:]
+    self.text = []
+    self.subNodes.append(child)
+    if child.parent and child in child.parent.subNodes:
+      child.parent.subNodes.remove(child)
+    child.parent = self
+    child.__adjustDepth()
+
+  def __copy(self):
+    """
+    Return a copy of this node with copies of
+    all child-nodes and text
+    """
+    newNode = XmlNode(self.name)
+    newNode.text = self.text[:]
+    for subNode in self.subNodes:
+      newNode.__adopt(subNode.__copy())
+    return newNode
+
+  def __nodeGenerator(self):
+    """
+    Returns a python generator object so that sub-nodes
+    can be listed recursively (depth first) when a node
+    is iterated over
+    """
+    for subNode in self.subNodes:
+      yield subNode
+      for subSubNode in subNode.__nodeGenerator():
+        yield subSubNode
+
+
+  ########################
+  ##  public functions  ##
+  ########################
+  def smudge(self):
+    self.dirty = True
+    if self.parent:
+      self.parent.smudge()
+  
+  # overwrite/add every smudged node from self onto that
+  def mergeDirtyFrom(self, that):
+    def seek(root, path): # will find or create
+      for x in path:
+        nd1 = None
+        for nd in root.subNodes:
+          if nd.name == x:
+            nd1 = nd
+            break
+        if nd1 is None:
+          nd1 = XmlNode(x)
+          root.__adopt(nd1)
+        root = nd1
+      return root
+    def visit(path, nd):
+      if not nd.dirty: return
+      nd1 = seek(self, path)
+      nd1.text = list(nd.text) # shallow copy
+      for sub in nd.subNodes:
+        visit(path + [sub.name], sub)
+    visit([], that)
+  
+  def add(self, newNodeName):
+    """
+    Create new node as child of this node with name 'newNodeName'
+    """
+    # check for a conflicting name
+    childrenNames = [subNode.name for subNode in self.subNodes]
+    if newNodeName in childrenNames:
+      if self.isMasterNode():
+        path = "masterNode"
+      else:
+        path = self.getPathBelowRoot()
+      msg = ("Unable to create node with name \"%s\" " % newNodeName +
+             "as sub-node of \"%s\", " % path +
+             "as this node already has a sub-node of that name.")
+      raise NodeError(msg)
+    # else
+    newNode = XmlNode(newNodeName)
+    self.__adopt(newNode)
+    return newNode
+
+  def clone(self, newNodeName):
+    """
+    Create new sibling-node based on recursive copy
+    of all sub-nodes and text.
+    """
+    # check for a conflicting name
+    childrenNames = [subNode.name for subNode in self.parent.subNodes]
+    if newNodeName in childrenNames:
+      if self.parent.isMasterNode():
+        parentPath = "master-node"
+      else:
+        parentPath = self.parent.getPathBelowRoot()
+      msg = ("Unable to create node with name \"%s\" " % newNodeName +
+             "as sub-node of \"%s\", " % parentPath +
+             "as this node already has a sub-node of that name.")
+      raise NodeError(msg)
+    # else
+    newNode = self.__copy()
+    newNode.name = newNodeName
+    self.parent.__adopt(newNode)
+    return newNode
+
+  def extend(self, newNodeName):
+    """
+    Create new node as child of this node with name 'newNodeName',
+    but pass any of this node's current children to the new node.
+    """
+    newNode = XmlNode(newNodeName)
+    # We don't need check for name conflicts because by
+    # definition 'newNode' will be this node's only child
+    for subNode in self.subNodes[:]:
+      newNode.__adopt(subNode)  # this will automatically remove 'subNode'
+                                # from 'self's' list of sub-nodes
+    self.__adopt(newNode)
+    return newNode
+
+  def isMasterNode(self):
+    """
+    Returns True if this node is the master-node
+    (has no parent), otherwise False
+    """
+    if self.parent:
+      return False
+    return True
+
+  def remove(self, fullRemove):
+    """
+    Remove this node from its parent's list of sub-nodes.
+    If 'fullRemove' is false, this node's sub-nodes will
+    be adopted by its parent unless any of those sub-nodes
+    has the same name as one of the parent's already-extant
+    children. In that circumstance, a "NodeError" is raised.
+    """
+    if fullRemove:
+      self.parent.subNodes.remove(self)
+    else:
+      # check for a conflicting name
+      siblingNames = [subNode.name for subNode in self.parent.subNodes if subNode != self]
+      for subNode in self.subNodes:
+        if subNode.name in siblingNames:
+          if self.parent.isMasterNode():
+            parentPath = "master-node"
+          else:
+            parentPath = self.parent.getPathBelowRoot()
+          msg = ("Unable to pass sub-node \"%s\" " % subNode.name +
+                 "to parent-node \"%s\", " % parentPath +
+                 "as parent already has a child of that name.")
+          raise NodeError(msg)
+      # else
+      self.parent.subNodes.remove(self)
+      for subNode in self.subNodes:
+        self.parent.__adopt(subNode)
+
+      # If parent had no other children besides this one,
+      # it can absorb this one's text.
+      if len(self.parent.subNodes) == 0:
+        self.parent.text = self.text[:]
+
+  def rename(self, newName):
+    """
+    Rename this node unless its parent already
+    has a sub-node with name 'newName'
+    """
+    siblingNames = [subNode.name for subNode in self.parent.subNodes if subNode != self]
+    if newName in siblingNames:
+      msg = ("Unable to rename \"%s\" " % self.getPathBelowRoot() +
+             "to \"%s\", as parent already has a child of that name." % newName)
+      raise NodeError(msg)
+    # else
+    self.name = newName
+
+  def findChild(self, path):
+    """
+    Return a node corresponding to 'path', where
+    each element of 'path' is the name of a node.
+    """
+    path = os.path.normpath(path)
+    if path == ".":
+      return self
+    # else
+    currentWorkingNode = self
+    pathElements = path.split(os.sep)
+    while len(pathElements) > 0:
+      for subNode in currentWorkingNode.subNodes:
+        if subNode.name == pathElements[0]:
+          currentWorkingNode = subNode
+          break  # break out of the for-loop and skip the "else" clause below
+      else:
+        # 'path' led to a non-existant node
+        return None
+
+      del pathElements[0]
+
+    return currentWorkingNode
+
+  def findChildren(self, soughtName):
+    """
+    Return a list of nodes beneath this
+    node whose names match 'soughtName'
+    """
+    foundNodes = []
+    def __find(node):
+      for subNode in node.subNodes:
+        if subNode.name == soughtName:
+          foundNodes.append(subNode)
+        __find(subNode)
+
+    __find(self)
+    return foundNodes
+
+  def findChildrenWithPath(self, soughtName):
+    """
+   Has a similar function to findChildren() but soughtName is
+   a pathName like "GrandfatherNode/FatherNode/soughtNode"
+    """
+
+    foundNodes=[]
+    sn = soughtName.split('/',1)	
+    if len(sn) == 1: return self.findChildren(soughtName)
+    
+    def __subfind(node,nm):
+    	names = nm.split('/',1)
+	for subNode in node.subNodes:
+		if subNode.name == names[0]:
+			if len(names) > 1:
+				return __subfind(subNode, names[1])
+			else:
+				return subNode
+		    	
+    def __find(node):
+      for subNode in node.subNodes:
+        if subNode.name == sn[0]:
+          foundNodes.append(__subfind(subNode,sn[1]))
+        __find(subNode)
+
+
+    __find(self)
+    return foundNodes
+
+  def getPathBelowRoot(self):
+    """
+    Return a path from the master-node to this node
+    where each element in the path corresponds to a
+    node's 'name' property.
+    """
+    pathElements = []
+    thisNode = self
+    while thisNode.parent:
+      pathElements.insert(0, thisNode.name)
+      thisNode = thisNode.parent
+
+    return os.sep.join(pathElements)
+
+  def getXml(self):
+    """
+    Return as a list the lines of xml code that represent this node,
+    its subNodes, their subNodes, etc., and any text contained in the
+    leaf nodes.
+    """
+    xml = []
+    def _getXml(xmlNode):
+      tagIndent  = "  " * (xmlNode.depth - 1)
+      lineIndent = "  " * xmlNode.depth
+      xml.append(tagIndent + ("<%s>" % xmlNode.name))
+      for subNode in xmlNode.subNodes:
+        _getXml(subNode)
+      for line in xmlNode.text:
+        xml.append(lineIndent + line)
+      xml.append(tagIndent + ("</%s>" % xmlNode.name))
+
+    if not self.parent:
+      # the all-encompassing 'masterNode' should not appear
+      # in the xml. The first-level subNodes will have zero
+      # left-hand indentation
+      for subNode in self.subNodes:
+        _getXml(subNode)
+    else:
+      _getXml(self)
+
+    return xml
+    
+
+def parseXmlString(data):
+  startTagPat = "<(?!/)(.*)>"  # matches '<' only if next char is not '/'
+  endTagPat   = "</(.*)>"      # matches '<' followed by '/'
+
+  def __parse(xmlNode, lineNum):
+    while lineNum < len(xmlLines):
+      thisLine = xmlLines[lineNum]
+      lineNum += 1
+      m = re.match(startTagPat, thisLine)
+      if m:
+        # 'thisLine' is a start-tag
+        if len(xmlNode.text) > 0:
+          if xmlNode.isMasterNode():
+            msg = "Master-node contains both sub-nodes and text."
+          else:
+            msg = "Node \"%s\" contains both sub-nodes and text." % xmlNode.getPathBelowRoot()
+          raise ParseError(msg)
+        # else
+        newNodeName = m.group(1)
+        try:
+          newNode = xmlNode.add(newNodeName)
+        except NodeError, e:
+          if xmlNode.isMasterNode():
+            msg = "Master-node has multiple children named \"%s\"." % newNodeName
+          else:
+            msg = "Node \"%s\" has multiple children named \"%s\"." % (xmlNode.getPathBelowRoot(), newNodeName)
+          raise ParseError(msg)
+        else:
+          lineNum = __parse(newNode, lineNum)
+      else:
+        m = re.match(endTagPat, thisLine)
+        if m:
+          # 'thisLine' is an end-tag
+          if m.group(1) == xmlNode.name:
+            return lineNum
+          else:
+            if xmlNode.isMasterNode():
+              msg = ("closing tag \"%s\" has no corresponding opening tag." % m.group(1))
+            else:
+              msg = ("closing tag \"%s\" does not match opening tag \"%s\"." %
+                     (m.group(1), xmlNode.getPathBelowRoot()))
+            raise ParseError(msg)
+        else:
+          # 'thisLine' is text
+          if len(xmlNode.subNodes) > 0:
+            if xmlNode.isMasterNode():
+              msg = "Master-node contains both sub-nodes and text."
+            else:
+              msg = "Node \"%s\" contains both sub-nodes and text." % xmlNode.getPathBelowRoot()
+            raise ParseError(msg)
+          # else
+          xmlNode.text.append(thisLine)
+    else:
+      if xmlNode.depth > 0:
+        msg = "Node \"%s\" has no closing tag." % xmlNode.getPathBelowRoot()
+        raise ParseError(msg)
+  
+  # read in the xml text file and remove empty lines and comments
+  xmlLines = data.split("\n")
+  xmlLines = [xmlLine.strip() for xmlLine in xmlLines
+              if (len(xmlLine.strip()) > 0 and
+                  not xmlLine.startswith("#"))]
+
+  # create the master node that will contain all the nodes in the text file
+  masterNode = XmlNode("masterNode")
+
+  # "__parse()" will read the info from 'xmlLines' into 'masterNode'
+  __parse(masterNode, 0)
+  return masterNode
+
+#import sys
+#sys.path.append('../lib') #not the best
+#from xmlNode import *
+
+#########################################################################################################
+#########################################################################################################
+#########################################################################################################
+
+
+
+def _getOptionDict(nodeText):
+	#return dict([n.split(':') for n in nodeText])
+	nodeDict={}
+	for n in nodeText:
+		testOption = n.split(':')
+		try:
+			nodeDict[testOption[0]] = testOption[1]
+		except IndexError,e:
+			nodeDict[testOption[0]] = ''
+	return nodeDict
+
+
+def addOption(option, node):
+	node.text.append(option)
+
+
+def removeOption(optionToRemove, node):
+	optionToRemove = optionToRemove.split(':')[0].strip()
+	optionDict= _getOptionDict(node.text)
+	if optionDict.has_key(optionToRemove):
+		del optionDict[optionToRemove]
+		node.text = [ a + ':' + b for a,b in optionDict.items()]
+		return True
+
+	return False
+
+
+
+
+
+def editOption(option, masterNodeName, nodesToChange, remove=False):
+	"""Adds, Edits or removes a testoption from nodesToChange"""
+
+	optionName= option.split(':')[0]
+
+
+	for n in nodesToChange:
+		r = removeOption(option,n)
+			
+		if remove: 
+			print masterNodeName, ":- Removed", optionName, "from", n.getPathBelowRoot()
+			continue
+			
+		addOption(option, n)
+		if r : #We're editing a testoption
+			print masterNodeName, ":- Changed", optionName, "in", n.getPathBelowRoot()
+		else:
+			print masterNodeName, ":- Added", optionName, "to", n.getPathBelowRoot()
+		
+
+
+def addNode(master,fullName, masterNodeName):
+	nw=deque()
+	dt = master.findChild(fullName)
+
+	while not dt:
+
+		fullName = fullName.rsplit('/',1)
+		try:
+			nw.appendleft(fullName[1])
+		except IndexError,e:
+			dt=master.add(fullName[0])
+			for n in nw:
+				dt = dt.add(n)
+			print masterNodeName, ":- Added new node ", dt.getPathBelowRoot()
+			return dt
+		fullName = fullName[0]
+		dt = master.findChild(fullName)
+
+	
+	for n in nw:
+		dt = dt.add(n)
+		 
+	print masterNodeName, ":- Added new node ", dt.getPathBelowRoot()
+		
+	return dt	
+
+
+def removeNode(master, nd, masterNodeName):
+	fullName = nd.getPathBelowRoot()
+
+
+	if nd:
+		parent = nd.parent
+		nd.remove(True)
+		print masterNodeName, ":- Removed node ", fullName
+	
+		#check if parent has any more children, otherwise remove it as well
+		if parent.subNodes == []:
+			parent.remove(True)	
+
+		return nd
+	else:
+		print fullName," does not exist in ",masterNodeName
+		return None
+
+
+def findLeafNodes(master,patterns):
+	leafNodes=[]
+	
+	def __fn(parents,pat):
+
+		newParents=[]
+		ttf= [x.strip('/') for x in pat.split('*',1)]
+
+
+		for parent in parents:
+			newParents.extend(parent.findChildrenWithPath(ttf[0]))
+
+
+		if len(ttf) > 1 and ttf[1].strip() !='':
+			candidates = __fn(newParents, ttf[1])
+			
+			return candidates
+		else:
+			return newParents
+
+
+	def __getAllLeaves(node):
+		allLeaves=[]
+
+		for subNode in node.subNodes:
+			if subNode.text != []:
+				allLeaves.append(subNode)
+			allLeaves.extend(__getAllLeaves(subNode))
+		return allLeaves
+
+
+	for pt in patterns:
+		pn = __fn([master], pt)
+
+
+		for candidate in pn:
+			if candidate==None: continue ###
+		
+			#leafNodes.extend(__getAllLeaves(candidate))
+			if candidate.text != [] or candidate.subNodes == []: 
+				leafNodes.append(candidate)
+			else: 
+				leafNodes.extend(__getAllLeaves(candidate))
+
+
+	return leafNodes
+		
+
+
+			
+def processFile(newOptions,removeOptions, xmlFileName, nodeSearchPattern,newNodes, deleteNodes,DRYRUN=False):
+	try:
+		f=open(xmlFileName)
+		x=parseXmlString(f.read())
+	except Exception,e:
+		print  unicode(e)
+		sys.exit(0)
+		
+
+
+	if nodeSearchPattern == []:
+		nodesToChange = []
+	else:
+		nodesToChange= findLeafNodes(x,nodeSearchPattern)
+
+
+	nodesToDelete = findLeafNodes(x, deleteNodes)
+
+
+	#if dryrun print affected nodes and return
+	if DRYRUN:
+		for n in nodesToDelete + nodesToChange:
+			print "%s: %s" % (xmlFileName,n.getPathBelowRoot())
+		return 
+	
+
+	#Add/delete nodes if any to add/delete
+	#use the subNodes of the master node as the master node since we assume these are the machine names
+	for sub in x.subNodes:
+		for nd in newNodes:
+			newNode = addNode(sub, nd, xmlFileName)
+			nodesToChange.append(newNode)
+	
+	#delete nodes
+	for dd in nodesToDelete:
+		removeNode(x, dd, xmlFileName)
+
+
+	for option in newOptions:	
+		editOption(option,xmlFileName, nodesToChange)
+	for roption in removeOptions:
+		editOption(roption, xmlFileName, nodesToChange, remove=True)
+
+	open(xmlFileName,'w').write('\n'.join(x.getXml()))
+
+	return
+		
+	
+
+def parseListFile(fname):
+	return open(fname,'r').read().split('\n')
+
+
+if __name__ == "__main__":
+	usage= """\t%prog [options]\nUse this to Add/Edit/Remove one or more test options or test Nodes from one or more test.info files\n
+	Examples: 
+	1. Add or change 'comparisonNumber' to 001 and remove the 'restartBenchmark' test option from all 2d Composite tests in all the testComp files in the current directory:\n
+	\t %prog -m "testComp.*" -t "Composite/*/2d" -a "comparisonNumber:001" -d "restartBenchmark" 
+	\n
+	2. Add a Composite/StirTurb/pm4dev/3d node to test.info:\n
+	\t %prog -m "test.info" --new-node "Composite/StirTurb/pm4dev/3d"
+	\n
+	3. Add a new UnitTest/Eos/3d with test options setupName, setupOptions , numProcs, parfiles to all .info files in current directory:\n
+	\t %prog -m "*.info" --new-node "UnitTest/Eos/3d" -a "setupOptions: -auto -3d +noio, numProc:4, parfiles:<defaultParfile>"
+	"""
+	parser = optparse.OptionParser(usage)
+	parser.add_option("-m", "--infoFileList", type="string",
+			help="""Comma separated list of test.info files.\nYou can also use UNIX glob patterns to specify files e.g testComp.*.""", dest="infoFileList", action="store")
+	parser.add_option("-t",	type="string", dest="testNames", action="store",
+		help="""Comma separated list of Test name patterns for the tests for which you want to add a new test option.\nUse the '/' character as a separator in a test name.\nYou can use the UNIX glob character * in the Test name pattern to match more than one test name.\n Examples of patterns include:
+\n
+"2d",\n			
+"Composite/2Blast/*"\n
+"2Blast/*/2d",\n
+"2Blast/pm4dev/hdf5Type/*",\n
+"Composite/*/2d",\n
+"Composite/*/pm4dev/*/2d" """
+		)
+
+	parser.add_option("--tf", help="""Specify a file containing a list of Test name patterns (one on a line).\nSee comments for the '-t' option.""",
+			dest="ftestNames",metavar='FILENAME' )
+
+	parser.add_option("-a", help="""Test options to Add/Edit (use a comma to separate options if more than one option).\nTo Edit a testoption, simply specify the new value -e.g use '-a "numprocs:4"' to change numprocs from 2 to 4.""", dest="testOptions",metavar='TESTOPTION')
+
+	parser.add_option("-d", help="""One or more test options to remove (comma separated list).\n e.g '-d "numprocs,parfiles' to remove numprocs & parfiles""", dest="testOptionsRemove", metavar='TESTOPTION')
+
+
+
+	parser.add_option("--new-node", metavar='NODE_NAME[,NODE_NAME[,...]]',
+		dest="newNodes",
+		help="""Coma separated list of new nodes to add to file(s).\n
+			Use the full node name, excluding the machine name 
+			e.g Composite/CurrentSheet/8wave/pmdev/hdf5/3d
+		    """)
+	
+	parser.add_option("--delete-node", metavar='NODE_NAME[,NODE_NAME[,...]]',
+		dest="deleteNodes",
+		help = """Coma separated list of nodes to remove. Can use patterns similar to the -t option above.
+			""")	
+
+
+	parser.add_option("--dry-run", dest="DRYRUN", action="store_true",
+		help = """Show nodes that will be changed/deleted by command without making actual changes.""")
+
+
+	(options,args) = parser.parse_args()
+	
+	testNames=[]	
+
+	if options.infoFileList:
+		infoFiles = [a.strip() for a in options.infoFileList.split(',')]
+	else:
+		infoFiles= raw_input("List info files to change (use comma to separate):\n")
+		infoFiles = [a.strip() for a in infoFiles.split(',')]
+
+	if options.testNames:
+		testNames = [a.strip() for a in options.testNames.split(',')]
+	elif options.ftestNames:
+		testNames = [a.strip() for a in parseListFile(options.ftestNames)]
+	else:
+		if not (options.newNodes or options.deleteNodes):
+			testNames= raw_input("List tests to change (use comma to separate if listing more than one test):\n")
+			testNames = [a.strip() for a in testNames.split(',')]
+
+	testOptions= options.testOptions 
+	testOptionsRemove=options.testOptionsRemove
+	newNodes=options.newNodes
+	deleteNodes=options.deleteNodes
+	DRYRUN=options.DRYRUN
+
+	if not (testOptions or testOptionsRemove) and not (newNodes or deleteNodes):
+		testOptions = raw_input("List test options  to add/edit(use a comma to separate options if adding more than one, press enter to skip):\n")
+		testOptionsRemove = raw_input("List test options to remove. Press Enter to skip:\n")
+	
+	testOptions = (testOptions and [a.strip() for a in testOptions.split(',')]) or []
+	testOptionsRemove = (testOptionsRemove and [a.strip() for a in testOptionsRemove.split(',')]) or []
+	
+	newNodes= (newNodes and [ a.strip() for a in newNodes.split(',')]) or []
+	deleteNodes=(deleteNodes and [a.strip() for a in deleteNodes.split(',')]) or []
+
+
+	for xmlFiles in infoFiles:
+		for xmlFile in glob.glob(xmlFiles):
+			processFile(testOptions,testOptionsRemove, xmlFile, testNames,newNodes, deleteNodes,DRYRUN)

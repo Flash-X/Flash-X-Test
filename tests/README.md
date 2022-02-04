@@ -1,0 +1,4 @@
+- Follow the directory structure described here to setup tests
+- Place 'Config' in the root of the test directory
+- Place 'TestName.xml' for each subset of tests you want to run
+- Execute 'runTests' 

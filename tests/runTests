@@ -1,0 +1,22 @@
+#!/usr/bin/env python3
+
+from FlashXTest.api import FlashXTest
+
+if __name__ == '__main__':
+    """
+    Main script to run tests
+    """
+    # Run tests
+    testDict = { 'Grid' : ['UnitTest/Grid/AMR/AMReX/2d/Init',
+                           'UnitTest/Grid/AMR/AMReX/2d/Refine',
+                           'UnitTest/Grid/AMR/AMReX/2d/FluxCorrection',
+                           'UnitTest/Grid/AMR/AMReX/2d/FluxCorrection2',
+                           'UnitTest/Grid/AMR/AMReX/2d/TestCyl',
+                           'UnitTest/GridAnomalousRefine/2d/Paramesh',
+                           'UnitTest/GridAnomalousRefine/2d/AMReX',
+                           'UnitTest/Multigrid/AMReX/3d'],
+
+                 'incompFlow' : ['UnitTest/LidDrivenCavity/AMReX/2d',
+                                 'UnitTest/RisingBubble/AMReX/2d'] }
+
+    FlashXTest.run(testDict,flashSite='sedona')

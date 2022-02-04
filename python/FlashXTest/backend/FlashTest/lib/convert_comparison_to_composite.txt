@@ -1,0 +1,76 @@
+In order to convert a comparison test to a composite test, the user must first take a few steps to modify the info file. Then, when flashTest is run, the old comparison benchmark and new, automatically generated restart benchmark will be copied to the autobaselines directory, and the info file updated accordingly. Finally, the user is responsible for commitng the changes to test.info.
+
+Before running test.info:
+1. Create an xml node in the Composite section of the info file and copy the contents of the Comaparison test node.
+2. Add the following fields: `checkpointBasename`, `comparisonNumber`, `restartParfiles`.
+3. Make sure the comparison benchmark is listed in the `shortPathToBenchmark` field if you want it to be copied over to the new location.
+
+Then run the composite test. The script should automatically copy the restart and comparison benchmarks to a subdirectory of /nfs/proj-flash5/autobaselines (or elsewhere if the user changed this variable). Then it will add the following fields to the info file: `restartNumber`, `comparisonBenchmark`, and `restartBenchmark`.
+
+Finally, in the test.info, removed the field shortPathToBenchmark. Now the test has been fully added and can be committed to the repo.
+
+Example:
+Before conversion:
+  `<Composite>
+    <DustCollapse>
+      <AMR>
+        <newMpole>
+          <2dCyl>
+            <pm4AltMorton> 
+              setupName: DustCollapse 
+              setupOptions: -site=compute001.mcs.anl.gov -auto -2d +cylindrical +Mode1 AltMorton=True +serialIO +uhd +newMpole 
+              numProcs: 4 
+              shortPathToBenchmark: /homes/kweide/flashTest/output/compute001/2019-10-25_2/<buildDir>/<runDir>/<chkMax> 
+              parfiles: <pathToSimulations>/DustCollapse/test_2dcyl.par 
+            </pm4AltMorton> 
+          </2dCyl>
+        </newMpole>
+      </AMR>
+    </DustCollapse>
+  </Composite>`
+
+Ready to run the test for the first time:
+  `<Composite>
+    <DustCollapse>
+      <AMR>
+        <newMpole>
+          <2dCyl>
+            <pm4AltMorton> 
+              setupName: DustCollapse 
+              setupOptions: -site=compute001.mcs.anl.gov -auto -2d +cylindrical +Mode1 AltMorton=True +serialIO +uhd +newMpole 
+              numProcs: 4 
+              shortPathToBenchmark: /homes/kweide/flashTest/output/compute001/2019-10-25_2/<buildDir>/<runDir>/<chkMax> 
+              parfiles: <pathToSimulations>/DustCollapse/test_2dcyl.par 
+              restartParfiles: <pathToSimulations>/DustCollapse/test_2dcyl_restart.par 
+              checkpointBasename: dustcoll_hdf5_chk_ 
+              comparisonNumber: 0003 
+            </pm4AltMorton> 
+          </2dCyl>
+        </newMpole>
+      </AMR>
+    </DustCollapse>
+  </Composite>`
+
+Fully updated:
+  `<Composite>
+    <DustCollapse>
+      <AMR>
+        <newMpole>
+          <2dCyl>
+            <pm4AltMorton> 
+              setupName: DustCollapse 
+              setupOptions: -site=compute001.mcs.anl.gov -auto -2d +cylindrical +Mode1 AltMorton=True +serialIO +uhd +newMpole 
+              numProcs: 4 
+              parfiles: <pathToSimulations>/DustCollapse/test_2dcyl.par 
+              restartParfiles: <pathToSimulations>/DustCollapse/test_2dcyl_restart.par 
+              checkpointBasename: dustcoll_hdf5_chk_ 
+              comparisonNumber: 0003 
+              comparisonBenchmark: /nfs/proj-flash5/autobaselines/<siteDir>/2020-06-18/<buildDir>/<runDir>/<checkpointBasename><comparisonNumber> 
+              restartNumber: 0005 
+              restartBenchmark: /nfs/proj-flash5/autobaselines/<siteDir>/2020-06-18/<buildDir>/<runDir>/<checkpointBasename><restartNumber> 
+            </pm4AltMorton> 
+          </2dCyl>
+        </newMpole>
+      </AMR>
+    </DustCollapse>
+  </Composite>`
