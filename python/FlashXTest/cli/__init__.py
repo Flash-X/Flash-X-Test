@@ -1,1 +1,1 @@
-from .FlashXTest import *
+from ._cli import *

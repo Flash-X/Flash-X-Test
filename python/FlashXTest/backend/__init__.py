@@ -1,1 +1,1 @@
-from . import FlashTest
+from .FlashTest import *

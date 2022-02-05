@@ -12,18 +12,18 @@ def FlashXTest():
     """
     pass
 
-@FlashXTest.command(name='setup')
+@FlashXTest.command(name='init')
 @click.option('--source', '-z', default=None, help='Flash-X source directory')
 @click.option('--site', '-s', default=None, help='Flash-X site name')
-def setup(source,site):
+def init(source,site):
     """
-    Setup test configuration
+    Initialize test configuration
     """
     # Arguments
     # ---------
     # source: Flash-X source directory
     # site: Flash-X site name
-    api.FlashXTest.setup(flashSite=site,pathToFlash=source)
+    api.init(flashSite=site,pathToFlash=source)
 
 @FlashXTest.command(name='run')
 @click.option('--name', '-n', required=True, help='Name of test')
@@ -40,4 +40,4 @@ def run(name,site,outdir,testlist):
     # site      : FlashX site name
     # outdir    : Output directory
     # testlist  : Tests to run from tests.xml file
-    api.FlashXTest.run({name:testlist},flashSite=site,pathToOutdir=outdir)
+    api.run({name:testlist},flashSite=site,pathToOutdir=outdir)

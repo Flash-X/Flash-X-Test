@@ -1,2 +1,2 @@
-from . import lib
-from . import scripts
+from .lib import flashTestParser
+from .lib import archive

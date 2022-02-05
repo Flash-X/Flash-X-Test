@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from FlashXTest.api import FlashXTest
+import FlashXTest.api as FlashXTest
 
 if __name__ == '__main__':
     """
