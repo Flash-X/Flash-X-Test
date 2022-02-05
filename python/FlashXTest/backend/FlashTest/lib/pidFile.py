@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 
-import os, errno, os.path
+import os, errno, os.path, sys
 from fcntl import LOCK_UN, LOCK_EX,LOCK_NB, flock 
+
+sys.path.insert(0,os.path.dirname(os.path.abspath(__file__)))
 
 MAXPIDBYTE=8
 MAXPID=65536

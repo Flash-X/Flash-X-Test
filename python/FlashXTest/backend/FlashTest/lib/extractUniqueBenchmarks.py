@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
 import sys, os, re
+
+sys.path.insert(0,os.path.dirname(os.path.abspath(__file__)))
+
 import xmlNode
 
 datePat = re.compile("\d\d\d\d-\d\d-\d\d(?:_\d+)?")

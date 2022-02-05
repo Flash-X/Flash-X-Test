@@ -26,7 +26,7 @@ def init(**apiDict):
 
     # Setup configuration if pathToConfig does not exist
     else:
-        lib.setConfig(apiDict)
+        lib.init.setConfig(apiDict)
 
 def run(testDict,**apiDict):
     """
@@ -58,12 +58,12 @@ def run(testDict,**apiDict):
     # the user Config file and set values that
     # were not provided in apiDict and override values
     # that were
-    mainDict = lib.getMainDict(apiDict)
+    mainDict = lib.init.getMainDict(apiDict)
 
     # Build sfocu for performing checks with baseline data
     # for Composite and Comparison tests
-    lib.buildSFOCU(mainDict)
+    lib.run.buildSFOCU(mainDict)
 
     for testName,testList in testDict.items():
         # Run flashTest - actually call the backend flashTest.py here
-        lib.flashTest(mainDict,testName,testList)
+        lib.run.flashTest(mainDict,testName,testList)

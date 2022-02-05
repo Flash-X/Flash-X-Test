@@ -2,6 +2,9 @@ import io
 import os, re, subprocess, time, datetime, sys
 import secondsToHuman
 import shutil
+
+sys.path.insert(0,os.path.dirname(os.path.abspath(__file__)))
+
 from getProcessResults import getProcessResults
 from strategyTemplates import *
 from xmlNode import *

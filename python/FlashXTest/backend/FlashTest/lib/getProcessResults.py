@@ -1,6 +1,8 @@
 
 import sys, os, time, signal, locale
 
+sys.path.insert(0,os.path.dirname(os.path.abspath(__file__)))
+
 CHUNKSIZE = 100               # number of bytes to read (default, for usePty)
 
 def getProcessResults(cmd, timeout=None, usePty=False):

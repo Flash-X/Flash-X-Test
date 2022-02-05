@@ -1,4 +1,6 @@
-import os, re
+import os, re, sys
+
+sys.path.insert(0,os.path.dirname(os.path.abspath(__file__)))
 
 class ParseError(Exception):
   pass

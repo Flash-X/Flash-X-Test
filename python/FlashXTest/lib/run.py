@@ -1,6 +1,6 @@
 """FlashXTest library to interface with backend.FlashTest"""
 
-import os,subprocess
+import os, sys, subprocess
 
 from .. import backend
 
@@ -40,9 +40,6 @@ def flashTest(mainDict,testName,testList):
                                                       optString,
                                                       " ".join(testList)), shell=True)
 
-    # Clean up 'testDir/.fxt' directory
-    #subprocess.run('rm {0} {1}'.format(mainDict['pathToInfo'],mainDict['pathToConfig']),shell=True)
-
     # Reassign value after running flashTest
     mainDict['pathToOutdir'] = pathToOutdir
 
@@ -65,12 +62,21 @@ def buildSFOCU(mainDict):
     ----------
     mainDict: Dictionary from Config file
     """
+    # Cache value of current directory
+    workingDir = os.getenv('PWD')
+
     # Build brand new version of sfocu
     # cd into sfocu directory and compile a new 
     # version
     os.chdir('{0}/tools/sfocu'.format(mainDict['pathToFlash']))
     subprocess.run('make SITE={0} NO_NCDF=True sfocu clean'.format(mainDict['flashSite']),shell=True)
     subprocess.run('make SITE={0} NO_NCDF=True sfocu'.format(mainDict['flashSite']),shell=True)
+
+    # Append SFOCU path to sys.path
+    sys.path.append(os.getenv('PWD'))
+
+    # cd back into workingDir
+    os.chdir(workingDir)    
 
 def __getOptString(mainDict):
     """
@@ -90,8 +96,6 @@ def __getOptString(mainDict):
     for option in optDict:
         if option in mainDict:
             optString = optString + '{0} {1} '.format(optDict[option],mainDict[option])
-
-    print(optString)
 
     return optString
 

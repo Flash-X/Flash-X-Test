@@ -1,6 +1,9 @@
 import re
 import six
-import sys
+import sys, os
+
+sys.path.insert(0,os.path.dirname(os.path.abspath(__file__)))
+
 class LayeredDict:
   """
   Object that contains a list of dictionaries, 'dicts', and implements

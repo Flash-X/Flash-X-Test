@@ -10,4 +10,4 @@
 
 - Use `./setup publish` to publish the pacakage to PyPi
 
-- You are good to go. Now you can simply type FlashXTest on your command line and it will be availabe, or you can import the API using `from FlashXTest.api import FlashXTest`
+- You are good to go. Now you can simply type FlashXTest on your command line and it will be availabe, or you can import the API using `import FlashXTest.api as FlashXTest`

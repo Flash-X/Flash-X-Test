@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 import sys, re, os, shutil
 
+sys.path.insert(0,os.path.dirname(os.path.abspath(__file__)))
+
 # regular expressions for dirs we won't descend into
 # to search for logfiles
 avoidPatterns = ["\.svn", "2005-09-*", "2005-10-*", "2005-11-*"]

@@ -2,7 +2,9 @@ import tempfile
 import subprocess
 import time
 import uuid
-import os
+import os,sys
+
+sys.path.insert(0,os.path.dirname(os.path.abspath(__file__)))
 
 def _run(args, input=None):
   p = subprocess.Popen(args, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
