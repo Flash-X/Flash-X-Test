@@ -36,7 +36,7 @@ def flashTest(testDict,mainDict):
     # TODO: Add checks to read logs and report error for each test
     # that failed
     if testProcess.returncode != 0:
-        print('FlashTest returned exit status {0}'.format(exit_status))
+        print('FlashTest returned exit status {0}'.format(testProcess.returncode))
         print('---------------------------------------------------------')
         raise ValueError
 
