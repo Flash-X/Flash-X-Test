@@ -532,7 +532,7 @@ def main():
     masterDict["pathToSiteDir"] = pathToSiteDir
     masterDict["siteDir"] = siteDir
 
-    # TODO: Find and elegant way to do this
+    # TODO: Find an elegant way to do this
     # This is a hacky way to change 'flashSite' dir
     # through command line options and make it conistent
     # with 'siteDir'. 

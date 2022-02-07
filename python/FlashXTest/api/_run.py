@@ -3,32 +3,7 @@
 import os
 from .. import lib
 
-def init(**apiDict):
-    """
-    Initialize test configuration
-
-    Arguments
-    ---------
-    apiDict : Dictionary to populate Config file
-    """
-    # Cache the value to current directory and set it as 
-    # testDir in apiDict
-    apiDict['testDir'] = os.getenv('PWD')
-
-    # Cache the value of user Config file and store it as
-    # pathToConfig in apiDict
-    apiDict['pathToConfig'] =  apiDict['testDir']+'/Config'
-
-    # Check if pathToConfig already exists and
-    # skip the setup process
-    if os.path.exists(apiDict['pathToConfig']):
-       print('Skipping initialization: Config file already exists!')
-
-    # Setup configuration if pathToConfig does not exist
-    else:
-        lib.init.setConfig(apiDict)
-
-def run(testDict,**apiDict):
+def run(testDict,shallow=False,**apiDict):
     """
     Run a list of tests from xml file 
 
@@ -39,11 +14,13 @@ def run(testDict,**apiDict):
                  testName : Name of the test xml file
                  testList : Tests to run from xml file
 
+    shallow  : Flag (True/False) 
+
     apiDict  : Dictionary to override values from Config file
     """
     # Cache the value to current directory and set it as 
     # testDir in apiDict
-    apiDict['testDir'] = os.getenv('PWD')
+    apiDict['testDir'] = os.getcwd()
 
     # Cache the value of user Config file and store it as
     # pathToConfig in apiDict
@@ -60,10 +37,32 @@ def run(testDict,**apiDict):
     # that were
     mainDict = lib.init.getMainDict(apiDict)
 
+    # Build a 'test.info' file from all
+    # testName.xml files in testDict, and 
+    # Set pathToInfo in mainDict 
+    lib.init.setPathToInfo(testDict,mainDict)
+
+    # Run shallow or deep based on flag
+    if shallow:
+        __shallowRun(testDict,mainDict)
+    else:
+        __deepRun(testDict,mainDict)
+
+def __shallowRun(testDict,mainDict):
+    """
+    testDict: Test dictionary
+    mainDict: Main dictionary
+    """
+    pass
+
+def __deepRun(testDict,mainDict):
+    """
+    testDict: Test dictionary
+    mainDict: Main dictonary
+    """
     # Build sfocu for performing checks with baseline data
     # for Composite and Comparison tests
     lib.run.buildSFOCU(mainDict)
 
-    for testName,testList in testDict.items():
-        # Run flashTest - actually call the backend flashTest.py here
-        lib.run.flashTest(mainDict,testName,testList)
+    # Run flashTest - actually call the backend flashTest.py here
+    lib.run.flashTest(testDict,mainDict)

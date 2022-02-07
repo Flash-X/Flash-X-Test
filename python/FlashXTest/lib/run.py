@@ -4,33 +4,25 @@ import os, sys, subprocess
 
 from .. import backend
 
-def flashTest(mainDict,testName,testList):
+def flashTest(testDict,mainDict):
     """
     Run flashTest.py from backend/FlashTest
 
     Arguments:
     ----------
     Arguments:
+    testDict  : Test dictionary
     mainDict  : Main dictionary
-    testName  : Name of test
-    testList  : List of tests
     """
-    # Cache value of output directory before running
-    # individual tests
-    pathToOutdir = mainDict['pathToOutdir']
-
-    # Set pathToOutdir for individual test
-    mainDict['pathToOutdir'] = pathToOutdir+'/'+str(testName)
-
     # Create output directory for TestResults
     # if it does not exist
     subprocess.run('mkdir -pv {0}'.format(mainDict['pathToOutdir']),shell=True)
 
-    # Get pathToInfo for the specific test
-    #
-    __setPathToInfo(mainDict,testName)
-
     optString = __getOptString(mainDict)
+
+    # Generate a list of tests from testDict
+    testList = []
+    [testList.extend(value) for key,value in testDict.items()]
 
     # run backend/FlashTest/flashTest.py with desired configuration
     #
@@ -39,9 +31,6 @@ def flashTest(mainDict,testName,testList):
                                           {2}'.format(os.path.dirname(backend.__file__),
                                                       optString,
                                                       " ".join(testList)), shell=True)
-
-    # Reassign value after running flashTest
-    mainDict['pathToOutdir'] = pathToOutdir
 
     # Handle errors
     # TODO: Add checks to read logs and report error for each test
@@ -72,8 +61,8 @@ def buildSFOCU(mainDict):
     subprocess.run('make SITE={0} NO_NCDF=True sfocu clean'.format(mainDict['flashSite']),shell=True)
     subprocess.run('make SITE={0} NO_NCDF=True sfocu'.format(mainDict['flashSite']),shell=True)
 
-    # Append SFOCU path to sys.path
-    sys.path.append(os.getenv('PWD'))
+    # Append SFOCU path to PATH
+    os.environ['PATH'] += os.path.pathsep + os.getcwd()
 
     # cd back into workingDir
     os.chdir(workingDir)    
@@ -98,39 +87,3 @@ def __getOptString(mainDict):
             optString = optString + '{0} {1} '.format(optDict[option],mainDict[option])
 
     return optString
-
-def __setPathToInfo(mainDict,testName):
-    """
-    Get test info site
-
-    Arguments:
-    -----------
-    testDir   : Test directory
-    testName  : Name of test
-    flashSite : Flash-X site
-
-    Return:
-    -------
-    testSiteInfo : Site xml file
-    """
-    # Create testDir/.fxt if it does not exists
-    # TODO: This is probably not needed since 'testDir/.fxt' is already
-    #       during __getMainDict 
-    subprocess.run('mkdir -pv {0}'.format(str(mainDict['testDir'])+'/.fxt'),shell=True)
-
-    # Set variables for testInfo and testSiteInfo
-    testInfo = str(mainDict['testDir'])+'/{0}.xml'.format(testName)
-    testSiteInfo = str(mainDict['testDir'])+'/.fxt'+'/test.info'.format(testName)
-
-    # Build testSiteInfo from testInfo 
-    # This done to 'trick' backend/FlashTest/flashTest.py
-    # TODO: Find an elegant way to do this
-    with open('{0}'.format(testSiteInfo), 'w') as testFile:
-        testFile.write('<{0}>\n'.format(mainDict['flashSite']))
-
-    os.system('cat {0} >> {1}'.format(testInfo,testSiteInfo))
-
-    with open('{0}'.format(testSiteInfo), 'a') as testFile:
-        testFile.write('</{0}>\n'.format(mainDict['flashSite']))
-
-    mainDict['pathToInfo'] = testSiteInfo

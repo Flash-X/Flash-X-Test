@@ -29,8 +29,9 @@ def init(source,site):
 @click.option('--name', '-n', required=True, help='Name of test')
 @click.option('--site', '-s', default=None, help='Flash-X site name')
 @click.option('--outdir', '-o', default=None, help='Output directory')
+@click.option('--shallow', is_flag=True, help='Option for shallow run')
 @click.argument('testlist', nargs=-1, required=True)
-def run(name,site,outdir,testlist):
+def run(name,site,outdir,shallow,testlist):
     """
     Run a list of tests from xml file
     """
@@ -39,5 +40,13 @@ def run(name,site,outdir,testlist):
     # name      : Name of the test sub-directory
     # site      : FlashX site name
     # outdir    : Output directory
+    # shallow   : Option for shallow run
     # testlist  : Tests to run from tests.xml file
-    api.run({name:testlist},flashSite=site,pathToOutdir=outdir)
+    api.run({name:testlist},shallow=shallow,flashSite=site,pathToOutdir=outdir)
+
+@FlashXTest.command(name='view')
+def view():
+    """
+    Launch webviewer
+    """
+    pass 
