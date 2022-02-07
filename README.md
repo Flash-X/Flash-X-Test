@@ -1,9 +1,9 @@
 ## Flash-X-Test 
 
-### python
+### Python
 
 Python package to install testing tools on your system
 
-### tests
+### Tests
 
 Example folder to organize tests
