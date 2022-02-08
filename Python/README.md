@@ -4,9 +4,9 @@
 
 - Use `./setup develop` for development mode
 
-- Use `./setup develop` and `./setup install` to install package on your system
+- Or use `./setup develop` and `./setup install` to install package on your system
 
-- Use `pip3 install FlashXTest` to install from PyPi
+- Or use `pip3 install FlashXTest` to install from PyPi
 
 - Use `./setup publish` to publish the pacakage to PyPi
 
