@@ -4,14 +4,14 @@ import os, sys, subprocess
 
 from .. import backend
 
-def flashTest(testDict,mainDict):
+def flashTest(jobList,mainDict):
     """
     Run flashTest.py from backend/FlashTest
 
     Arguments:
     ----------
     Arguments:
-    testDict  : Test dictionary
+    jobList   : List of jobs
     mainDict  : Main dictionary
     """
     # Create output directory for TestResults
@@ -22,7 +22,9 @@ def flashTest(testDict,mainDict):
 
     # Generate a list of tests from testDict
     testList = []
-    [testList.extend(value) for key,value in testDict.items()]
+
+    for jobInfo in jobList:
+        testList.extend(backend.lib.flashTestParser.fileToList(jobInfo))
 
     # run backend/FlashTest/flashTest.py with desired configuration
     #
