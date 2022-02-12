@@ -11,8 +11,6 @@ runs:
   steps:
     - run: maple container pour --image=${{inputs.image}} 
       shell: bash
-    - run: maple container execute 'mkdir -p $HOME/.local/bin && export PATH="PATH:$HOME/.local/bin"'
-      shell: bash
     - run: maple container execute 'cd Python && ./setup develop && ./setup install && ./setup clean'
       shell: bash
     - run: maple container commit --image=${{inputs.image}}
