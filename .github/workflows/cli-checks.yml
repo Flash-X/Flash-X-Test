@@ -28,7 +28,6 @@ jobs:
           maple container pour --image=flash_x_test
           maple container execute "cd Tests && ~/.local/bin/FlashXTest init"
           maple container rinse
-          maple image delete flashx
 
   init-parameters:
     name: "init-parameters"
@@ -47,4 +46,3 @@ jobs:
           maple container pour --image=flash_x_test
           maple container execute "cd Tests && ~/.local/bin/FlashXTest init -z $PWD -s None"
           maple container rinse
-          maple image delete flashx
