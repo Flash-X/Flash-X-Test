@@ -1,0 +1,19 @@
+# Name of the composite action
+name: install
+
+inputs:
+  image: 
+    description: 'Input image for FlashXTest'
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - run: maple container pour --image=${{inputs.image}} 
+      shell: bash
+    - run: maple container execute 'cd Python && ./setup develop && ./setup install && ./setup clean'
+      shell: bash
+    - run: maple container commit --image=${{inputs.image}}
+      shell: bash
+    - run: maple container rinse
+      shell: bash

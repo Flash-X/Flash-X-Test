@@ -1,0 +1,50 @@
+name: CLI-Checks
+
+on:
+  pull_request:
+    branches: 
+      - main
+    paths-ignore:
+      - '**.md'
+      - 'LICENSE'
+      - 'CITATION'
+
+jobs:
+
+  init-default:
+    name: "init-default"
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2      
+    - uses: akashdhruv/Maple/.github/actions/maple@main
+    - name: Build Container
+      run: |
+          maple image build flash_x_test
+    - uses: ./.github/actions/install
+      with:
+        image: flash_x_test
+    - name: Run FlashXTest checks
+      run: |
+          maple container pour --image=flash_x_test
+          maple container execute "cd Tests && ~/.local/bin/FlashXTest init"
+          maple container rinse
+          maple image delete flashx
+
+  init-parameters:
+    name: "init-parameters"
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2      
+    - uses: akashdhruv/Maple/.github/actions/maple@main
+    - name: Build Container
+      run: |
+          maple image build flash_x_test
+    - uses: ./.github/actions/install
+      with:
+        image: flash_x_test
+    - name: Run FlashXTest checks
+      run: |
+          maple container pour --image=flash_x_test
+          maple container execute "cd Tests && ~/.local/bin/FlashXTest init -z $PWD -s None"
+          maple container rinse
+          maple image delete flashx
