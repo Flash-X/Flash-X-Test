@@ -1,0 +1,25 @@
+# Maplefile for FlashXTest
+
+# Name of the base image which will
+# be used to build the local image 
+base='ubuntu'
+
+# Name of the local image that will be
+# used to pour the container and add layers
+image='flash_x_test'
+
+# Commands for building local image and 
+# installing dependencies 
+build=[]
+
+# Name of the local container that will be used
+# to run/modify the image
+# Note: 'container' is a writable instance of an 'image'
+container='flash_x_test'
+
+# Commands to execute inside the container and update the
+# image
+publish=[]
+
+# Backend for service docker/singularity
+backend='docker'
