@@ -1,0 +1,13 @@
+#!/bin/bash
+
+#SBATCH --ntasks=8
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=8
+#SBATCH --partition=sedona
+##SBATCH --begin=00:18
+
+cd $SLURM_SUBMIT_DIR
+
+module restore flashx
+
+FlashXTest run 

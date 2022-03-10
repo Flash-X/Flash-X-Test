@@ -1,6 +1,6 @@
 include README.md
 include LICENSE
-include FlashXTest/backend/FlashTest/*
-include FlashXTest/backend/FlashTest/lib/*
-include FlashXTest/backend/FlashTest/scripts/*
-include FlashXTest/backend/FlashTest/scripts/restarttest/*
+include flashtest/backend/FlashTest/*
+include flashtest/backend/FlashTest/lib/*
+include flashtest/backend/FlashTest/scripts/*
+include flashtest/backend/FlashTest/scripts/restarttest/*

@@ -1,8 +1,0 @@
-UnitTest/Grid/AMR/AMReX/2d/Init
-UnitTest/Grid/AMR/AMReX/2d/Refine
-UnitTest/Grid/AMR/AMReX/2d/FluxCorrection
-UnitTest/Grid/AMR/AMReX/2d/FluxCorrection2
-UnitTest/Grid/AMR/AMReX/2d/TestCyl
-UnitTest/GridAnomalousRefine/2d/Paramesh
-UnitTest/GridAnomalousRefine/2d/AMReX
-UnitTest/Multigrid/AMReX/3d
