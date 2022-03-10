@@ -1,0 +1,10 @@
+#!/bin/bash
+
+#SBATCH --ntasks=8
+#SBATCH --nodes=1
+
+cd $SLURM_SUBMIT_DIR
+
+module restore flashx
+
+flashtest run 

@@ -3,28 +3,33 @@
 import os
 from .. import lib
 
-def run(jobList,shallow=False,**apiDict):
+
+def run(jobList=None, shallow=False, **apiDict):
     """
-    Run a list of tests from xml file 
+    Run a list of tests from xml file
 
     Arguments
     ---------
     jobList  : List of jobs files
-    shallow  : Flag (True/False) 
+    shallow  : Flag (True/False)
     apiDict  : Dictionary to override values from Config file
     """
-    # Cache the value to current directory and set it as 
+    # Cache the value to current directory and set it as
     # testDir in apiDict
-    apiDict['testDir'] = os.getcwd()
+    apiDict["testDir"] = os.getcwd()
 
     # Cache the value of user Config file and store it as
     # pathToConfig in apiDict
-    apiDict['pathToConfig'] =  apiDict['testDir']+'/Config'
+    apiDict["pathToConfig"] = apiDict["testDir"] + "/config"
+
+    # Check jobList
+    if not jobList:
+        jobList = [apiDict["testDir"] + "/jobFile"]
 
     # Environment variable for OpenMP
     # Set the default value. Each test
     # can override this from xml file
-    os.environ['OMP_NUM_THREADS'] = str(1)
+    os.environ["OMP_NUM_THREADS"] = str(1)
 
     # Get mainDict for performing tests. This will read
     # the user Config file and set values that
@@ -33,23 +38,25 @@ def run(jobList,shallow=False,**apiDict):
     mainDict = lib.init.getMainDict(apiDict)
 
     # Build a 'test.info' file from all
-    # testName.xml files in jobList, and 
-    # Set pathToInfo in mainDict 
+    # testName.xml files in jobList, and
+    # Set pathToInfo in mainDict
     lib.init.setInfo(mainDict)
 
     # Run shallow or deep based on flag
     if shallow:
-        __shallowRun(jobList,mainDict)
+        __shallowRun(jobList, mainDict)
     else:
-        __deepRun(jobList,mainDict)
+        __deepRun(jobList, mainDict)
 
-def __shallowRun(jobList,mainDict):
+
+def __shallowRun(jobList, mainDict):
     """
     mainDict: Main dictionary
     """
     pass
 
-def __deepRun(jobList,mainDict):
+
+def __deepRun(jobList, mainDict):
     """
     mainDict: Main dictonary
     """
@@ -58,4 +65,4 @@ def __deepRun(jobList,mainDict):
     lib.run.buildSFOCU(mainDict)
 
     # Run flashTest - actually call the backend flashTest.py here
-    lib.run.flashTest(jobList,mainDict)
+    lib.run.flashTest(jobList, mainDict)
