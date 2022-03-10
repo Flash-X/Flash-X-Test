@@ -1,11 +1,12 @@
 Testing framework
 =================
 
--  Install pip package for testing ``pip3 install FlashXTest``
--  Create a ‘Config’ file using
-   ``FlashXTest init -z <pathToFlash> -s <flashSite>``
--  Test information is supplied in ‘TestsMain.xml’
--  Add user tests to ‘TestsUser.xml’
--  Create a job file like ‘Grid’, ‘incompFlow’, etc.
--  Run a job file with tests using
-   ``FlashXTest run Grid incompFlow ...`` etc.
+-  Install **FlashTest** package from Python directory
+-  Create a **config** file using
+   ``flashtest init -z <pathToFlash> -s <flashSite>``
+-  Test information is supplied in **testInfo.xml**
+-  Add user tests to **testInfo.xml**
+-  Create a job file. See **jobFile** for example
+-  Run  with tests using
+   ``flashtest run <jobFile1> <jobFile2> <jobFile3>`` or
+   ``flashtest run`` to use default **jobFile**
