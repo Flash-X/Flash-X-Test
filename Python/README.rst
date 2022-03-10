@@ -6,7 +6,7 @@ Installation
 
 -  Use ``./setup develop`` for development mode
 
--  Or use ``./setup develop`` and ``./setup install`` to install package
+-  Or use ``./setup install`` to install package
    on your system
 
 -  You are good to go. Now you can simply type ``flashtest`` on your
