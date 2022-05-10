@@ -1,6 +1,0 @@
-include README.md
-include LICENSE
-include flashtest/backend/FlashTest/*
-include flashtest/backend/FlashTest/lib/*
-include flashtest/backend/FlashTest/scripts/*
-include flashtest/backend/FlashTest/scripts/restarttest/*
