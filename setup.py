@@ -1,4 +1,4 @@
-"""Build and installation script for flashtest."""
+"""Build and installation script for flashxtest."""
 
 # standard libraries
 import re
@@ -8,7 +8,7 @@ from setuptools import setup, find_packages
 with open("README.rst", mode="r") as readme:
     long_description = readme.read()
 
-with open("FlashTest/__meta__.py", mode="r") as source:
+with open("FlashXTest/__meta__.py", mode="r") as source:
     content = source.read().strip()
     metadata = {
         key: re.search(key + r'\s*=\s*[\'"]([^\'"]*)[\'"]', content).group(1)
@@ -27,15 +27,15 @@ setup(
     package_dir={"": "./"},
     package_data={
         "": [
-            "backend/FlashTest/ERROR",
-            "backend/FlashTest/exeScript",
-            "backend/FlashTest/configBase",
-            "backend/FlashTest/configTemplate",
-            "backend/FlashTest/scripts/changeInfoFiles",
-            "backend/FlashTest/scripts/restarttest/restarttest.sh",
+            "backend/FlashXTest/ERROR",
+            "backend/FlashXTest/exeScript",
+            "backend/FlashXTest/configBase",
+            "backend/FlashXTest/configTemplate",
+            "backend/FlashXTest/scripts/changeInfoFiles",
+            "backend/FlashXTest/scripts/restarttest/restarttest.sh",
         ]
     },
-    scripts=["FlashTest/flashtest"],
+    scripts=["FlashXTest/flashxtest"],
     include_package_data=True,
     long_description=long_description,
     classifiers=["Programming Language :: Python :: 3.8"],

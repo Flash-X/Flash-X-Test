@@ -1,4 +1,4 @@
-"""Python CLI for flashtest"""
+"""Python CLI for flashxtest"""
 
 import os
 import pwd
@@ -6,15 +6,15 @@ import click
 from .. import api
 
 
-@click.group(name="flashtest")
-def flashtest():
+@click.group(name="flashxtest")
+def flashxtest():
     """
-    Python CLI to flashtest
+    Python CLI to flashxtest
     """
     pass
 
 
-@flashtest.command(name="init")
+@flashxtest.command(name="init")
 @click.option("--source", "-z", default=None, help="Flash-X source directory")
 @click.option("--site", "-s", default=None, help="Flash-X site name")
 def init(source, site):
@@ -28,7 +28,7 @@ def init(source, site):
     api.init(flashSite=site, pathToFlash=source)
 
 
-@flashtest.command(name="run")
+@flashxtest.command(name="run")
 @click.option('--site', '-s', default=None, help='Flash-X site name')
 @click.option('--outdir', '-o', default=None, help='Output directory')
 @click.option('--shallow', is_flag=True, help='Option for shallow run')
@@ -46,7 +46,7 @@ def run(joblist,site,outdir,shallow):
     api.run(joblist,shallow=shallow,flashSite=site,pathToOutdir=outdir)
 
 
-@flashtest.command(name="view")
+@flashxtest.command(name="view")
 def view():
     """
     Launch webviewer

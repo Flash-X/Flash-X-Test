@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-import FlashTest
+import FlashXTest
 
 if __name__ == "__main__":
-    FlashTest.cli.flashtest()
+    FlashXTest.cli.flashxtest()
