@@ -23,10 +23,10 @@ jobs:
     - uses: ./.github/actions/install
       with:
         image: flash_x_test
-    - name: Run flashtest checks
+    - name: Run flashxtest checks
       run: |
           maple container pour --image=flash_x_test
-          maple container execute "cd Tests && ~/.local/bin/flashtest init"
+          maple container execute "cd Tests && ~/.local/bin/flashxtest init"
           maple container rinse
 
   init-parameters:
@@ -41,8 +41,8 @@ jobs:
     - uses: ./.github/actions/install
       with:
         image: flash_x_test
-    - name: Run flashtest checks
+    - name: Run flashxtest checks
       run: |
           maple container pour --image=flash_x_test
-          maple container execute "cd Tests && ~/.local/bin/flashtest init -z $PWD -s None"
+          maple container execute "cd Tests && ~/.local/bin/flashxtest init -z $PWD -s None"
           maple container rinse
