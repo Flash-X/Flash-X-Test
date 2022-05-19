@@ -1,4 +1,4 @@
-FlashTest
+FlashXTest
 ==========
 
 Installation
@@ -9,9 +9,9 @@ Installation
 -  Or use ``./setup install`` to install package
    on your system
 
--  You are good to go. Now you can simply type ``flashtest`` on your
+-  You are good to go. Now you can simply type ``flashxtest`` on your
    command line and it will be availabe, or you can import the Python API using
-   ``import FlashTest.api as flashtest``
+   ``import FlashXTest.api as flashxtest``
 
 Tests
 -----
@@ -21,4 +21,4 @@ A copy of tests currently run on nightly test suite are located in ``Tests/``
 Examples
 -----
 
-Examples for using FlashTest are locate in ``Examples/``
+Examples for using FlashXTest are locate in ``Examples/``
