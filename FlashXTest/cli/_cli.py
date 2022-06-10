@@ -9,7 +9,7 @@ from .. import api
 @click.group(name="flashxtest")
 def flashxtest():
     """
-    Python CLI to flashxtest
+    Python CLI for Flash-X Testing Utility
     """
     pass
 
