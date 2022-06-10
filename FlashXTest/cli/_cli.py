@@ -45,6 +45,17 @@ def run(joblist,site,outdir,shallow):
     # shallow   : Option for shallow run
     api.run(joblist,shallow=shallow,flashSite=site,pathToOutdir=outdir)
 
+@flashxtest.command(name="add")
+@click.argument('simdir')
+@click.option('--test-key', '-t', default='default', help='Name of the test to add from test.toml')
+def add(simdir, test_key):
+    """
+    Add a test from simulation directory
+    """
+    # Arguments
+    # ---------
+    # simdir   : Relative path to test
+    api.add(simdir, test_key)
 
 @flashxtest.command(name="view")
 def view():
