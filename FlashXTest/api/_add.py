@@ -28,14 +28,19 @@ def add(simDir, testKey, **apiDict):
     # that were
     mainDict = lib.init.getMainDict(apiDict)
 
-    infoDict = lib.manage.parseTest(simDir, testKey, mainDict)
+    infoDict = lib.add.parseTest(simDir, testKey, mainDict)
 
-    testNode = lib.manage.checkTest(infoDict, mainDict)
+    testNode = lib.add.checkTest(infoDict, mainDict)
 
     if testNode:
-        print(
-            f"Test node {infoDict['testNode']} already exists in testInfo.xml. Use flashxtest update instead"
-        )
+        print(f"Test node {infoDict['testNode']} already exists in testInfo.xml")
+        overwrite = input("Overwrite existing test? Y/n ")
+       
+        if overwrite == 'y' or overwrite == 'Y':
+            print("OVERWRITING")
+            lib.add.addTest(infoDict, mainDict, replaceExisting=True)
+        else:
+            print("SKIPPING")
 
     else:
-        lib.manage.addTest(infoDict, mainDict)
+        lib.add.addTest(infoDict, mainDict)

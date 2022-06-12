@@ -20,10 +20,10 @@ def parseTest(simDir, testKey, mainDict):
     # Read the test info from toml file
     infoDict = toml.load(pathToSim + "/" + "test.toml")[testKey]
 
+    # Setup name
     infoDict["setupName"] = simDir
 
     return infoDict
-
 
 def checkTest(infoDict, mainDict):
     """
@@ -35,20 +35,13 @@ def checkTest(infoDict, mainDict):
     # mainNode
     mainNode = backend.xmlNode.parseXml(mainDict["testDir"] + "/" + "testInfo.xml")
 
-    # get node list from test
-    nodeList = infoDict["testNode"].split("/")
-
-    # find test nodes
-    testNode = mainNode.findChild(nodeList[0])
-
-    for node in nodeList[1:]:
-        if testNode:
-            testNode = testNode.findChild(node)
+    # get test node
+    testNode = mainNode.findChild(infoDict["testNode"])
 
     return testNode
 
 
-def addTest(infoDict, mainDict):
+def addTest(infoDict, mainDict, replaceExisting=False):
     """
     Arguments:
     ----------
@@ -74,52 +67,60 @@ def addTest(infoDict, mainDict):
     # get node list from infoDict
     nodeList = infoDict["testNode"].split("/")
 
+    # Remove old test
+    if replaceExisting:
+        for index in range(len(nodeList)-1, 1, -1):
+            oldTest=mainNode.findChild('/'.join(nodeList[:index]))
+            oldTest.remove(True)
+
     for testType in ["UnitTest", "Composite", "Comparison"]:
 
-        allTests = mainNode.findChild(testType)
+        currTests = mainNode.findChild(testType)
 
-        if allTests:
+        if (currTests or nodeList[0] == testType):
             # Create an entry for testType in pathToInfo
             infoFile.write("<{0}>\n".format(testType))
 
-            for line in allTests.getXml()[1:-1]:
+        if currTests:
+            for line in currTests.getXml()[1:-1]:
                 infoFile.write("{0}\n".format(line))
+       
+        if nodeList[0] == testType:
 
-            if nodeList[0] == testType:
+            indent = 2
+            for newNode in nodeList[1:]:
+                infoFile.write(indent * " " + "<{0}>\n".format(newNode))
+                indent = indent + 2
 
-                indent = 2
-                for newNode in nodeList[1:]:
-                    infoFile.write(indent * " " + "<{0}>\n".format(newNode))
-                    indent = indent + 2
+            infoFile.write(
+                indent * " " + "setupName: " + infoDict["setupName"] + "\n"
+            )
+            infoFile.write(
+                indent * " " + "setupOptions: " + infoDict["setupOptions"] + "\n"
+            )
+            infoFile.write(
+                indent * " " + "numProcs: " + str(infoDict["numProcs"]) + "\n"
+            )
+            infoFile.write(
+                indent * " "
+                + "parfiles: <pathToSimulations>"
+                + "/"
+                + infoDict["setupName"]
+                + "/"
+                + infoDict["parFile"]
+                + "\n"
+            )
 
-                infoFile.write(
-                    indent * " " + "setupName: " + infoDict["setupName"] + "\n"
-                )
-                infoFile.write(
-                    indent * " " + "setupOptions: " + infoDict["setupOptions"] + "\n"
-                )
-                infoFile.write(
-                    indent * " " + "numProcs: " + str(infoDict["numProcs"]) + "\n"
-                )
-                infoFile.write(
-                    indent * " "
-                    + "parfiles: <pathToSimulations>"
-                    + "/"
-                    + infoDict["setupName"]
-                    + "/"
-                    + infoDict["parFile"]
-                    + "\n"
-                )
-
+            indent = indent - 2
+            for newNode in reversed(nodeList[1:]):
+                infoFile.write(indent * " " + "</{0}>\n".format(newNode))
                 indent = indent - 2
-                for newNode in reversed(nodeList[1:]):
-                    infoFile.write(indent * " " + "</{0}>\n".format(newNode))
-                    indent = indent - 2
 
+        if (currTests or nodeList[0] == testType):
             # Close the entry for testType in pathToInfo
             infoFile.write("</{0}>\n".format(testType))
-
+    
     subprocess.run(
-        "mv {0} {1}".format(pathToInfo, mainDict["testDir"] + "/testInfo.xml"),
-        shell=True,
-    )
+         "mv {0} {1}".format(pathToInfo, mainDict["testDir"] + "/testInfo.xml"),
+         shell=True,
+     )
