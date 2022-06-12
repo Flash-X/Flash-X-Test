@@ -18,7 +18,7 @@ def parseTest(simDir, testKey, mainDict):
     pathToSim = mainDict["pathToFlash"] + "/source/Simulation/SimulationMain/" + simDir
 
     # Read the test info from toml file
-    infoDict = toml.load(pathToSim + "/" + "test.toml")[testKey]
+    infoDict = toml.load(pathToSim + "/" + "flash.toml")['tests'][testKey]
 
     # Setup name
     infoDict["setupName"] = simDir
