@@ -57,6 +57,17 @@ def add(simdir, test_key):
     # simdir   : Relative path to test
     api.add(simdir, test_key)
 
+@flashxtest.command(name="remove")
+@click.argument('testnode')
+def remove(testnode):
+    """
+    Remove a test from test suite
+    """
+    # Arguments
+    # ---------
+    # simdir   : Relative path to test
+    api.remove(testnode)
+
 @flashxtest.command(name="view")
 def view():
     """
