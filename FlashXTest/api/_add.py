@@ -30,9 +30,9 @@ def add(simDir, testKey, **apiDict):
 
     infoDict = lib.add.parseTest(simDir, testKey, mainDict)
 
-    testNode = lib.add.checkTest(infoDict, mainDict)
+    testExists, nodeExists, queryNode = lib.add.checkTest(infoDict, mainDict)
 
-    if testNode:
+    if testExists:
         print(f"Test node {infoDict['testNode']} already exists in testInfo.xml")
         overwrite = input("Overwrite existing test? Y/n ")
        
@@ -41,6 +41,9 @@ def add(simDir, testKey, **apiDict):
             lib.add.addTest(infoDict, mainDict, replaceExisting=True)
         else:
             print("SKIPPING")
+
+    elif nodeExists:
+        print(f"Parent node {queryNode} already exists in testInfo.xml. Cannot add test")
 
     else:
         lib.add.addTest(infoDict, mainDict)
