@@ -19,6 +19,6 @@ Tests
 A copy of tests currently run on nightly test suite are located in ``Tests/``
 
 Examples
------
+--------
 
 Examples for using FlashXTest are locate in ``Examples/``
