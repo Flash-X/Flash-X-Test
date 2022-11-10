@@ -47,8 +47,8 @@ def run(joblist,site,outdir,shallow):
 
 @flashxtest.command(name="add")
 @click.argument('simdir')
-@click.option('--test-node', '-t', isRequired=True, help='Name of the test to add from test.toml')
-@click.option("--num-procs", '-n', isRequired=True, help="Number of processors")
+@click.option('--test-node', '-t', required=True, help='Name of the test to add from test.toml')
+@click.option("--num-procs", '-n', required=True, help="Number of processors")
 def add(simdir, test_node, num_procs):
     """
     Add a test from simulation directory
