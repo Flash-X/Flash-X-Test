@@ -11,8 +11,8 @@ with open("testsuite", "r") as testSpecFile:
 testSpecList = [testSpec for testSpec in testSpecList if testSpec]
 
 testParser = argparse.ArgumentParser(description='Parser for test specification')
-testParser.add_argument("-t", "--test-node", help='Test node')
-testParser.add_argument("-n", "--num-procs", help='Num procs')
+testParser.add_argument("-t", "--test", help='Test node')
+testParser.add_argument("-n", "--nprocs", help='Num procs')
 
 testSuite = {}
 
