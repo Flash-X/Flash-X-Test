@@ -47,15 +47,16 @@ def run(joblist,site,outdir,shallow):
 
 @flashxtest.command(name="add")
 @click.argument('simdir')
-@click.option('--test-key', '-t', default='default', help='Name of the test to add from test.toml')
-def add(simdir, test_key):
+@click.option('--test-node', '-t', isRequired=True, help='Name of the test to add from test.toml')
+@click.option("--num-procs", '-n', isRequired=True, help="Number of processors")
+def add(simdir, test_node, num_procs):
     """
     Add a test from simulation directory
     """
     # Arguments
     # ---------
     # simdir   : Relative path to test
-    api.add(simdir, test_key)
+    api.add(simdir, test_node, num_procs)
 
 @flashxtest.command(name="remove")
 @click.argument('testnode')
