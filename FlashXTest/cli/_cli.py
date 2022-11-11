@@ -29,49 +29,12 @@ def init(source, site):
 
 
 @flashxtest.command(name="run")
-@click.option('--site', '-s', default=None, help='Flash-X site name')
-@click.option('--outdir', '-o', default=None, help='Output directory')
-@click.option('--shallow', is_flag=True, help='Option for shallow run')
-@click.argument('joblist', nargs=-1)
-def run(joblist,site,outdir,shallow):
+@click.argument('testsuite', type=str)
+def run(testsuite):
     """
     Run a list of tests from xml file
     """
     # Arguments
     # ---------
-    # joblist   : List of jobfiles
-    # site      : FlashX site name
-    # outdir    : Output directory
-    # shallow   : Option for shallow run
-    api.run(joblist,shallow=shallow,flashSite=site,pathToOutdir=outdir)
-
-@flashxtest.command(name="add")
-@click.argument('simdir')
-@click.option('--test-node', '-t', required=True, help='Name of the test to add from test.toml')
-@click.option("--num-procs", '-n', required=True, help="Number of processors")
-def add(simdir, test_node, num_procs):
-    """
-    Add a test from simulation directory
-    """
-    # Arguments
-    # ---------
-    # simdir   : Relative path to test
-    api.add(simdir, test_node, num_procs)
-
-@flashxtest.command(name="remove")
-@click.argument('testnode')
-def remove(testnode):
-    """
-    Remove a test from test suite
-    """
-    # Arguments
-    # ---------
-    # simdir   : Relative path to test
-    api.remove(testnode)
-
-@flashxtest.command(name="view")
-def view():
-    """
-    Launch webviewer
-    """
-    pass
+    # testsuite : string for the test suite file
+    api.run(testSuite=testsuite)

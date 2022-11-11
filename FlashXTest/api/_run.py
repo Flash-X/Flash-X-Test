@@ -4,15 +4,13 @@ import os
 from .. import lib
 
 
-def run(jobList=None, shallow=False, **apiDict):
+def run(testSuite=None):
     """
     Run a list of tests from xml file
 
     Arguments
     ---------
-    jobList  : List of jobs files
-    shallow  : Flag (True/False)
-    apiDict  : Dictionary to override values from Config file
+    testSuite : Name of the testSuite file
     """
     # Cache the value to current directory and set it as
     # testDir in apiDict
@@ -21,10 +19,6 @@ def run(jobList=None, shallow=False, **apiDict):
     # Cache the value of user Config file and store it as
     # pathToConfig in apiDict
     apiDict["pathToConfig"] = apiDict["testDir"] + "/config"
-
-    # Check jobList
-    if not jobList:
-        jobList = [apiDict["testDir"] + "/jobFile"]
 
     # Environment variable for OpenMP
     # Set the default value. Each test
@@ -42,24 +36,9 @@ def run(jobList=None, shallow=False, **apiDict):
     # Set pathToInfo in mainDict
     lib.init.setInfo(mainDict)
 
-    # Run shallow or deep based on flag
-    if shallow:
-        __shallowRun(jobList, mainDict)
-    else:
-        __deepRun(jobList, mainDict)
+ 
+    lib.init.parseTestSuite(apiDict, mainDict)
 
-
-def __shallowRun(jobList, mainDict):
-    """
-    mainDict: Main dictionary
-    """
-    pass
-
-
-def __deepRun(jobList, mainDict):
-    """
-    mainDict: Main dictonary
-    """
     # Build sfocu for performing checks with baseline data
     # for Composite and Comparison tests
     lib.run.buildSFOCU(mainDict)

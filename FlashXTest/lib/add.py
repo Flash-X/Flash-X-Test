@@ -6,22 +6,25 @@ import toml
 from .. import backend
 
 
-def parseTest(simDir, testKey, mainDict):
+def parseTest(simDir, testNode, mainDict):
     """
     Arguments:
     ----------
     simDir    : Simulation directory
-    testKey   : Key for test
+    testNode  : Key for test
     mainDict  : Main dictionary
     """
     # Get path to simulation directory
     pathToSim = mainDict["pathToFlash"] + "/source/Simulation/SimulationMain/" + simDir
 
     # Read the test info from toml file
-    infoDict = toml.load(pathToSim + "/tests/" + "test.toml")[testKey]
+    infoDict = toml.load(pathToSim + "/tests/" + "tests.toml")[testNode]
 
     # Setup name
     infoDict["setupName"] = simDir
+ 
+    # testNode
+    infoDict["testNode"] = testNode
 
     return infoDict
 
