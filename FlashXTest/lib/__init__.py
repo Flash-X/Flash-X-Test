@@ -1,4 +1,3 @@
-from . import init
+from . import setup
 from . import run
 from . import add
-from . import remove

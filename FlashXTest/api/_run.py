@@ -4,7 +4,7 @@ import os
 from .. import lib
 
 
-def run(testSuite=None):
+def run(**apiDict):
     """
     Run a list of tests from xml file
 
@@ -29,19 +29,17 @@ def run(testSuite=None):
     # the user Config file and set values that
     # were not provided in apiDict and override values
     # that were
-    mainDict = lib.init.getMainDict(apiDict)
+    mainDict = lib.setup.getMainDict(apiDict)
 
-    # Build a 'test.info' file from all
-    # testName.xml files in jobList, and
-    # Set pathToInfo in mainDict
-    lib.init.setInfo(mainDict)
+    # Get testSuiteDict from testSuite file
+    suiteDict = lib.setup.getSuiteDict(apiDict)
 
- 
-    lib.init.parseTestSuite(apiDict, mainDict)
+    # Create a test.info file for flashTest backend
+    lib.setup.createTestInfo(mainDict, suiteDict)
 
     # Build sfocu for performing checks with baseline data
     # for Composite and Comparison tests
-    lib.run.buildSFOCU(mainDict)
+    # lib.run.buildSFOCU(mainDict)
 
     # Run flashTest - actually call the backend flashTest.py here
-    lib.run.flashTest(jobList, mainDict)
+    # lib.run.flashTest(jobList, mainDict)

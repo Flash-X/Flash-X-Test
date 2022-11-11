@@ -29,7 +29,7 @@ def init(source, site):
 
 
 @flashxtest.command(name="run")
-@click.argument('testsuite', type=str)
+@click.argument("testsuite", type=str)
 def run(testsuite):
     """
     Run a list of tests from xml file
@@ -37,4 +37,4 @@ def run(testsuite):
     # Arguments
     # ---------
     # testsuite : string for the test suite file
-    api.run(testSuite=testsuite)
+    api.run(pathToSuite=testsuite)

@@ -50,4 +50,4 @@ def __setConfig(apiDict):
 
     # Setup configuration if pathToConfig does not exist
     else:
-        lib.init.setConfig(apiDict)
+        lib.setup.setConfig(apiDict)
