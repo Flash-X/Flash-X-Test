@@ -42,6 +42,7 @@ def getXmlText(suiteDict, testNode):
 
     xmlText.append(f'setupName: {infoDict["setupName"]}')
     xmlText.append(f'setupOptions: {infoDict["setupOptions"]}')
+    xmlText.append(f'numProcs: {infoDict["numProcs"]}')
 
     if "parFiles" in infoDict.keys():
         parfiles = [

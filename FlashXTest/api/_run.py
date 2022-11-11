@@ -39,7 +39,7 @@ def run(**apiDict):
 
     # Build sfocu for performing checks with baseline data
     # for Composite and Comparison tests
-    # lib.run.buildSFOCU(mainDict)
+    lib.run.buildSFOCU(mainDict)
 
     # Run flashTest - actually call the backend flashTest.py here
-    # lib.run.flashTest(jobList, mainDict)
+    lib.run.flashTest(mainDict, suiteDict)

@@ -5,16 +5,17 @@ import os, sys, subprocess
 from .. import backend
 
 
-def flashTest(jobList, mainDict):
+def flashTest(mainDict, suiteDict):
     """
     Run flashTest.py from backend/FlashTest
 
     Arguments:
     ----------
     Arguments:
-    jobList   : List of jobs
     mainDict  : Main dictionary
     """
+    testList = list(suiteDict.keys())
+
     # Create output directory for TestResults if it does not exist
     subprocess.run("mkdir -pv {0}".format(mainDict["pathToOutdir"]), shell=True)
 
@@ -25,12 +26,6 @@ def flashTest(jobList, mainDict):
     subprocess.run("mkdir -pv {0}".format(mainDict["baselineDir"]), shell=True)
 
     optString = __getOptString(mainDict)
-
-    # Generate a list of tests from testDict
-    testList = []
-
-    for jobInfo in jobList:
-        testList.extend(backend.lib.flashTestParser.fileToList(jobInfo))
 
     # run backend/FlashTest/flashTest.py with desired configuration
     #

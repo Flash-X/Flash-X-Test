@@ -20,4 +20,4 @@ incompFlow/RisingBubble --test=UnitTest/RisingBubble/AMReX/2d --nprocs=4
 incompFlow/LidDrivenCavity --test=UnitTest/LidDrivenCavity/AMReX/2d --debug
 
 # Grid UnitTests
-unitTest/Poisson/AMReX --test=UnitTest/Multigrid/AMReX/3d --nprocs=2
+unitTest/Poisson/Amrex --test=UnitTest/Multigrid/AMReX/3d --nprocs=2
