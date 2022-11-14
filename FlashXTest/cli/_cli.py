@@ -9,7 +9,9 @@ from .. import api
 @click.group(name="flashxtest")
 def flashxtest():
     """
-    Python CLI for Flash-X Testing Utility
+    \b
+    Command line interface for managing 
+    Flash-X testing framework
     """
     pass
 
@@ -19,7 +21,9 @@ def flashxtest():
 @click.option("--site", "-s", default=None, help="Flash-X site name")
 def init(source, site):
     """
-    Initialize test configuration
+    \b
+    Initialize site specific configuration.
+    This command create a "config" and "execScript"
     """
     # Arguments
     # ---------
@@ -31,7 +35,8 @@ def init(source, site):
 @flashxtest.group(name="suite")
 def suite():
     """
-    Test suite management
+    \b
+    Testsuite management
     """
     pass
 
@@ -39,6 +44,7 @@ def suite():
 @flashxtest.group(name="archive")
 def archive():
     """
+    \b
     Archive management
     """
     pass
