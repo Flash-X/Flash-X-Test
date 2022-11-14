@@ -3,7 +3,7 @@
 import os, sys, subprocess
 
 from .. import backend
-
+from .. import lib
 
 def flashTest(mainDict, suiteDict):
     """
@@ -42,12 +42,17 @@ def flashTest(mainDict, suiteDict):
     # TODO: Add checks to read logs and report error for each test
     # that failed
     if testProcess.returncode != 0:
-        print("FlashTest returned exit status {0}".format(testProcess.returncode))
-        print("---------------------------------------------------------")
-        raise ValueError
+        print(
+            lib.colors.FAIL
+            + "FlashTest returned exit status {0}".format(testProcess.returncode)
+        )
+        print(
+            lib.colors.FAIL + "---------------------------------------------------------"
+        )
+        raise ValueError(lib.color.Fail + "[FlashXTest] run failed")
 
     else:
-        print("FlashTest reports SUCCESS")
+        print(lib.colors.OKGREEN + "FlashTest reports SUCCESS")
 
 
 def buildSFOCU(mainDict):

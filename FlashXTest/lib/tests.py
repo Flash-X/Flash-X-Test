@@ -4,9 +4,10 @@ import os, sys, subprocess
 import toml
 
 from .. import backend
+from .. import lib
 
 
-def parseTestToml(mainDict, suiteDict, testNode):
+def parseToml(mainDict, suiteDict, testNode):
     """
     Arguments:
     ----------
@@ -23,6 +24,14 @@ def parseTestToml(mainDict, suiteDict, testNode):
 
     # Read the test info from toml file
     infoDict = toml.load(pathToSim + "/tests/" + "tests.toml")[testNode]
+
+    for key in infoDict.keys():
+        if key not in ["setupOptions", "parfiles", "restartParfiles", "transfers"]:
+            raise ValueError(
+                lib.colors.FAIL
+                + f'[FlashXTest] unrecognized key "{key}" for "{testNode}" '
+                + f'in {pathToSim + "/tests/" + "tests.toml"}'
+            )
 
     suiteDict[testNode].update(infoDict)
 
@@ -44,10 +53,10 @@ def getXmlText(suiteDict, testNode):
     xmlText.append(f'setupOptions: {infoDict["setupOptions"]}')
     xmlText.append(f'numProcs: {infoDict["numProcs"]}')
 
-    if "parFiles" in infoDict.keys():
+    if "parfiles" in infoDict.keys():
         parfiles = [
             "<pathToSimulations>" + "/" + infoDict["setupName"] + "/tests/" + parfile
-            for parfile in infoDict["parFiles"]
+            for parfile in infoDict["parfiles"]
         ]
     else:
         parfiles = ["<defaultParfile>"]

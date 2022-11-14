@@ -46,8 +46,11 @@ def __setConfig(apiDict):
     # Check if pathToConfig already exists and
     # skip the setup process
     if os.path.exists(apiDict["pathToConfig"]):
-        print("Skipping initialization: Config file already exists!")
+        print(
+            lib.colors.WARNING
+            + "[FlashXTest] Skipping initialization: Config file already exists!"
+        )
 
     # Setup configuration if pathToConfig does not exist
     else:
-        lib.setup.setConfig(apiDict)
+        lib.files.setConfig(apiDict)

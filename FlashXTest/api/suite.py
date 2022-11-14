@@ -4,9 +4,9 @@ import os
 from .. import lib
 
 
-def run(**apiDict):
+def setup(**apiDict):
     """
-    Run a list of tests from xml file
+    Setup test.info from a list of suites
 
     Arguments
     ---------
@@ -29,14 +29,21 @@ def run(**apiDict):
     # the user Config file and set values that
     # were not provided in apiDict and override values
     # that were
-    mainDict = lib.setup.getMainDict(apiDict)
+    mainDict = lib.dicts.getMainDict(apiDict)
 
     # Get testSuiteDict from testSuite file
-    suiteDict = lib.setup.getSuiteDict(apiDict)
+    suiteDict = lib.dicts.getSuiteDict(apiDict)
 
     # Create a test.info file for flashTest backend
-    lib.setup.createTestInfo(mainDict, suiteDict)
+    lib.files.createTestInfo(mainDict, suiteDict)
 
+    print(lib.colors.OKGREEN + "[FlashXText] test.info is setup")
+
+
+def run():
+    """
+    Run a list of tests from test.info in current working directory
+    """
     # Build sfocu for performing checks with baseline data
     # for Composite and Comparison tests
     lib.run.buildSFOCU(mainDict)

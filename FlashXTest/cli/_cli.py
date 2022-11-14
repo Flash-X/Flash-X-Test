@@ -28,13 +28,17 @@ def init(source, site):
     api.init(flashSite=site, pathToFlash=source)
 
 
-@flashxtest.command(name="run")
-@click.argument("testsuite", type=str)
-def run(testsuite):
+@flashxtest.group(name="suite")
+def suite():
     """
-    Run a list of tests from xml file
+    Test suite management
     """
-    # Arguments
-    # ---------
-    # testsuite : string for the test suite file
-    api.run(pathToSuite=testsuite)
+    pass
+
+
+@flashxtest.group(name="archive")
+def archive():
+    """
+    Archive management
+    """
+    pass
