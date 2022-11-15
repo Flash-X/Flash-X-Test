@@ -29,8 +29,8 @@ def __setExeScript(apiDict):
     ---------
     apiDict: Dictionary to populate Config file
     """
-    # apiDict['pathToExeScript'] = apiDict['testDir']+'/exeScript'
-    pass
+    apiDict["pathToExeScript"] = apiDict["testDir"] + "/exeScript"
+    lib.files.setExe(apiDict)
 
 
 def __setConfig(apiDict):

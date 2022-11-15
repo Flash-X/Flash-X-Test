@@ -7,6 +7,13 @@ import shlex
 from .. import backend
 from .. import lib
 
+def setExe(apiDict):
+    """
+    Arguments
+    ---------
+    apiDict : API dictionary
+    """
+    pass
 
 def setConfig(apiDict):
     """

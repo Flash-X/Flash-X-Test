@@ -1,20 +1,32 @@
 """Python CLI for flashxtest"""
 
 import os
-import pwd
+import subprocess
 import click
+import pkg_resources
+
 from .. import api
 
 
-@click.group(name="flashxtest")
-def flashxtest():
+@click.group(name="flashxtest", invoke_without_command=True)
+@click.pass_context
+@click.option("--version", "-v", is_flag=True)
+def flashxtest(ctx, version):
     """
     \b
     Command line interface for managing
-    Flash-X testing framework
+    Flash-X testing framework. Type --help
+    for individual commands to learn more.
     """
-    pass
+    if ctx.invoked_subcommand is None and not version:
+        subprocess.run(
+            f'export PATH=~/.local/bin:/usr/local/bin:$PATH && flashxtest --help',
+            shell=True,
+            check=True,
+        )
 
+    if version:
+        click.echo(pkg_resources.require("FlashXTest")[0].version)
 
 @flashxtest.command(name="init")
 @click.option("--source", "-z", default=None, help="Flash-X source directory")
@@ -23,7 +35,19 @@ def init(source, site):
     """
     \b
     Initialize site specific configuration.
-    This command create a "config" and "execScript"
+
+    \b
+    This command is used to setup site specific
+    configuration for your testing environment
+    using "config" and "execScript" files. At
+    present only "config" file is created since
+    this feature is under development.
+
+    \b
+    This command will not work if "config" file
+    is present in the working directory. To edit
+    existing site specific configuration, "config"
+    should be edited directly.
     """
     # Arguments
     # ---------
@@ -38,9 +62,30 @@ def setup_suite(suitelist):
     """
     \b
     Create a "test.info" from a list of suite files.
-    If no arguments are supplied
-    all "*.suite" files are used from the working
-    directory
+
+    \b
+    This command accepts multiple files with suffix,
+    ".suite" to build a "test.info". If no arguments are 
+    supplied, all "*.suite" files are used from the working
+    directory.
+
+    \b
+    The ".suite" files represent a collection of tests 
+    specification associated with a "config" file. Each
+    line in the file represents a test specific defined as,
+
+    \b
+    incompFlow/LidDrivenCavity --test="UnitTest/LidDrivenCavity/AMReX/2d" --nprocs=4 --debug
+
+    \b
+    The first value represents a Flash-X setup defined in 
+    source/Simulation/SimulationMain directory with following 
+    options,
+
+    \b
+    -------------------------------------------------------
+    test - test node defined in setup_name/tests/tests.yaml)
+    nprocs - number of procs
     """
     api.setup_suite(pathToSuites=suitelist)
 
@@ -49,7 +94,10 @@ def setup_suite(suitelist):
 def run():
     """
     \b
-    Run the test suite using "test.info" from
+    Run the test suite using "test.info".
+
+    \b
+    from
     the working directory
     """
     # Arguments
