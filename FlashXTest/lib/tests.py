@@ -76,6 +76,9 @@ def getXmlText(suiteDict, testNode):
         ]
         infoDict["parfiles"] = " ".join(parFileList)
 
+    if infoDict["debug"]:
+        infoDict["setupOptions"] = infoDict["setupOptions"] + " -debug"
+
     for xmlKey in [
         "setupName",
         "setupOptions",
