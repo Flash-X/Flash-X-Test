@@ -5,7 +5,8 @@ import os, sys, subprocess
 from .. import backend
 from .. import lib
 
-def flashTest(mainDict, suiteDict):
+
+def flashTest(mainDict, testList):
     """
     Run flashTest.py from backend/FlashTest
 
@@ -14,7 +15,10 @@ def flashTest(mainDict, suiteDict):
     Arguments:
     mainDict  : Main dictionary
     """
-    testList = list(suiteDict.keys())
+    # remove site from testList
+    testList = [test.replace(f'{mainDict["flashSite"]}/', "") for test in testList]
+
+    print(testList)
 
     # Create output directory for TestResults if it does not exist
     subprocess.run("mkdir -pv {0}".format(mainDict["pathToOutdir"]), shell=True)
@@ -47,9 +51,10 @@ def flashTest(mainDict, suiteDict):
             + "FlashTest returned exit status {0}".format(testProcess.returncode)
         )
         print(
-            lib.colors.FAIL + "---------------------------------------------------------"
+            lib.colors.FAIL
+            + "---------------------------------------------------------"
         )
-        raise ValueError(lib.color.Fail + "[FlashXTest] run failed")
+        raise ValueError(lib.colors.FAIL + "[FlashXTest] run failed")
 
     else:
         print(lib.colors.OKGREEN + "FlashTest reports SUCCESS")

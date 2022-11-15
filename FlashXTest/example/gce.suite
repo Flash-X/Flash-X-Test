@@ -1,0 +1,249 @@
+# Test suite file for test gce
+# comments start with "#"
+
+# incompFlow/LidDrivenCavity
+incompFlow/LidDrivenCavity --test=UnitTest/LidDrivenCavity/AMReX/2d --nprocs=4
+
+# unitTest/Grid/Milhoja/TestFluxes
+unitTest/Grid/Milhoja/TestFluxes --test=UnitTest/Grid/AMR/Milhoja/1D/TestFluxes --nprocs=1
+unitTest/Grid/Milhoja/TestFluxes --test=UnitTest/Grid/AMR/Milhoja/2D/TestFluxes --nprocs=1
+unitTest/Grid/Milhoja/TestFluxes --test=UnitTest/Grid/AMR/Milhoja/3D/TestFluxes --nprocs=1
+
+# DustCollapse
+DustCollapse --test=Composite/DustCollapse/AMR/newMpole/1dSph/pm4dev --nprocs=2
+DustCollapse --test=Composite/DustCollapse/AMR/newMpole/2dCyl/pm4dev --nprocs=4
+DustCollapse --test=Composite/DustCollapse/AMR/newMpole/2dCyl/pm4AltMorton --nprocs=4
+DustCollapse --test=Composite/DustCollapse/AMR/newMpole/2dCyl/pm4AltMortonBittree --nprocs=4
+DustCollapse --test=Composite/DustCollapse/AMR/newMpole/3d/pm4dev --nprocs=8
+DustCollapse --test=Composite/DustCollapse/AMR/newMpole/3d/AMReX --nprocs=4
+DustCollapse --test=Composite/DustCollapse/PseudoUG/newMpole/3d/pm4dev --nprocs=8
+DustCollapse --test=Comparison/DustCollapse/AMR/newMpole/1dSph/pm4dev --nprocs=2
+DustCollapse --test=Comparison/DustCollapse/AMR/newMpole/1dSph/AMReX --nprocs=2
+DustCollapse --test=Comparison/DustCollapse/AMR/newMpole/1dSph/spark --nprocs=2
+DustCollapse --test=Comparison/DustCollapse/AMR/newMpole/2dCyl/pm4dev --nprocs=4
+DustCollapse --test=Comparison/DustCollapse/AMR/newMpole/2dCyl/pm4AltMorton --nprocs=4
+DustCollapse --test=Comparison/DustCollapse/AMR/newMpole/2dCyl/pm4Bittree --nprocs=4
+DustCollapse --test=Comparison/DustCollapse/AMR/newMpole/2dCyl/pm4AltMortonBittree --nprocs=4
+DustCollapse --test=Comparison/DustCollapse/AMR/newMpole/2dCyl/AMReX --nprocs=4
+DustCollapse --test=Comparison/DustCollapse/AMR/newMpole/3d/pm4dev --nprocs=4
+DustCollapse --test=Comparison/DustCollapse/AMR/newMpole/3d/AMReX --nprocs=8
+DustCollapse --test=Comparison/DustCollapse/PseudoUG/newMpole/3d/pm4dev --nprocs=8
+DustCollapse --test=Comparison/DustCollapse/PseudoUG/newMpole/3d/AMReX --nprocs=8
+
+# SNIa_DoubleDetonation
+SNIa_DoubleDetonation --test=Composite/SNIaShellDet/AMR/2d/Paramesh --nprocs=8
+SNIa_DoubleDetonation --test=Composite/SNIaDDT/AMR/2d/Paramesh --nprocs=8
+SNIa_DoubleDetonation --test=Composite/SNIaDDT/AMR/2d/pm4AltMortonBittree --nprocs=8
+SNIa_DoubleDetonation --test=Composite/SNIaDDT/AMR/2d/spark --nprocs=8
+SNIa_DoubleDetonation --test=Comparison/SNIaDDT/AMR/2d/Paramesh --nprocs=8
+SNIa_DoubleDetonation --test=Comparison/SNIaDDT/AMR/2d/pm4AltMortonBittree --nprocs=8
+SNIa_DoubleDetonation --test=Comparison/SNIaDDT/AMR/2d/spark --nprocs=8
+SNIa_DoubleDetonation --test=Comparison/SNIaShellDet/AMR/2d/Paramesh --nprocs=8
+
+# unitTest/Grid/Amrex/TestFluxCorrection2
+unitTest/Grid/Amrex/TestFluxCorrection2 --test=UnitTest/Grid/AMR/AMReX/2d/FluxCorrection2 --nprocs=1
+
+# unitTest/Poisson/Amrex
+unitTest/Poisson/Amrex --test=UnitTest/Multigrid/AMReX/3d --nprocs=1
+
+# StreamingDopplerShift
+StreamingDopplerShift --test=Composite/DopplerShift_MI_16E_OrderV_1D --nprocs=4
+
+# Sedov
+Sedov --test=Composite/Sedov/PseudoUG/2d/AMReX/simpleUnsplit --nprocs=4
+Sedov --test=Composite/Sedov/PseudoUG/2d/AMReX/unsplit --nprocs=4
+Sedov --test=Composite/Sedov/PseudoUG/2d/AMReX/spark --nprocs=4
+Sedov --test=Composite/Sedov/PseudoUG/2d/Paramesh/simpleUnsplit --nprocs=4
+Sedov --test=Composite/Sedov/PseudoUG/2d/Paramesh/unsplit --nprocs=4
+Sedov --test=Composite/Sedov/PseudoUG/2dCyl/AMReX/unsplit --nprocs=8
+Sedov --test=Composite/Sedov/PseudoUG/2dCyl/Paramesh/unsplit --nprocs=8
+Sedov --test=Composite/Sedov/PseudoUG/2dCyl/Paramesh/spark --nprocs=8
+Sedov --test=Composite/Sedov/PseudoUG/3d/AMReX/unsplit --nprocs=8
+Sedov --test=Composite/Sedov/PseudoUG/3d/Paramesh/unsplit --nprocs=8
+Sedov --test=Composite/Sedov/AMR/2d/AMReX/simpleUnsplit --nprocs=1
+Sedov --test=Composite/Sedov/AMR/2d/AMReX/unsplit --nprocs=2
+Sedov --test=Composite/Sedov/AMR/2d/AMReX/spark --nprocs=4
+Sedov --test=Composite/Sedov/AMR/2d/Paramesh/simpleUnsplit --nprocs=1
+Sedov --test=Composite/Sedov/AMR/2d/Paramesh/unsplit --nprocs=1
+Sedov --test=Composite/Sedov/AMR/2dCyl/AMReX/unsplit --nprocs=8
+Sedov --test=Composite/Sedov/AMR/2dCyl/Paramesh/unsplit --nprocs=8
+Sedov --test=Composite/Sedov/AMR/3d/AMReX/unsplit --nprocs=8
+Sedov --test=Composite/Sedov/AMR/3d/AMReX/unsplitPIO --nprocs=8
+Sedov --test=Composite/Sedov/AMR/3d/AMReX/unsplitAsyncIO --nprocs=8
+Sedov --test=Composite/Sedov/AMR/3d/Paramesh/unsplit --nprocs=8
+Sedov --test=Composite/Sedov/AMR/3d/pm4Bittree/unsplit --nprocs=8
+Sedov --test=Composite/Sedov/AMR/3d/pm4Bittree/AsyncIOunsplit --nprocs=8
+Sedov --test=Composite/Sedov/AMR/3d/pm4Nolwf/unsplit --nprocs=8
+Sedov --test=Comparison/Sedov/Part/2d/Paramesh --nprocs=4
+Sedov --test=Comparison/Sedov/UG/2d/unsplit --nprocs=4
+Sedov --test=Comparison/Sedov/UG/2d/spark --nprocs=4
+Sedov --test=Comparison/Sedov/PseudoUG/2d/AMReX/simpleUnsplit --nprocs=4
+Sedov --test=Comparison/Sedov/PseudoUG/2d/AMReX/unsplit --nprocs=4
+Sedov --test=Comparison/Sedov/PseudoUG/2d/AMReX/spark --nprocs=4
+Sedov --test=Comparison/Sedov/PseudoUG/2d/Paramesh/simpleUnsplit --nprocs=4
+Sedov --test=Comparison/Sedov/PseudoUG/2d/Paramesh/unsplit --nprocs=4
+Sedov --test=Comparison/Sedov/PseudoUG/2d/Milhoja/simpleUnsplit --nprocs=4
+Sedov --test=Comparison/Sedov/PseudoUG/2dCyl/AMReX/unsplit --nprocs=8
+Sedov --test=Comparison/Sedov/PseudoUG/2dCyl/Paramesh/unsplit --nprocs=8
+Sedov --test=Comparison/Sedov/PseudoUG/2dCyl/Paramesh/spark --nprocs=8
+Sedov --test=Comparison/Sedov/PseudoUG/3d/AMReX/unsplit --nprocs=8
+Sedov --test=Comparison/Sedov/PseudoUG/3d/AMReX/spark --nprocs=8
+Sedov --test=Comparison/Sedov/PseudoUG/3d/Paramesh/unsplit --nprocs=8
+Sedov --test=Comparison/Sedov/PseudoUG/3d/Milhoja/unsplit --nprocs=8
+Sedov --test=Comparison/Sedov/AMR/2d/AMReX/simpleUnsplit --nprocs=1
+Sedov --test=Comparison/Sedov/AMR/2d/AMReX/unsplit --nprocs=2
+Sedov --test=Comparison/Sedov/AMR/2d/AMReX/spark --nprocs=4
+Sedov --test=Comparison/Sedov/AMR/2d/Paramesh/simpleUnsplit --nprocs=1
+Sedov --test=Comparison/Sedov/AMR/2d/Paramesh/unsplit --nprocs=1
+Sedov --test=Comparison/Sedov/AMR/2dCyl/AMReX/unsplit --nprocs=8
+Sedov --test=Comparison/Sedov/AMR/2dCyl/AMReX/unsplitNolwf --nprocs=8
+Sedov --test=Comparison/Sedov/AMR/2dCyl/Paramesh/unsplit --nprocs=8
+Sedov --test=Comparison/Sedov/AMR/2dCyl/Paramesh/spark --nprocs=8
+Sedov --test=Comparison/Sedov/AMR/3d/AMReX/unsplit --nprocs=8
+Sedov --test=Comparison/Sedov/AMR/3d/Paramesh/unsplit --nprocs=8
+Sedov --test=Comparison/Sedov/AMR/3d/pm4Bittree/unsplit --nprocs=8
+
+# incompFlow/RisingBubble
+incompFlow/RisingBubble --test=UnitTest/RisingBubble/AMReX/2d --nprocs=2
+
+# unitTest/Grid/Amrex/TestRefine
+unitTest/Grid/Amrex/TestRefine --test=UnitTest/Grid/AMR/AMReX/2d/Refine --nprocs=1
+
+# unitTest/Eos/WeakLib
+unitTest/Eos/WeakLib --test=UnitTest/Eos/weaklib/3d/pm4dev --nprocs=1
+
+# unitTest/Eos/Helmholtz
+unitTest/Eos/Helmholtz --test=UnitTest/Eos/helmholtz/3d/pm4dev --nprocs=1
+unitTest/Eos/Helmholtz --test=UnitTest/Eos/helmholtz/3d/AMReX --nprocs=1
+
+# Cellular
+Cellular --test=Composite/Cellular/AMR/2d/Paramesh/unsplit --nprocs=8
+Cellular --test=Comparison/Cellular/AMR/2d/Paramesh/unsplit --nprocs=8
+
+# unitTest/Eos/Helmholtz/starkiller
+unitTest/Eos/Helmholtz/starkiller --test=UnitTest/Eos/starkiller/3d/pm4dev --nprocs=1
+
+# DeleptonizationWave
+DeleptonizationWave --test=Comparison/DeleptonizationWave/1dSph/Paramesh --nprocs=4
+DeleptonizationWave --test=Comparison/DeleptonizationWave/2d/Paramesh --nprocs=4
+DeleptonizationWave --test=Comparison/DeleptonizationWave/3d/Paramesh --nprocs=4
+
+# YahilLattimerCollapse
+YahilLattimerCollapse --test=Composite/Yahil/AMR/1dSph/Paramesh/unsplit --nprocs=4
+YahilLattimerCollapse --test=Composite/Yahil/AMR/1dSph/Paramesh/spark --nprocs=4
+YahilLattimerCollapse --test=Composite/Yahil/AMR/2dCyl/Paramesh/unsplit --nprocs=4
+YahilLattimerCollapse --test=Composite/Yahil/AMR/2dCyl/Paramesh/spark --nprocs=4
+YahilLattimerCollapse --test=Comparison/Yahil/AMR/1dSph/Paramesh/unsplit --nprocs=4
+YahilLattimerCollapse --test=Comparison/Yahil/AMR/1dSph/Paramesh/spark --nprocs=4
+YahilLattimerCollapse --test=Comparison/Yahil/AMR/2dCyl/Paramesh/unsplit --nprocs=4
+YahilLattimerCollapse --test=Comparison/Yahil/AMR/2dCyl/Paramesh/spark --nprocs=4
+
+# HydroStatic
+HydroStatic --test=Composite/HydroStatic/AMR/2d/AMReX --nprocs=6
+HydroStatic --test=Composite/HydroStatic/AMR/2d/Paramesh --nprocs=6
+HydroStatic --test=Composite/HydroStatic/AMR/2d/pm4AltMortonBittree --nprocs=6
+
+# IsentropicVortex
+IsentropicVortex --test=Composite/IsentropicVortex/PseudoUG/2d/AMReX/unsplit --nprocs=4
+IsentropicVortex --test=Composite/IsentropicVortex/PseudoUG/2d/AMReX/spark --nprocs=4
+IsentropicVortex --test=Composite/IsentropicVortex/PseudoUG/2d/Paramesh/unsplit --nprocs=4
+IsentropicVortex --test=Comparison/IsentropicVortex/PseudoUG/2d/AMReX/unsplit --nprocs=4
+IsentropicVortex --test=Comparison/IsentropicVortex/PseudoUG/2d/AMReX/spark --nprocs=4
+IsentropicVortex --test=Comparison/IsentropicVortex/PseudoUG/2d/Paramesh/unsplit --nprocs=4
+
+# unitTest/Grid/Amrex/TestCyl2d
+unitTest/Grid/Amrex/TestCyl2d --test=UnitTest/Grid/AMR/AMReX/2d/TestCyl --nprocs=1
+
+# unitTest/Grid/AnomalousRefine
+unitTest/Grid/AnomalousRefine --test=UnitTest/GridAnomalousRefine/2d/Paramesh --nprocs=1
+unitTest/Grid/AnomalousRefine --test=UnitTest/GridAnomalousRefine/2d/pm4AltMortonBittree --nprocs=1
+unitTest/Grid/AnomalousRefine --test=UnitTest/GridAnomalousRefine/2d/AMReX --nprocs=3
+
+# unitTest/Grid/Milhoja/TestInit
+unitTest/Grid/Milhoja/TestInit --test=UnitTest/Grid/AMR/Milhoja/1D/TestInit --nprocs=1
+unitTest/Grid/Milhoja/TestInit --test=UnitTest/Grid/AMR/Milhoja/2D/TestInit --nprocs=1
+unitTest/Grid/Milhoja/TestInit --test=UnitTest/Grid/AMR/Milhoja/3D/TestInit --nprocs=1
+
+# Sod
+Sod --test=Composite/Sod/PseudoUG/2d/AMReX/simpleUnsplit --nprocs=4
+Sod --test=Composite/Sod/PseudoUG/2d/AMReX/unsplit --nprocs=4
+Sod --test=Composite/Sod/PseudoUG/2d/AMReX/spark --nprocs=4
+Sod --test=Composite/Sod/PseudoUG/2d/AMReX/sparkMT --nprocs=4
+Sod --test=Composite/Sod/PseudoUG/2d/AMReX/sparkPIO --nprocs=4
+Sod --test=Composite/Sod/PseudoUG/2d/Paramesh/simpleUnsplit --nprocs=4
+Sod --test=Composite/Sod/PseudoUG/2d/Paramesh/unsplit --nprocs=4
+Sod --test=Composite/Sod/PseudoUG/2d/Paramesh/sparkMT --nprocs=4
+Sod --test=Composite/Sod/AMR/2d/AMReX/simpleUnsplit --nprocs=1
+Sod --test=Composite/Sod/AMR/2d/AMReX/unsplit --nprocs=2
+Sod --test=Composite/Sod/AMR/2d/AMReX/unsplitPIO --nprocs=2
+Sod --test=Composite/Sod/AMR/2d/AMReX/unsplitAsyncIO --nprocs=2
+Sod --test=Composite/Sod/AMR/2d/Paramesh/simpleUnsplit --nprocs=1
+Sod --test=Composite/Sod/AMR/2d/Paramesh/unsplit --nprocs=1
+Sod --test=Composite/Sod/AMR/2d/pm4Bittree/simpleUnsplit --nprocs=1
+Sod --test=Composite/Sod/AMR/2d/pm4AltMortonBittree/simpleUnsplit --nprocs=2
+Sod --test=Composite/Sod/AMR/2d/pm4AltMortonBittree/unsplit --nprocs=2
+Sod --test=Composite/Sod/AMR/2d/pm4AltMortonBittree/TBL/simpleUnsplit --nprocs=2
+Sod --test=Composite/Sod/AMR/2d/pm4AltMortonBittree/TBL/unsplit --nprocs=2
+Sod --test=Comparison/Sod/UG/2d/simpleUnsplit --nprocs=1
+Sod --test=Comparison/Sod/UG/2d/unsplit --nprocs=4
+Sod --test=Comparison/Sod/UG/2d/spark --nprocs=4
+Sod --test=Comparison/Sod/UG/2d/TBL/simpleUnsplit --nprocs=1
+Sod --test=Comparison/Sod/PseudoUG/2d/AMReX/simpleUnsplit --nprocs=4
+Sod --test=Comparison/Sod/PseudoUG/2d/AMReX/unsplit --nprocs=4
+Sod --test=Comparison/Sod/PseudoUG/2d/AMReX/spark --nprocs=4
+Sod --test=Comparison/Sod/PseudoUG/2d/AMReX/TBL/simpleUnsplit --nprocs=4
+Sod --test=Comparison/Sod/PseudoUG/2d/Paramesh/simpleUnsplit --nprocs=4
+Sod --test=Comparison/Sod/PseudoUG/2d/Paramesh/unsplit --nprocs=4
+Sod --test=Comparison/Sod/PseudoUG/2d/Paramesh/spark --nprocs=4
+Sod --test=Comparison/Sod/AMR/2d/AMReX/simpleUnsplit --nprocs=1
+Sod --test=Comparison/Sod/AMR/2d/AMReX/unsplit --nprocs=2
+Sod --test=Comparison/Sod/AMR/2d/AMReXFc/unsplit --nprocs=2
+Sod --test=Comparison/Sod/AMR/2d/AMReXFc/TBL/unsplit --nprocs=2
+Sod --test=Comparison/Sod/AMR/2d/Paramesh/simpleUnsplit --nprocs=1
+Sod --test=Comparison/Sod/AMR/2d/Paramesh/unsplit --nprocs=1
+Sod --test=Comparison/Sod/AMR/2d/pm4Bittree/simpleUnsplit --nprocs=1
+Sod --test=Comparison/Sod/AMR/2d/pm4AltMortonBittree/simpleUnsplit --nprocs=2
+Sod --test=Comparison/Sod/AMR/2d/pm4AltMortonBittree/unsplit --nprocs=2
+Sod --test=Comparison/Sod/AMR/2d/pm4AltMortonBittree/TBL/simpleUnsplit --nprocs=2
+Sod --test=Comparison/Sod/AMR/2d/pm4AltMortonBittree/TBL/unsplit --nprocs=2
+Sod --test=Comparison/Sod/AMR/2d/pm4AltMortonBittreeFc/unsplit --nprocs=2
+Sod --test=Comparison/Sod/AMR/2d/pm4AltMortonBittreeFc/TBL/unsplit --nprocs=2
+Sod --test=Comparison/Sod/AMR/3d/Paramesh/unsplit --nprocs=8
+Sod --test=Comparison/Sod/AMR/3d/pm4Nolwf/unsplit --nprocs=8
+Sod --test=Comparison/Sod/AMR/3d/cube16/Paramesh/unsplit --nprocs=8
+Sod --test=Comparison/Sod/AMR/3d/cube16/pm4Nolwf/unsplit --nprocs=8
+Sod --test=Comparison/Sod/AMR/3d/cube16/AMReX/unsplit --nprocs=8
+Sod --test=Comparison/Sod/AMR/3d/cube16/AMReXNolwf/unsplit --nprocs=8
+
+# unitTest/Grid/Amrex/TestFluxCorrection
+unitTest/Grid/Amrex/TestFluxCorrection --test=UnitTest/Grid/AMR/AMReX/2d/FluxCorrection --nprocs=1
+
+# unitTest/IO
+unitTest/IO --test=UnitTest/IO/hdf5/3d/pm4dev --nprocs=4
+unitTest/IO --test=UnitTest/IO/hdf5/3d/Asyncpm4dev --nprocs=4
+
+# unitTest/Gravity/Poisson3
+unitTest/Gravity/Poisson3 --test=UnitTest/Gravity/AMR/3d/Paramesh --nprocs=1
+unitTest/Gravity/Poisson3 --test=UnitTest/Gravity/AMR/2dCyl/Paramesh --nprocs=1
+
+# CCSN_WL
+CCSN_WL --test=Comparison/CCSN/AMR/1dSph/Paramesh/WeakLib --nprocs=4
+
+# unitTest/Gravity/PointMass
+unitTest/Gravity/PointMass --test=UnitTest/PointMassGravity/3d/Paramesh --nprocs=3
+unitTest/Gravity/PointMass --test=UnitTest/PointMassGravity/3d/AMReX --nprocs=3
+unitTest/Gravity/PointMass --test=UnitTest/PointMassGravity/2dCyl/Paramesh --nprocs=2
+unitTest/Gravity/PointMass --test=UnitTest/PointMassGravity/2dCyl/AMReX --nprocs=2
+
+# unitTest/Grid/Amrex/TestInit
+unitTest/Grid/Amrex/TestInit --test=UnitTest/Grid/AMR/AMReX/2d/Init --nprocs=1
+
+# StreamingSineWave
+StreamingSineWave --test=Composite/StreamingSineWave/PseudoUG/3d/Paramesh --nprocs=6
+StreamingSineWave --test=Composite/StreamingSineWave/PseudoUG/3d/AMReX --nprocs=6
+StreamingSineWave --test=Composite/StreamingSineWave/AMR/3d/Paramesh --nprocs=6
+StreamingSineWave --test=Composite/StreamingSineWave/AMR/3d/AMReX --nprocs=6
+StreamingSineWave --test=Comparison/StreamingSineWave/PseudoUG/3d/Paramesh --nprocs=6
+StreamingSineWave --test=Comparison/StreamingSineWave/PseudoUG/3d/AMReX --nprocs=6
+StreamingSineWave --test=Comparison/StreamingSineWave/AMR/3d/Paramesh --nprocs=6
+StreamingSineWave --test=Comparison/StreamingSineWave/AMR/3d/AMReX --nprocs=6

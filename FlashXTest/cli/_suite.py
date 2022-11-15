@@ -12,8 +12,8 @@ from .. import cli
 def setup(suitelist):
     """
     \b
-    Create a "test.info" from a list of
-    suite files. If no arguments are supplied
+    Create a "test.info" from a list of suite files. 
+    If no arguments are supplied
     all "*.suite" files are used from the working
     directory
     """

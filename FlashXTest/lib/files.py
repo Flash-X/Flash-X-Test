@@ -103,29 +103,31 @@ def createTestInfo(mainDict, suiteDict):
     with open(pathToInfo, "w") as testInfoFile:
 
         # Create xml node to store info
-        testInfoNode = backend.FlashTest.lib.xmlNode.XmlNode("testInfoNode")
+        infoNode = backend.FlashTest.lib.xmlNode.XmlNode("infoNode")
 
         # Add the site node
-        testInfoNode.add(f'{mainDict["flashSite"]}')
+        infoNode.add(f'{mainDict["flashSite"]}')
 
         # create test node from suiteDict
         for testNode in suiteDict.keys():
 
             # convert the test node string into a list
-            testNodeList = testNode.split("/")
+            nodeList = testNode.split("/")
 
-            leafNode = testInfoNode.findChild(f'{mainDict["flashSite"]}')
+            leafNode = infoNode.findChild(f'{mainDict["flashSite"]}')
 
-            for node in testNodeList:
+            for node in nodeList:
+
                 if not leafNode.findChild(node):
                     leafNode.add(node)
-                    leafNode = leafNode.findChild(node)
+
+                leafNode = leafNode.findChild(node)
 
             lib.tests.parseToml(mainDict, suiteDict, testNode)
             leafNode.text = lib.tests.getXmlText(suiteDict, testNode)
 
         # Write xml to file
-        for line in testInfoNode.getXml():
+        for line in infoNode.getXml():
             testInfoFile.write(f"{line}\n")
 
     mainDict["pathToInfo"] = pathToInfo

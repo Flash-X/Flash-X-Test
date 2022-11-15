@@ -29,15 +29,7 @@ def getMainDict(apiDict):
     mainDict = backend.flashTestParser.parseFile(configMain)
 
     # Update mainDict with values from apiDict
-    for key, value in apiDict.items():
-        if value and key in mainDict:
-            mainDict[key] = value
-
-    # Set pathToConfig for mainDict
-    mainDict["pathToConfig"] = apiDict["pathToConfig"]
-
-    # Set testDir
-    mainDict["testDir"] = apiDict["testDir"]
+    mainDict.update(apiDict)
 
     return mainDict
 
@@ -110,3 +102,20 @@ def getSuiteDict(apiDict):
                 suiteDict.update(tempDict)
 
     return suiteDict
+
+
+def createJobList(infoNode, jobList):
+    """
+    Create a list of node paths by recursively searching
+    till the end of the tree
+
+    Arguments
+    ---------
+    infoNode : FlashTest node object
+    jobList  : Empty jobList
+    """
+    if infoNode.subNodes:
+        for infoNode in infoNode.subNodes:
+            createJobList(infoNode, jobList)
+    else:
+        jobList.append(infoNode.getPathBelowRoot())

@@ -16,8 +16,8 @@
 # --rbase, -rb (date string YYYY-MM-DD[_version])
 
 # Incompressible Navier-Stokes UniTests
-incompFlow/RisingBubble --test=UnitTest/RisingBubble/AMReX/2d --nprocs=4
-incompFlow/LidDrivenCavity --test=UnitTest/LidDrivenCavity/AMReX/2d --debug
+incompFlow/RisingBubble --test="UnitTest/RisingBubble/AMReX/2d" --nprocs=4
+incompFlow/LidDrivenCavity --test="UnitTest/LidDrivenCavity/AMReX/2d" --debug
 
 # Grid UnitTests
-unitTest/Poisson/Amrex --test=UnitTest/Multigrid/AMReX/3d --nprocs=2
+unitTest/Poisson/Amrex --test="UnitTest/Multigrid/AMReX/3d" --nprocs=2

@@ -1,7 +1,7 @@
 """FlashXTest library to interface with backend.FlashTest"""
 
 import os, sys, subprocess
-import toml
+import yaml
 
 from .. import backend
 from .. import lib
@@ -22,11 +22,24 @@ def parseToml(mainDict, suiteDict, testNode):
         + suiteDict[testNode]["setupName"]
     )
 
-    # Read the test info from toml file
-    infoDict = toml.load(pathToSim + "/tests/" + "tests.toml")[testNode]
+    testDict = {}
+
+    # Read the test info from yaml file
+    with open(pathToSim + "/tests/" + "tests.yaml", "r") as stream:
+        try:
+            testDict.update(yaml.safe_load(stream))
+        except yaml.YAMLError as exc:
+            print(exc)
+
+    infoDict = testDict[testNode]
 
     for key in infoDict.keys():
-        if key not in ["setupOptions", "parfiles", "restartParfiles", "transfers"]:
+        if key not in [
+            "setupOptions",
+            "parfiles",
+            "restartParfiles",
+            "transfers",
+        ]:
             raise ValueError(
                 lib.colors.FAIL
                 + f'[FlashXTest] unrecognized key "{key}" for "{testNode}" '
@@ -49,18 +62,29 @@ def getXmlText(suiteDict, testNode):
     # Set the info dict
     infoDict = suiteDict[testNode]
 
-    xmlText.append(f'setupName: {infoDict["setupName"]}')
-    xmlText.append(f'setupOptions: {infoDict["setupOptions"]}')
-    xmlText.append(f'numProcs: {infoDict["numProcs"]}')
+    if "parfiles" not in infoDict.keys():
+        infoDict["parfiles"] = "<defaultParfile>"
 
-    if "parfiles" in infoDict.keys():
-        parfiles = [
-            "<pathToSimulations>" + "/" + infoDict["setupName"] + "/tests/" + parfile
-            for parfile in infoDict["parfiles"]
-        ]
+    elif infoDict["parfiles"] == "<defaultParfile>":
+        pass
+
     else:
-        parfiles = ["<defaultParfile>"]
+        parFileList = infoDict["parfiles"].split(" ")
+        parFileList = [
+            "<pathToSimulations>" + "/" + infoDict["setupName"] + "/tests/" + parfile
+            for parfile in parFileList
+        ]
+        infoDict["parfiles"] = " ".join(parFileList)
 
-    xmlText.append(f'parfiles: {" ".join(parfiles)}')
+    for xmlKey in [
+        "setupName",
+        "setupOptions",
+        "numProcs",
+        "parfiles",
+        "restartParfiles",
+        "transfers",
+    ]:
+        if xmlKey in infoDict.keys():
+            xmlText.append(f"{xmlKey}: {infoDict[xmlKey]}")
 
     return xmlText
