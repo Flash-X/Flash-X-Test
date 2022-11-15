@@ -20,13 +20,14 @@ def flashxtest(ctx, version):
     """
     if ctx.invoked_subcommand is None and not version:
         subprocess.run(
-            f'export PATH=~/.local/bin:/usr/local/bin:$PATH && flashxtest --help',
+            f"export PATH=~/.local/bin:/usr/local/bin:$PATH && flashxtest --help",
             shell=True,
             check=True,
         )
 
     if version:
         click.echo(pkg_resources.require("FlashXTest")[0].version)
+
 
 @flashxtest.command(name="init")
 @click.option("--source", "-z", default=None, help="Flash-X source directory")
@@ -65,27 +66,29 @@ def setup_suite(suitelist):
 
     \b
     This command accepts multiple files with suffix,
-    ".suite" to build a "test.info". If no arguments are 
+    ".suite" to build a "test.info". If no arguments are
     supplied, all "*.suite" files are used from the working
     directory.
 
     \b
-    The ".suite" files represent a collection of tests 
-    specification associated with a "config" file. Each
-    line in the file represents a test specific defined as,
+    The ".suite" files represent a collection of mutually
+    exclusive test specifications associated with a "config" file.
+    Each line in a file represent a unique test specification
+    defined as,
 
     \b
-    incompFlow/LidDrivenCavity --test="UnitTest/LidDrivenCavity/AMReX/2d" --nprocs=4 --debug
+    incompFlow/LidDrivenCavity -t "UnitTest/LidDrivenCavity/AMReX/2d" -np 4 --debug
 
     \b
-    The first value represents a Flash-X setup defined in 
-    source/Simulation/SimulationMain directory with following 
+    The first value represents a Flash-X setup defined in
+    source/Simulation/SimulationMain directory with following
     options,
 
     \b
-    -------------------------------------------------------
-    test - test node defined in setup_name/tests/tests.yaml)
-    nprocs - number of procs
+    -t, --test TEXT	Defined in */tests/tests.yaml)
+    -np, --nprocs TEXT	Number of processors
+    --debug BOOLEAN	Debug test
+
     """
     api.setup_suite(pathToSuites=suitelist)
 
@@ -97,8 +100,8 @@ def run():
     Run the test suite using "test.info".
 
     \b
-    from
-    the working directory
+    This command runs all the tests defined in
+    "test.info", and conveys errors
     """
     # Arguments
     # ---------

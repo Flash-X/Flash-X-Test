@@ -54,7 +54,7 @@ def getSuiteDict(apiDict):
     # Create a test suite parser
     suiteParser = argparse.ArgumentParser(description="Parser for test suite")
     suiteParser.add_argument("-t", "--test", help="Test node", type=str)
-    suiteParser.add_argument("-n", "--nprocs", help="Num procs", type=int)
+    suiteParser.add_argument("-np", "--nprocs", help="Num procs", type=int)
     suiteParser.add_argument("--debug", action="store_true")
     suiteParser.set_defaults(debug=False, nprocs=1, test="")
 
@@ -115,7 +115,7 @@ def createJobList(infoNode, jobList):
     jobList  : Empty jobList
     """
     if infoNode.subNodes:
-        for infoNode in infoNode.subNodes:
-            createJobList(infoNode, jobList)
+        for subNode in infoNode.subNodes:
+            createJobList(subNode, jobList)
     else:
         jobList.append(infoNode.getPathBelowRoot())
