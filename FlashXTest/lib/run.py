@@ -42,22 +42,30 @@ def flashTest(mainDict, testList):
         shell=True,
     )
 
+    os.environ["EXITSTATUS"] = str(testProcess.returncode)
+    os.environ["FLASH_BASE"] = mainDict["pathToFlash"]
+    os.environ["RESULTS_DIR"] = (
+        mainDict["pathToOutdir"] + os.sep + mainDict["flashSite"]
+    )
+
+    subprocess.run("bash $FLASHTEST_BASE/error.sh", shell=True, check=True)
+
     # Handle errors
     # TODO: Add checks to read logs and report error for each test
     # that failed
-    if testProcess.returncode != 0:
-        print(
-            lib.colors.FAIL
-            + "FlashTest returned exit status {0}".format(testProcess.returncode)
-        )
-        print(
-            lib.colors.FAIL
-            + "---------------------------------------------------------"
-        )
-        raise ValueError(lib.colors.FAIL + "[FlashXTest] run failed")
-
-    else:
-        print(lib.colors.OKGREEN + "FlashTest reports SUCCESS")
+    # if testProcess.returncode != 0:
+    #     print(
+    #         lib.colors.FAIL
+    #         + "FlashTest returned exit status {0}".format(testProcess.returncode)
+    #     )
+    #     print(
+    #         lib.colors.FAIL
+    #         + "---------------------------------------------------------"
+    #     )
+    #     raise ValueError(lib.colors.FAIL + "[FlashXTest] run failed")
+    #
+    # else:
+    #     print(lib.colors.OKGREEN + "FlashTest reports SUCCESS")
 
 
 def buildSFOCU(mainDict):

@@ -10,7 +10,7 @@ from .. import api
 def flashxtest():
     """
     \b
-    Command line interface for managing 
+    Command line interface for managing
     Flash-X testing framework
     """
     pass
@@ -32,19 +32,27 @@ def init(source, site):
     api.init(flashSite=site, pathToFlash=source)
 
 
-@flashxtest.group(name="suite")
-def suite():
+@flashxtest.command(name="setup-suite")
+@click.argument("suitelist", type=str, nargs=-1)
+def setup_suite(suitelist):
     """
     \b
-    Testsuite management
+    Create a "test.info" from a list of suite files.
+    If no arguments are supplied
+    all "*.suite" files are used from the working
+    directory
     """
-    pass
+    api.setup_suite(pathToSuites=suitelist)
 
 
-@flashxtest.group(name="archive")
-def archive():
+@flashxtest.command(name="run")
+def run():
     """
     \b
-    Archive management
+    Run the test suite using "test.info" from
+    the working directory
     """
-    pass
+    # Arguments
+    # ---------
+    # testsuite : string for the test suite file
+    api.run()
