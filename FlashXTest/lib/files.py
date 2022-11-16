@@ -7,6 +7,7 @@ import shlex
 from .. import backend
 from .. import lib
 
+
 def setExe(apiDict):
     """
     Arguments
@@ -14,6 +15,7 @@ def setExe(apiDict):
     apiDict : API dictionary
     """
     pass
+
 
 def setConfig(apiDict):
     """
@@ -130,7 +132,7 @@ def createTestInfo(mainDict, suiteDict):
 
                 leafNode = leafNode.findChild(node)
 
-            lib.tests.parseToml(mainDict, suiteDict, testNode)
+            lib.tests.parseYaml(mainDict, suiteDict, testNode)
             leafNode.text = lib.tests.getXmlText(suiteDict, testNode)
 
         # Write xml to file

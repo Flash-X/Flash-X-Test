@@ -30,7 +30,7 @@ def run(**apiDict):
 
     # Parse test.info and create a testList
     testList = []
-    lib.structs.createJobList(
+    lib.structs.jobListFromNode(
         backend.FlashTest.lib.xmlNode.parseXml(apiDict["pathToInfo"]), testList
     )
 

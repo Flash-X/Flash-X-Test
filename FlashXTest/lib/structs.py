@@ -104,7 +104,7 @@ def getSuiteDict(apiDict):
     return suiteDict
 
 
-def createJobList(infoNode, jobList):
+def jobListFromNode(infoNode, jobList):
     """
     Create a list of node paths by recursively searching
     till the end of the tree
@@ -116,6 +116,30 @@ def createJobList(infoNode, jobList):
     """
     if infoNode.subNodes:
         for subNode in infoNode.subNodes:
-            createJobList(subNode, jobList)
+            jobListFromNode(subNode, jobList)
     else:
         jobList.append(infoNode.getPathBelowRoot())
+
+
+def suiteListFromNode(infoNode, suiteList):
+    """
+    Create a list of node paths by recursively searching
+    till the end of the tree
+
+    Arguments
+    ---------
+    infoNode  : FlashTest node object
+    suiteList : Empty list for test suite
+    """
+    if infoNode.subNodes:
+        for subNode in infoNode.subNodes:
+            suiteListFromNode(subNode, suiteList)
+    else:
+        xmlDict = {}
+        for xmlEntry in infoNode.text:
+            key, value = xmlEntry.split(":")
+            xmlDict.update({key: value.strip()})
+
+        xmlDict["nodeName"] = infoNode.getPathBelowRoot()
+
+        suiteList.append(xmlDict)

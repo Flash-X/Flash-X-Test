@@ -18,8 +18,6 @@ def flashTest(mainDict, testList):
     # remove site from testList
     testList = [test.replace(f'{mainDict["flashSite"]}/', "") for test in testList]
 
-    print(testList)
-
     # Create output directory for TestResults if it does not exist
     subprocess.run("mkdir -pv {0}".format(mainDict["pathToOutdir"]), shell=True)
 
@@ -48,24 +46,16 @@ def flashTest(mainDict, testList):
         mainDict["pathToOutdir"] + os.sep + mainDict["flashSite"]
     )
 
-    subprocess.run("bash $FLASHTEST_BASE/error.sh", shell=True, check=True)
+    # try:
+    checkProcess = subprocess.run(
+        "bash $FLASHTEST_BASE/error.sh", shell=True, check=True
+    )
 
-    # Handle errors
-    # TODO: Add checks to read logs and report error for each test
-    # that failed
-    # if testProcess.returncode != 0:
-    #     print(
-    #         lib.colors.FAIL
-    #         + "FlashTest returned exit status {0}".format(testProcess.returncode)
-    #     )
-    #     print(
-    #         lib.colors.FAIL
-    #         + "---------------------------------------------------------"
-    #     )
-    #     raise ValueError(lib.colors.FAIL + "[FlashXTest] run failed")
-    #
-    # else:
-    #     print(lib.colors.OKGREEN + "FlashTest reports SUCCESS")
+    print(lib.colors.OKGREEN + "[FlashXTest] SUCCESS")
+
+    # except checkProcess.CalledProcessError as e:
+    #    #print(lib.colors.FAIL + f"{e.output}")
+    #    print(e.output)
 
 
 def buildSFOCU(mainDict):

@@ -1,13 +1,63 @@
 """FlashXTest library to interface with backend.FlashTest"""
 
 import os, sys, subprocess
+import warnings
 import yaml
 
 from .. import backend
 from .. import lib
 
 
-def parseToml(mainDict, suiteDict, testNode):
+class TestLoader(yaml.SafeLoader):
+    """
+    Class TestLoader for YAML
+    """
+
+    def __init__(self, stream):
+        """
+        Constructor
+        """
+        super().__init__(stream)
+        self._stream = stream
+
+    def construct_mapping(self, node, deep=False):
+        """
+        Mapping function
+        """
+        mapping = set()
+        for key_node, value_node in node.value:
+            key = self.construct_object(key_node, deep=deep)
+            if key in mapping:
+                raise ValueError(
+                    lib.colors.FAIL
+                    + f"[FlashXTest] Duplicate {key!r} key found in {self._stream.name!r}."
+                )
+            mapping.add(key)
+        return super().construct_mapping(node, deep)
+
+
+def loadYaml(filename):
+    """
+    Arguments
+    ---------
+    filename : name of the file to parse
+
+    Returns
+    -------
+    yamlDict : YAML dictionary
+    """
+    # Load yaml
+    with open(filename, "r") as stream:
+        try:
+            yamlDict = yaml.load(stream, Loader=TestLoader)
+
+        except yaml.YAMLError as exc:
+            print(exc)
+
+    return yamlDict
+
+
+def parseYaml(mainDict, suiteDict, testNode):
     """
     Arguments:
     ----------
@@ -22,16 +72,7 @@ def parseToml(mainDict, suiteDict, testNode):
         + suiteDict[testNode]["setupName"]
     )
 
-    testDict = {}
-
-    # Read the test info from yaml file
-    with open(pathToSim + "/tests/" + "tests.yaml", "r") as stream:
-        try:
-            testDict.update(yaml.safe_load(stream))
-        except yaml.YAMLError as exc:
-            print(exc)
-
-    infoDict = testDict[testNode]
+    infoDict = loadYaml(pathToSim + "/tests/" + "tests.yaml")[testNode]
 
     for key in infoDict.keys():
         if key not in [
@@ -43,7 +84,7 @@ def parseToml(mainDict, suiteDict, testNode):
             raise ValueError(
                 lib.colors.FAIL
                 + f'[FlashXTest] unrecognized key "{key}" for "{testNode}" '
-                + f'in {pathToSim + "/tests/" + "tests.toml"}'
+                + f'in {pathToSim + "/tests/" + "tests.yaml"}'
             )
 
     suiteDict[testNode].update(infoDict)
