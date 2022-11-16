@@ -57,19 +57,17 @@ def loadYaml(filename):
     return yamlDict
 
 
-def parseYaml(mainDict, suiteDict, testNode):
+def parseYaml(mainDict, setupName, testNode):
     """
     Arguments:
     ----------
     mainDict  : Main dictionary
-    suiteDict : Suite dictionary
+    setupName : Setup name
     testNode  : Key for test
     """
     # Get path to simulation directory
     pathToSim = (
-        mainDict["pathToFlash"]
-        + "/source/Simulation/SimulationMain/"
-        + suiteDict[testNode]["setupName"]
+        mainDict["pathToFlash"] + "/source/Simulation/SimulationMain/" + setupName
     )
 
     infoDict = loadYaml(pathToSim + "/tests/" + "tests.yaml")[testNode]
@@ -87,21 +85,17 @@ def parseYaml(mainDict, suiteDict, testNode):
                 + f'in {pathToSim + "/tests/" + "tests.yaml"}'
             )
 
-    suiteDict[testNode].update(infoDict)
+    return infoDict
 
 
-def getXmlText(suiteDict, testNode):
+def getXmlText(infoDict):
     """
     Arguments:
     ----------
-    suiteDict: Suite dictionary
-    testNode: testNode
+    infoDict: Test info dictionary
     """
     # Create an empty list
     xmlText = []
-
-    # Set the info dict
-    infoDict = suiteDict[testNode]
 
     if "parfiles" not in infoDict.keys():
         infoDict["parfiles"] = "<defaultParfile>"
@@ -127,8 +121,10 @@ def getXmlText(suiteDict, testNode):
         "parfiles",
         "restartParfiles",
         "transfers",
+        "environment",
     ]:
         if xmlKey in infoDict.keys():
-            xmlText.append(f"{xmlKey}: {infoDict[xmlKey]}")
+            if infoDict[xmlKey]:
+                xmlText.append(f"{xmlKey}: {infoDict[xmlKey]}")
 
     return xmlText

@@ -132,8 +132,12 @@ def createTestInfo(mainDict, suiteDict):
 
                 leafNode = leafNode.findChild(node)
 
-            lib.tests.parseYaml(mainDict, suiteDict, testNode)
-            leafNode.text = lib.tests.getXmlText(suiteDict, testNode)
+            suiteDict[testNode].update(
+                lib.tests.parseYaml(
+                    mainDict, suiteDict[testNode]["setupName"], testNode
+                )
+            )
+            leafNode.text = lib.tests.getXmlText(suiteDict[testNode])
 
         # Write xml to file
         for line in infoNode.getXml():

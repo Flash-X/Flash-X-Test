@@ -1,6 +1,6 @@
 # File containing details of test specifications for
 # specific simulations that reference keys defined in
-# tests/tests.toml files defined in the simulation 
+# tests/tests.toml files defined in the simulation
 # directories
 #
 # Comments can be added using a `#` sign and individual
@@ -16,7 +16,10 @@
 # --rbase, -rb (date string YYYY-MM-DD[_version])
 
 # Incompressible Navier-Stokes UniTests
-incompFlow/RisingBubble --test="UnitTest/RisingBubble/AMReX/2d" --nprocs=2
+incompFlow/RisingBubble \
+	--test="UnitTest/RisingBubble/AMReX/2d" \
+	--nprocs=2
+
 incompFlow/LidDrivenCavity --test="UnitTest/LidDrivenCavity/AMReX/2d" --nprocs=4 --debug
 
 # Grid UnitTests

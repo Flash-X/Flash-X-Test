@@ -34,6 +34,14 @@ def getMainDict(apiDict):
     return mainDict
 
 
+def __continuationLines(fin):
+    for line in fin:
+        line = line.rstrip("\n")
+        while line.endswith("\\"):
+            line = line[:-1] + next(fin).rstrip("\n")
+        yield line
+
+
 def getSuiteDict(apiDict):
     """
     Arguments
@@ -55,8 +63,9 @@ def getSuiteDict(apiDict):
     suiteParser = argparse.ArgumentParser(description="Parser for test suite")
     suiteParser.add_argument("-t", "--test", help="Test node", type=str)
     suiteParser.add_argument("-np", "--nprocs", help="Num procs", type=int)
+    suiteParser.add_argument("-e", "--env", help="Environment variable", type=str)
     suiteParser.add_argument("--debug", action="store_true")
-    suiteParser.set_defaults(debug=False, nprocs=1, test="")
+    suiteParser.set_defaults(debug=False, nprocs=1, test="", env=None)
 
     # Loop over all suite files and populate
     # suite dictionary
@@ -75,8 +84,7 @@ def getSuiteDict(apiDict):
         suiteList = []
 
         with open(suiteFile, "r") as sfile:
-            for line in sfile:
-                line = line.rstrip("\n")
+            for line in __continuationLines(sfile):
                 suiteList.append(line.split("#")[0])
 
         suiteList = [spec for spec in suiteList if spec]
@@ -91,6 +99,7 @@ def getSuiteDict(apiDict):
                     "setupName": testName,
                     "numProcs": testArgs.nprocs,
                     "debug": testArgs.debug,
+                    "environment": testArgs.env,
                 }
             }
 
