@@ -147,19 +147,22 @@ def parseSuite(apiDict):
 
             testArgs = suiteParser.parse_args(shlex.split(spec)[1:])
             testSpec.nodeName = testArgs.test
+
+            for currSpec in specList:
+                if testSpec.nodeName in currSpec.nodeName:
+                    raise ValueError(
+                        lib.colors.FAIL
+                        + f"[FlashXTest] Duplicate for {testSpec.nodeName!r} detected in suite files"
+                    )
+
             testSpec.numProcs = testArgs.nprocs
+
             testSpec.environment = (
                 " ".join(list(itertools.chain.from_iterable(testArgs.env)))
                 if testArgs.env
                 else None
             )
             testSpec.debug = testArgs.debug
-
-            for currSpec in specList:
-                if testSpec.nodeName in currSpec.nodeName:
-                    raise ValueError(
-                        f"[FlashXTest] Duplicate for {testSpec.nodeName!r} detected in suite files"
-                    )
 
             specList.append(testSpec)
 

@@ -105,6 +105,11 @@ def createInfo(mainDict, specList):
             for key in yamlInfo.keys():
                 if hasattr(testSpec, key):
                     setattr(testSpec, key, yamlInfo[key])
+                else:
+                    raise ValueError(
+                        f"{key!r} defined for test {testSpec.nodeName!r}"
+                        + f" in {testSpec.setupName!r} does exist in TestSpec"
+                    )
 
             infoNode.findChildrenWithPath(testSpec.nodeName)[
                 0
