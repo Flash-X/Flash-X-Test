@@ -6,7 +6,7 @@ from .. import backend
 from .. import lib
 
 
-def flashTest(mainDict, testList):
+def flashTest(mainDict, jobList):
     """
     Run flashTest.py from backend/FlashTest
 
@@ -14,9 +14,10 @@ def flashTest(mainDict, testList):
     ----------
     Arguments:
     mainDict  : Main dictionary
+    jobList   : List of jobs
     """
-    # remove site from testList
-    testList = [test.replace(f'{mainDict["flashSite"]}/', "") for test in testList]
+    # remove site from jobList
+    jobList = [job.replace(f'{mainDict["flashSite"]}/', "") for job in jobList]
 
     # Create output directory for TestResults if it does not exist
     subprocess.run("mkdir -pv {0}".format(mainDict["pathToOutdir"]), shell=True)
@@ -35,7 +36,7 @@ def flashTest(mainDict, testList):
         "python3 {0}/FlashTest/flashTest.py \
                                           {1} \
                                           {2}".format(
-            os.path.dirname(backend.__file__), optString, " ".join(testList)
+            os.path.dirname(backend.__file__), optString, " ".join(jobList)
         ),
         shell=True,
     )

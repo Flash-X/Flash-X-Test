@@ -8,6 +8,31 @@ from .. import backend
 from .. import lib
 
 
+def getMainDict(apiDict):
+    """
+    Arguments
+    --------
+    apiDict  : Dictionary to override values from Config file
+
+    Returns
+    -------
+    mainDict: Dictionary for keys in the config file
+    """
+    # Build Config file for mainDict.
+    # Read the user Config file (configApi), append it to Base Config from backend (configBase),
+    # and create a new Config (configMain) in 'testDir/.fxt' folder
+    configApi = apiDict["pathToConfig"]
+    configMain = configApi
+
+    # Parse the configMain file
+    mainDict = backend.flashTestParser.parseFile(configMain)
+
+    # Update mainDict with values from apiDict
+    mainDict.update(apiDict)
+
+    return mainDict
+
+
 def setExe(apiDict):
     """
     Arguments
@@ -94,53 +119,3 @@ def setConfig(apiDict):
             cfile.write(line)
 
     print(lib.colors.OKGREEN + "[FlashXTest] Initialized configuration")
-
-
-def createTestInfo(mainDict, suiteDict):
-    """
-    Get test info site
-
-    Arguments:
-    -----------
-    mainDict : Main dictionary
-    testSuiteDict: Test suite dictionary
-    """
-    # Set variables for site Info
-    pathToInfo = str(mainDict["testDir"]) + "/test.info"
-
-    # Build test.info file from the test suite
-    with open(pathToInfo, "w") as testInfoFile:
-
-        # Create xml node to store info
-        infoNode = backend.FlashTest.lib.xmlNode.XmlNode("infoNode")
-
-        # Add the site node
-        infoNode.add(f'{mainDict["flashSite"]}')
-
-        # create test node from suiteDict
-        for testNode in suiteDict.keys():
-
-            # convert the test node string into a list
-            nodeList = testNode.split("/")
-
-            leafNode = infoNode.findChild(f'{mainDict["flashSite"]}')
-
-            for node in nodeList:
-
-                if not leafNode.findChild(node):
-                    leafNode.add(node)
-
-                leafNode = leafNode.findChild(node)
-
-            suiteDict[testNode].update(
-                lib.tests.parseYaml(
-                    mainDict, suiteDict[testNode]["setupName"], testNode
-                )
-            )
-            leafNode.text = lib.tests.getXmlText(suiteDict[testNode])
-
-        # Write xml to file
-        for line in infoNode.getXml():
-            testInfoFile.write(f"{line}\n")
-
-    mainDict["pathToInfo"] = pathToInfo

@@ -26,12 +26,12 @@ def run(**apiDict):
     os.environ["OMP_NUM_THREADS"] = str(1)
 
     # Get mainDict
-    mainDict = lib.structs.getMainDict(apiDict)
+    mainDict = lib.config.getMainDict(apiDict)
 
     # Parse test.info and create a testList
-    testList = []
-    lib.structs.jobListFromNode(
-        backend.FlashTest.lib.xmlNode.parseXml(apiDict["pathToInfo"]), testList
+    jobList = []
+    lib.info.jobListFromNode(
+        backend.FlashTest.lib.xmlNode.parseXml(apiDict["pathToInfo"]), jobList
     )
 
     # Build sfocu for performing checks with baseline data
@@ -39,4 +39,4 @@ def run(**apiDict):
     lib.run.buildSFOCU(mainDict)
 
     # Run flashTest - actually call the backend flashTest.py here
-    lib.run.flashTest(mainDict, testList)
+    lib.run.flashTest(mainDict, jobList)

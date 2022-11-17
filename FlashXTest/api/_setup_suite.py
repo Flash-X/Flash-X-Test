@@ -25,12 +25,12 @@ def setup_suite(**apiDict):
     # the user Config file and set values that
     # were not provided in apiDict and override values
     # that were
-    mainDict = lib.structs.getMainDict(apiDict)
+    mainDict = lib.config.getMainDict(apiDict)
 
-    # Get testSuiteDict from testSuite file
-    suiteDict = lib.structs.getSuiteDict(apiDict)
+    # Get specList from suite files
+    specList = lib.suite.parseSuite(apiDict)
 
     # Create a test.info file for flashTest backend
-    lib.files.createTestInfo(mainDict, suiteDict)
+    lib.info.createInfo(mainDict, specList)
 
     print(lib.colors.OKGREEN + "[FlashXText] test.info is setup")
