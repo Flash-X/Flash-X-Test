@@ -1,8 +1,6 @@
 """FlashXTest library to interface with backend.FlashTest"""
 
 import os, subprocess
-import argparse
-import shlex
 
 from .. import backend
 from .. import lib

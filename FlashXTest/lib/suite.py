@@ -1,6 +1,7 @@
 """FlashXTest library to interface with backend.FlashTest"""
 
 import os, subprocess
+import itertools
 import glob
 import argparse
 import shlex
@@ -111,7 +112,9 @@ def parseSuite(apiDict):
     suiteParser = argparse.ArgumentParser(description="Parser for test suite")
     suiteParser.add_argument("-t", "--test", help="Test node", type=str)
     suiteParser.add_argument("-np", "--nprocs", help="Num procs", type=int)
-    suiteParser.add_argument("-e", "--env", help="Environment variable", type=str)
+    suiteParser.add_argument(
+        "-e", "--env", action="append", nargs="+", help="Environment variable", type=str
+    )
     suiteParser.add_argument("--debug", action="store_true")
     suiteParser.set_defaults(debug=False, nprocs=1, test="", env=None)
 
@@ -145,7 +148,11 @@ def parseSuite(apiDict):
             testArgs = suiteParser.parse_args(shlex.split(spec)[1:])
             testSpec.nodeName = testArgs.test
             testSpec.numProcs = testArgs.nprocs
-            testSpec.environment = testArgs.env
+            testSpec.environment = (
+                " ".join(list(itertools.chain.from_iterable(testArgs.env)))
+                if testArgs.env
+                else None
+            )
             testSpec.debug = testArgs.debug
 
             for currSpec in specList:
