@@ -1,8 +1,8 @@
 Flash-X-Test
-==========
+============
 
 Installation
-------------
+============
 
 -  Use ``./setup develop`` for development mode
 
@@ -16,12 +16,12 @@ Installation
    ``import FlashXTest.api as flashxtest``
 
 Usage
---------
+=====
 
 ``flashxtest --help`` and ``flashxtest [command] --help`` provide information on usage
 
 
 Examples
---------
+========
 
 See ``FlashXTest/example/example.suite`` for an example test suite
