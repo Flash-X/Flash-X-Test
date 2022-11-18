@@ -16,7 +16,7 @@ with open("FlashXTest/__meta__.py", mode="r") as source:
     }
 
 # core dependencies - click, docker, singularity
-DEPENDENCIES = ["click", "six"]
+DEPENDENCIES = ["click", "six", "argparse", "pyyaml"]
 
 setup(
     name=metadata["__pkgname__"],
@@ -27,12 +27,13 @@ setup(
     package_dir={"": "./"},
     package_data={
         "": [
-            "backend/FlashXTest/ERROR",
-            "backend/FlashXTest/exeScript",
-            "backend/FlashXTest/configBase",
-            "backend/FlashXTest/configTemplate",
-            "backend/FlashXTest/scripts/changeInfoFiles",
-            "backend/FlashXTest/scripts/restarttest/restarttest.sh",
+            "backend/FlashTest/ERROR",
+            "backend/FlashTest/error.sh",
+            "backend/FlashTest/exeScript",
+            "backend/FlashTest/configBase",
+            "backend/FlashTest/configTemplate",
+            "backend/FlashTest/scripts/changeInfoFiles",
+            "backend/FlashTest/scripts/restarttest/restarttest.sh",
         ]
     },
     scripts=["FlashXTest/flashxtest"],

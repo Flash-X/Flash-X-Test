@@ -3,18 +3,22 @@
 import os, sys, subprocess
 
 from .. import backend
+from .. import lib
 
 
-def flashTest(jobList, mainDict):
+def flashTest(mainDict, jobList):
     """
     Run flashTest.py from backend/FlashTest
 
     Arguments:
     ----------
     Arguments:
-    jobList   : List of jobs
     mainDict  : Main dictionary
+    jobList   : List of jobs
     """
+    # remove site from jobList
+    jobList = [job.replace(f'{mainDict["flashSite"]}/', "") for job in jobList]
+
     # Create output directory for TestResults if it does not exist
     subprocess.run("mkdir -pv {0}".format(mainDict["pathToOutdir"]), shell=True)
 
@@ -26,33 +30,33 @@ def flashTest(jobList, mainDict):
 
     optString = __getOptString(mainDict)
 
-    # Generate a list of tests from testDict
-    testList = []
-
-    for jobInfo in jobList:
-        testList.extend(backend.lib.flashTestParser.fileToList(jobInfo))
-
     # run backend/FlashTest/flashTest.py with desired configuration
     #
     testProcess = subprocess.run(
         "python3 {0}/FlashTest/flashTest.py \
                                           {1} \
                                           {2}".format(
-            os.path.dirname(backend.__file__), optString, " ".join(testList)
+            os.path.dirname(backend.__file__), optString, " ".join(jobList)
         ),
         shell=True,
     )
 
-    # Handle errors
-    # TODO: Add checks to read logs and report error for each test
-    # that failed
-    if testProcess.returncode != 0:
-        print("FlashTest returned exit status {0}".format(testProcess.returncode))
-        print("---------------------------------------------------------")
-        raise ValueError
+    os.environ["EXITSTATUS"] = str(testProcess.returncode)
+    os.environ["FLASH_BASE"] = mainDict["pathToFlash"]
+    os.environ["RESULTS_DIR"] = (
+        mainDict["pathToOutdir"] + os.sep + mainDict["flashSite"]
+    )
 
-    else:
-        print("FlashTest reports SUCCESS")
+    # try:
+    checkProcess = subprocess.run(
+        "bash $FLASHTEST_BASE/error.sh", shell=True, check=True
+    )
+
+    print(lib.colors.OKGREEN + "[FlashXTest] SUCCESS")
+
+    # except checkProcess.CalledProcessError as e:
+    #    #print(lib.colors.FAIL + f"{e.output}")
+    #    print(e.output)
 
 
 def buildSFOCU(mainDict):

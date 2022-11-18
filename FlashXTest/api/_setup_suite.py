@@ -2,17 +2,16 @@
 
 import os
 from .. import lib
+from .. import backend
 
 
-def remove(testNode, **apiDict):
+def setup_suite(**apiDict):
     """
-    Run a list of tests from xml file
+    Setup test.info from a list of suites
 
     Arguments
     ---------
-    simDir:Simulation directory
-    testKey:test key from test.toml
-    apiDict:Dictionary to override values from Config file
+    testSuite : Name of the testSuite file
     """
     # Cache the value to current directory and set it as
     # testDir in apiDict
@@ -26,8 +25,10 @@ def remove(testNode, **apiDict):
     # the user Config file and set values that
     # were not provided in apiDict and override values
     # that were
-    mainDict = lib.init.getMainDict(apiDict)
+    mainDict = lib.config.getMainDict(apiDict)
 
-    apiDict["testNode"] = testNode
+    # Get specList from suite files
+    specList = lib.suite.parseSuite(mainDict)
 
-    lib.remove.removeTest(apiDict, mainDict)
+    # Create a test.info file for flashTest backend
+    lib.info.createInfo(mainDict, specList)

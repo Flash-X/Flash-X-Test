@@ -1,4 +1,3 @@
 from ._init import init
+from ._setup_suite import setup_suite
 from ._run import run
-from ._add import add
-from ._remove import remove

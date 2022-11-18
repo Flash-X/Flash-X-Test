@@ -1,0 +1,26 @@
+# File containing details of test specifications for
+# specific simulations that reference keys defined in
+# tests/tests.toml files defined in the simulation
+# directories
+#
+# Comments can be added using a `#` sign and individual
+# tests spec can be defined with relevant options as shown below
+#
+# List of options
+# --test, -t (string value), desired test key/node from tests/tests.toml
+# --nprocs, -np (integer value), number of procs to be used
+# --nthreads, -nt (integer value), number of threads to be used
+# --env, -e (colon seperated environment variables)
+# --debug (boolean), to run test in debug
+# --cbase, -cb (date string YYYY-MM-DD[_version])
+# --rbase, -rb (date string YYYY-MM-DD[_version])
+
+# Incompressible Navier-Stokes UniTests
+incompFlow/RisingBubble \
+	--test="UnitTest/RisingBubble/AMReX/2d" \
+	--nprocs=2
+
+incompFlow/LidDrivenCavity --test="UnitTest/LidDrivenCavity/AMReX/2d" --nprocs=4 --debug
+
+# Grid UnitTests
+unitTest/Poisson/Amrex --test="UnitTest/Multigrid/AMReX/3d"
