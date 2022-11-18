@@ -73,7 +73,9 @@ class TestSpec:
 
         # Deal with environment variables
         if self.environment:
-            self.environment = self.environment.replace(":", " ")
+            self.environment = " ".join(
+                list(itertools.chain.from_iterable(self.environment))
+            )
 
         # append to xmlText
         for xmlKey in list(self.__dict__.keys()):
@@ -156,12 +158,7 @@ def parseSuite(apiDict):
                     )
 
             testSpec.numProcs = testArgs.nprocs
-
-            testSpec.environment = (
-                " ".join(list(itertools.chain.from_iterable(testArgs.env)))
-                if testArgs.env
-                else None
-            )
+            testSpec.environment = testArgs.env
             testSpec.debug = testArgs.debug
 
             specList.append(testSpec)
