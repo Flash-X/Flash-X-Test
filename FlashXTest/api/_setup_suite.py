@@ -28,9 +28,7 @@ def setup_suite(**apiDict):
     mainDict = lib.config.getMainDict(apiDict)
 
     # Get specList from suite files
-    specList = lib.suite.parseSuite(apiDict)
+    specList = lib.suite.parseSuite(mainDict)
 
     # Create a test.info file for flashTest backend
     lib.info.createInfo(mainDict, specList)
-
-    print(lib.colors.OKGREEN + "[FlashXText] test.info is setup")

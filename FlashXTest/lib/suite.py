@@ -93,11 +93,11 @@ def __continuationLines(fin):
         yield line
 
 
-def parseSuite(apiDict):
+def parseSuite(mainDict):
     """
     Arguments
     ---------
-    apiDict : Dicitionary for the API
+    mainDict : Dicitionary for the API
 
     Returns
     specList : List of test specifications
@@ -107,8 +107,8 @@ def parseSuite(apiDict):
 
     # Check if pathToSuites is defined, if not use
     # all *.suite files from the working directory
-    if not apiDict["pathToSuites"]:
-        apiDict["pathToSuites"] = glob.glob("*.suite")
+    if not mainDict["pathToSuites"]:
+        mainDict["pathToSuites"] = glob.glob("*.suite")
 
     # Create a test suite parser
     suiteParser = argparse.ArgumentParser(description="Parser for test suite")
@@ -122,7 +122,7 @@ def parseSuite(apiDict):
 
     # Loop over all suite files and populate
     # suite dictionary
-    for suiteFile in apiDict["pathToSuites"]:
+    for suiteFile in mainDict["pathToSuites"]:
 
         # Handle exceptions
         if not suiteFile.endswith(".suite"):

@@ -73,6 +73,18 @@ def createInfo(mainDict, specList):
     # Set variables for site Info
     pathToInfo = str(mainDict["testDir"]) + "/test.info"
 
+    if os.path.exists(pathToInfo):
+        overwrite = input(
+            lib.colors.WARNING
+            + f"[FlashXTest] {pathToInfo!r} already exits. Replace? (Y/n) "
+        )
+
+        if overwrite == "y" or overwrite == "Y":
+            print(lib.colors.OKGREEN + "OVERWRITING")
+        else:
+            print(lib.colors.OKGREEN + "SKIPPING")
+            return
+
     # Get uniquie setup names
     setupList = []
     for testSpec in specList:
@@ -80,9 +92,9 @@ def createInfo(mainDict, specList):
     setupList = [*set(setupList)]
 
     # Get yaml dictionary
-    yamlDict = {}
+    setupYaml = {}
     for setupName in setupList:
-        yamlDict[setupName] = lib.yml.parseYaml(mainDict, setupName)
+        setupYaml[setupName] = lib.yml.parseYaml(mainDict, setupName)
 
     # Build test.info file from the test suite
     with open(pathToInfo, "w") as testInfoFile:
@@ -100,11 +112,11 @@ def createInfo(mainDict, specList):
                 infoNode.findChild(f'{mainDict["flashSite"]}'), testSpec.nodeName
             )
 
-            yamlInfo = yamlDict[testSpec.setupName][testSpec.nodeName]
+            setupInfo = setupYaml[testSpec.setupName][testSpec.nodeName]
 
-            for key in yamlInfo.keys():
+            for key in setupInfo.keys():
                 if hasattr(testSpec, key):
-                    setattr(testSpec, key, yamlInfo[key])
+                    setattr(testSpec, key, setupInfo[key])
                 else:
                     raise ValueError(
                         f"{key!r} defined for test {testSpec.nodeName!r}"
@@ -120,3 +132,5 @@ def createInfo(mainDict, specList):
             testInfoFile.write(f"{line}\n")
 
     mainDict["pathToInfo"] = pathToInfo
+
+    print(lib.colors.OKGREEN + "[FlashXText] test.info is setup")
