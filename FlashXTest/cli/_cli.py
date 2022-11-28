@@ -109,7 +109,8 @@ def run_suite():
 @flashxtest.command(name="compile")
 @click.argument("setupname", type=str, required=True)
 @click.option("--test", "-t", type=str, required=True)
-def compile(setupname, test):
+@click.option("--objdir", type=str, default="object")
+def compile(setupname, test, objdir):
     """
     \b
     Compile a test defined for a specific setup
@@ -118,14 +119,15 @@ def compile(setupname, test):
     This command compiles a test defined
     in tests.yaml for a specific setup
     """
-    api.dry_run(setupName=setupname, nodeName=test, run_test=False)
+    api.dry_run(setupName=setupname, nodeName=test, objDir=objdir, run_test=False)
 
 
 @flashxtest.command(name="run")
 @click.argument("setupname", type=str, required=True)
 @click.option("--test", "-t", type=str, required=True)
 @click.option("--nprocs", "-np", type=str, required=True)
-def run(setupname, test, nprocs):
+@click.option("--objdir", type=str, default="object")
+def run(setupname, test, nprocs, objdir):
     """
     \b
     Compile and run a test defined for a specific setup
@@ -134,4 +136,10 @@ def run(setupname, test, nprocs):
     This command compiles and runs a test defined
     in tests.yaml for a specific setup
     """
-    api.dry_run(setupName=setupname, nodeName=test, numProcs=nprocs, run_test=True)
+    api.dry_run(
+        setupName=setupname,
+        nodeName=test,
+        numProcs=nprocs,
+        objDir=objdir,
+        run_test=True,
+    )
