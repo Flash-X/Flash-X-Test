@@ -26,8 +26,9 @@ def dry_run(run_test=False, **apiDict):
 
     subprocess.run(
         f'cd {mainDict["pathToFlash"]} && '
-        + f'./setup {mainDict["setupName"]} {setupInfo["setupOptions"]} -site={mainDict["flashSite"]} && '
-        + f"cd object && make -j",
+        + f'./setup {mainDict["setupName"]} {setupInfo["setupOptions"]} '
+        + f'-site={mainDict["flashSite"]} -objdir={mainDict["objDir"]} && '
+        + f'cd {mainDict["objDir"]} && make -j',
         shell=True,
         check=True,
     )
@@ -51,7 +52,8 @@ def dry_run(run_test=False, **apiDict):
             if len(parfiles_list) > 1:
                 raise ValueError(
                     lib.colors.FAIL
-                    + f'[FlashXTest] {mainDict["nodeName"]} for {mainDict["setupName"]} contains multiple parfiles'
+                    + f'[FlashXTest] {mainDict["nodeName"]} for {mainDict["setupName"]} '
+                    + f"contains multiple parfiles"
                 )
             else:
                 parfile = parfiles_list[0]
@@ -69,7 +71,7 @@ def dry_run(run_test=False, **apiDict):
                 )
 
         subprocess.run(
-            f'cd {mainDict["pathToFlash"]}/object && '
+            f'cd {mainDict["pathToFlash"]}/{mainDict["objDir"]} && '
             + f"cp {parfile_path} . && "
             + f'mpirun -n {mainDict["numProcs"]} ./flashx -par_file {parfile}',
             shell=True,
