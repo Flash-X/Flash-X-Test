@@ -5,7 +5,7 @@ from .. import lib
 from .. import backend
 
 
-def run(**apiDict):
+def run_suite(**apiDict):
     """
     Run a list of tests from test.info in current working directory
     """

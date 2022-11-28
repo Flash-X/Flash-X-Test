@@ -93,8 +93,8 @@ def setup_suite(suitelist):
     api.setup_suite(pathToSuites=suitelist)
 
 
-@flashxtest.command(name="run")
-def run():
+@flashxtest.command(name="run-suite")
+def run_suite():
     """
     \b
     Run the test suite using "test.info".
@@ -103,7 +103,35 @@ def run():
     This command runs all the tests defined in
     "test.info", and conveys errors
     """
-    # Arguments
-    # ---------
-    # testsuite : string for the test suite file
-    api.run()
+    api.run_suite()
+
+
+@flashxtest.command(name="compile")
+@click.argument("setup", type=str, required=True)
+@click.option("--test", "-t", type=str, required=True)
+def compile(setup, test):
+    """
+    \b
+    Compile a test defined for a specific setup
+
+    \b
+    This command compiles a test defined
+    in tests.yaml for a specific setup
+    """
+    api.dry_run(setupName=setup, nodeName=test, run_test=False)
+
+
+@flashxtest.command(name="run")
+@click.argument("setup", type=str, required=True)
+@click.option("--test", "-t", type=str, required=True)
+@click.option("--nprocs", "-np", type=str, required=True)
+def run(setup, test, nprocs):
+    """
+    \b
+    Compile and run a test defined for a specific setup
+
+    \b
+    This command compiles and runs a test defined
+    in tests.yaml for a specific setup
+    """
+    api.dry_run(setupName=setup, nodeName=test, numProcs=nprocs, run_test=True)
