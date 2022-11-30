@@ -109,7 +109,7 @@ def run_suite():
 @flashxtest.command(name="compile")
 @click.argument("setupname", type=str, required=True)
 @click.option("--test", "-t", type=str, required=True)
-@click.option("--objdir", type=str, default="object")
+@click.option("-objdir", type=str, default="object")
 def compile(setupname, test, objdir):
     """
     \b
@@ -126,7 +126,7 @@ def compile(setupname, test, objdir):
 @click.argument("setupname", type=str, required=True)
 @click.option("--test", "-t", type=str, required=True)
 @click.option("--nprocs", "-np", type=str, required=True)
-@click.option("--objdir", type=str, default="object")
+@click.option("-objdir", type=str, default="object")
 def run(setupname, test, nprocs, objdir):
     """
     \b
