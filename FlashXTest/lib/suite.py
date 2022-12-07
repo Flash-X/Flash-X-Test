@@ -42,7 +42,7 @@ class TestSpec:
 
         # Deal with parfile paths
         if self.parfiles:
-            if self.parfiles == "<defaultParfiles>":
+            if self.parfiles == "<defaultParfile>":
                 pass
             else:
                 parFileList = self.parfiles.split(" ")
