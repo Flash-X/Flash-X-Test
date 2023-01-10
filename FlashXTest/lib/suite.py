@@ -41,7 +41,7 @@ class TestSpec:
         ]:
             setattr(self, attr, None)
 
-    def getXmlText(self):
+    def getXmlText(self, mainDict):
         """
         get Xml text from test specifications
         """
@@ -81,16 +81,19 @@ class TestSpec:
             self.restartParfiles = " ".join(parFileList)
 
         if self.nodeName.split("/")[0] == "Composite":
+
             self.checkpointBasename = "flash_hdf5_chk_"
             self.comparisonNumber = "0001"
             self.restartNumber = "0002"
-            self.comparisonBenchmark = f"<baselineDir>/<siteDir>/{self.cbase}/<buildDir>/<runDir>/<checkpointBasename><comparisonNumber>"
-            self.restartBenchmark = f"<baselineDir>/<siteDir>/{self.rbase}/<buildDir>/<runDir>/<checkpointBasename><restartNumber>"
 
-        if self.nodeName.split("/")[0] == "Comparison":
-            self.shortPathToBenchmark = (
-                f"<baselineDir>/<siteDir>/{self.cbase}/<buildDir>/<runDir>/<chkMax>"
-            )
+            if self.cbase:
+                self.comparisonBenchmark = f'{mainDict["baselineDir"]}/<siteDir>/{self.cbase}/<buildDir>/<runDir>/<checkpointBasename><comparisonNumber>'
+
+            if self.rbase:
+                self.restartBenchmark = f'{mainDict["baselineDir"]}/<siteDir>/{self.rbase}/<buildDir>/<runDir>/<checkpointBasename><restartNumber>'
+
+        if self.nodeName.split("/")[0] == "Comparison" and self.cbase:
+            self.shortPathToBenchmark = f'{mainDict["baselineDir"]}/<siteDir>/{self.cbase}/<buildDir>/<runDir>/<chkMax>'
 
         # Deal with environment variables
         if self.environment:
@@ -150,8 +153,8 @@ def parseSuite(mainDict):
         nprocs=1,
         test="",
         env=None,
-        cbase=date.today().isoformat(),
-        rbase=date.today().isoformat(),
+        cbase=None,
+        rbase=None,
     )
 
     # Loop over all suite files and populate
