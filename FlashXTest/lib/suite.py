@@ -1,5 +1,6 @@
 """FlashXTest library to interface with backend.FlashTest"""
 
+from datetime import date
 import os, subprocess
 import itertools
 import glob
@@ -28,7 +29,15 @@ class TestSpec:
             "restartParfiles",
             "transfers",
             "environment",
+            "checkpointBasename",
+            "comparisonNumber",
+            "comparisonBenchmark",
+            "restartNumber",
+            "restartBenchmark",
+            "shortPathToBenchmark",
             "debug",
+            "cbase",
+            "rbase",
         ]:
             setattr(self, attr, None)
 
@@ -71,6 +80,18 @@ class TestSpec:
             ]
             self.restartParfiles = " ".join(parFileList)
 
+        if self.nodeName.split("/")[0] == "Composite":
+            self.checkpointBasename = "flash_hdf5_chk_"
+            self.comparisonNumber = "0001"
+            self.restartNumber = "0002"
+            self.comparisonBenchmark = f"<baselineDir>/<siteDir>/{self.cbase}/<buildDir>/<runDir>/<checkpointBasename><comparisonNumber>"
+            self.restartBenchmark = f"<baselineDir>/<siteDir>/{self.rbase}/<buildDir>/<runDir>/<checkpointBasename><restartNumber>"
+
+        if self.nodeName.split("/")[0] == "Comparison":
+            self.shortPathToBenchmark = (
+                f"<baselineDir>/<siteDir>/{self.cbase}/<buildDir>/<runDir>/<chkMax>"
+            )
+
         # Deal with environment variables
         if self.environment:
             self.environment = " ".join(
@@ -79,7 +100,7 @@ class TestSpec:
 
         # append to xmlText
         for xmlKey in list(self.__dict__.keys()):
-            if getattr(self, xmlKey):
+            if (getattr(self, xmlKey)) and (xmlKey not in ["cbase", "rbase", "debug"]):
                 xmlText.append(f"{xmlKey}: {getattr(self, xmlKey)}")
 
         return xmlText
@@ -115,10 +136,23 @@ def parseSuite(mainDict):
     suiteParser.add_argument("-t", "--test", help="Test node", type=str)
     suiteParser.add_argument("-np", "--nprocs", help="Num procs", type=int)
     suiteParser.add_argument(
+        "-cbase", "--cbase", help="Date for comparison benchmark", type=str
+    )
+    suiteParser.add_argument(
+        "-rbase", "--rbase", help="Date for restart benchmark", type=str
+    )
+    suiteParser.add_argument(
         "-e", "--env", action="append", nargs="+", help="Environment variable", type=str
     )
     suiteParser.add_argument("--debug", action="store_true")
-    suiteParser.set_defaults(debug=False, nprocs=1, test="", env=None)
+    suiteParser.set_defaults(
+        debug=False,
+        nprocs=1,
+        test="",
+        env=None,
+        cbase=date.today().isoformat(),
+        rbase=date.today().isoformat(),
+    )
 
     # Loop over all suite files and populate
     # suite dictionary
@@ -160,6 +194,8 @@ def parseSuite(mainDict):
             testSpec.numProcs = testArgs.nprocs
             testSpec.environment = testArgs.env
             testSpec.debug = testArgs.debug
+            testSpec.cbase = testArgs.cbase
+            testSpec.rbase = testArgs.rbase
 
             specList.append(testSpec)
 

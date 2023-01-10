@@ -30,7 +30,18 @@ def __setExeScript(apiDict):
     apiDict: Dictionary to populate Config file
     """
     apiDict["pathToExeScript"] = apiDict["testDir"] + "/exeScript"
-    lib.config.setExe(apiDict)
+
+    # Check if pathToExeScript already exists and
+    # skip the setup process
+    if os.path.exists(apiDict["pathToExeScript"]):
+        print(
+            lib.colors.WARNING
+            + "[FlashXTest] Skipping initialization: Exec script already exists!"
+        )
+
+    # Setup configuration if pathToConfig does not exist
+    else:
+        lib.config.setExe(apiDict)
 
 
 def __setConfig(apiDict):

@@ -32,7 +32,10 @@ def flashxtest(ctx, version):
 @flashxtest.command(name="init")
 @click.option("--source", "-z", default=None, help="Flash-X source directory")
 @click.option("--site", "-s", default=None, help="Flash-X site name")
-def init(source, site):
+@click.option(
+    "--baseline", "-b", default=None, help="Path to baseline directory on local machine"
+)
+def init(source, site, baseline):
     """
     \b
     Initialize site specific configuration.
@@ -54,7 +57,12 @@ def init(source, site):
     # ---------
     # source: Flash-X source directory
     # site: Flash-X site name
-    api.init(flashSite=site, pathToFlash=source)
+    if (not source) or ("$PWD" in source) or ("$pwd" in source):
+        source = os.getcwd()
+    if not baseline:
+        baseline = os.getcwd() + "/TestBaseline"
+
+    api.init(flashSite=site, pathToFlash=source, baselineDir=baseline)
 
 
 @flashxtest.command(name="setup-suite")
@@ -106,6 +114,20 @@ def run_suite():
     api.run_suite()
 
 
+@flashxtest.command(name="show")
+@click.argument("setupname", type=str, required=True)
+def show(setupname):
+    """
+    \b
+    Show available tests for a given setup name
+
+    \b
+    This command prints tests located in tests/test.yaml
+    for a given simulation name.
+    """
+    api.show_tests(setupName=setupname)
+
+
 @flashxtest.command(name="compile")
 @click.argument("setupname", type=str, required=True)
 @click.option("--test", "-t", type=str, required=True)
@@ -119,7 +141,12 @@ def compile(setupname, test, objdir):
     This command compiles a test defined
     in tests.yaml for a specific setup
     """
-    api.dry_run(setupName=setupname, nodeName=test, objDir=objdir, run_test=False)
+    api.dry_run(
+        setupName=setupname,
+        nodeName=test,
+        objDir=os.path.join(os.getcwd(), objdir),
+        run_test=False,
+    )
 
 
 @flashxtest.command(name="run")
@@ -140,6 +167,6 @@ def run(setupname, test, nprocs, objdir):
         setupName=setupname,
         nodeName=test,
         numProcs=nprocs,
-        objDir=objdir,
+        objDir=os.path.join(os.getcwd(), objdir),
         run_test=True,
     )
