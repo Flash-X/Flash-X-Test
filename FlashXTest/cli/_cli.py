@@ -128,6 +128,20 @@ def show(setupname):
     api.show_tests(setupName=setupname)
 
 
+@flashxtest.command(name="benchmark")
+@click.argument("test_list", nargs=-1, required=False)
+@click.option("--all", is_flag=True, help="Benchmark all tests")
+def benchmark(test_list, all):
+    """
+    \b
+    Benchmark all or specific tests from the current run
+
+    \b
+    This command creates a benchmark for tests
+    """
+    api.benchmark(testList=test_list, allTests=all)
+
+
 @flashxtest.command(name="compile")
 @click.argument("setupname", type=str, required=True)
 @click.option("--test", "-t", type=str, required=True)
