@@ -125,7 +125,7 @@ def createInfo(mainDict, specList):
 
             infoNode.findChildrenWithPath(testSpec.nodeName)[
                 0
-            ].text = testSpec.getXmlText()
+            ].text = testSpec.getXmlText(mainDict)
 
         # Write xml to file
         for line in infoNode.getXml():

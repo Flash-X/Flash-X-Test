@@ -20,6 +20,9 @@ def run_suite(**apiDict):
     # Set path to Info
     apiDict["pathToInfo"] = apiDict["testDir"] + "/test.info"
 
+    # Set path to exe
+    apiDict["pathToExeScript"] = apiDict["testDir"] + "/exeScript"
+
     # Environment variable for OpenMP
     # Set the default value. Each test
     # can override this from xml file

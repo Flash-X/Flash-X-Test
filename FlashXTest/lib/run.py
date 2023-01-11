@@ -39,6 +39,7 @@ def flashTest(mainDict, jobList):
             os.path.dirname(backend.__file__), optString, " ".join(jobList)
         ),
         shell=True,
+        check=True,
     )
 
     os.environ["EXITSTATUS"] = str(testProcess.returncode)
@@ -102,6 +103,7 @@ def __getOptString(mainDict):
         "pathToOutdir": "-o",
         "pathToConfig": "-c",
         "flashSite": "-s",
+        "pathToExeScript": "-e",
     }
 
     optString = "-v -L "

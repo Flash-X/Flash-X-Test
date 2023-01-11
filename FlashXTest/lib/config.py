@@ -37,7 +37,10 @@ def setExe(apiDict):
     ---------
     apiDict : API dictionary
     """
-    pass
+    exeBase = os.path.dirname(backend.__file__) + "/FlashTest/exeScript"
+    exeFile = apiDict["pathToExeScript"]
+
+    subprocess.run(f"cat {exeBase} > {exeFile}", shell=True, check=True)
 
 
 def setConfig(apiDict):
@@ -79,7 +82,7 @@ def setConfig(apiDict):
             # Set default baseLineDir
             line = line.replace(
                 "baselineDir:",
-                str("baselineDir:        " + apiDict["testDir"] + "/TestArchive"),
+                str("baselineDir:        " + apiDict["baselineDir"]),
             )
 
             # Set default pathToOutdir

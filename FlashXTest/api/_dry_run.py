@@ -6,6 +6,31 @@ from .. import lib
 from .. import backend
 
 
+def show_tests(**apiDict):
+    """
+    Show all tests for a given setupname
+    """
+    # Cache the value to current directory and set it as
+    # testDir in apiDict
+    apiDict["testDir"] = os.getcwd()
+
+    # Cache the value of user Config file and store it as
+    # pathToConfig in apiDict
+    apiDict["pathToConfig"] = apiDict["testDir"] + "/config"
+
+    # Get mainDict
+    mainDict = lib.config.getMainDict(apiDict)
+
+    # Get setup information from yaml file
+    testDict = lib.yml.parseYaml(mainDict, mainDict["setupName"])
+
+    for nodeName in testDict:
+        print(f"\n{nodeName}")
+
+        for key, value in testDict[nodeName].items():
+            print(f"\t{key}: {value}")
+
+
 def dry_run(run_test=False, **apiDict):
     """
     Compile a specific test using setupName and testNode
