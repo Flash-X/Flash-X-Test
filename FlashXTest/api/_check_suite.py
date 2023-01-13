@@ -15,10 +15,13 @@ def check_suite(**apiDict):
 
     # Cache the value of user Config file and store it as
     # pathToConfig in apiDict
-    apiDict["pathToConfig"] = apiDict["testDir"] + "/Config"
+    apiDict["pathToConfig"] = apiDict["testDir"] + "/config"
 
     # Set path to Info
     apiDict["pathToInfo"] = apiDict["testDir"] + "/test.info"
+
+    # Get mainDict
+    mainDict = lib.config.getMainDict(apiDict)
 
     # Check suite
     lib.suite.checkSuite(

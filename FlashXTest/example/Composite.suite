@@ -1,0 +1,7 @@
+# Test suite file for test gce
+# comments start with "#"
+
+#------------------------------------------------
+# Tests for - Sod
+#------------------------------------------------
+Sod -t "Composite/Sod/PseudoUG/2d/AMReX/simpleUnsplit" -np 4 -cbase 2023-01-12 -rbase 2023-01-12_6

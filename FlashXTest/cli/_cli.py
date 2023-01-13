@@ -34,7 +34,8 @@ def flashxtest(ctx, version):
 @click.option("--site", "-s", default=None, help="Flash-X site name")
 @click.option("--local-archive", "-a", default=None, help="Path to local archive")
 @click.option("--main-archive", "-m", default=None, help="Path to main archive")
-def init(source, site, local_archive, main_archive):
+@click.option("--mpi-path", "-mpi", default="mpiexec", help="Name for MPI executable")
+def init(source, site, local_archive, main_archive, mpi_path):
     """
     \b
     Initialize site specific configuration.
@@ -68,6 +69,7 @@ def init(source, site, local_archive, main_archive):
         pathToFlash=source,
         pathToLocalArchive=local_archive,
         pathToMainArchive=main_archive,
+        pathToMPI=mpi_path,
     )
 
 
@@ -118,6 +120,20 @@ def run_suite():
     "test.info", and conveys errors
     """
     api.run_suite()
+
+
+@flashxtest.command(name="check-suite")
+def check_suite():
+    """
+    \b
+    Check and report changes to "test.info".
+
+    \b
+    This command will compare "test.info"
+    with "suite" files and report if changes
+    are detected
+    """
+    api.check_suite()
 
 
 @flashxtest.command(name="show")

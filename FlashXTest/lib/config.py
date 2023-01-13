@@ -40,7 +40,11 @@ def setExe(apiDict):
     exeBase = os.path.dirname(backend.__file__) + "/FlashTest/exeScript"
     exeFile = apiDict["pathToExeScript"]
 
-    subprocess.run(f"cat {exeBase} > {exeFile}", shell=True, check=True)
+    with open(exeBase, "r") as ebase, open(exeFile, "w") as efile:
+        lines = ebase.readlines()
+        for line in lines:
+            line = line.replace("mpiexec", apiDict["pathToMPI"])
+            efile.write(line)
 
 
 def setConfig(apiDict):
