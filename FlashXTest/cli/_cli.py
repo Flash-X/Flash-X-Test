@@ -32,10 +32,9 @@ def flashxtest(ctx, version):
 @flashxtest.command(name="init")
 @click.option("--source", "-z", default=None, help="Flash-X source directory")
 @click.option("--site", "-s", default=None, help="Flash-X site name")
-@click.option(
-    "--baseline", "-b", default=None, help="Path to baseline directory on local machine"
-)
-def init(source, site, baseline):
+@click.option("--local-archive", "-a", default=None, help="Path to local archive")
+@click.option("--main-archive", "-m", default=None, help="Path to main archive")
+def init(source, site, local_archive, main_archive):
     """
     \b
     Initialize site specific configuration.
@@ -59,10 +58,17 @@ def init(source, site, baseline):
     # site: Flash-X site name
     if (not source) or ("$PWD" in source) or ("$pwd" in source):
         source = os.getcwd()
-    if not baseline:
-        baseline = os.getcwd() + "/TestBaseline"
+    if not local_archive:
+        local_archive = os.getcwd() + "/TestLocalArchive"
+    if not main_archive:
+        main_archive = os.getcwd() + "/TestMainArchive"
 
-    api.init(flashSite=site, pathToFlash=source, baselineDir=baseline)
+    api.init(
+        flashSite=site,
+        pathToFlash=source,
+        pathToLocalArchive=local_archive,
+        pathToMainArchive=main_archive,
+    )
 
 
 @flashxtest.command(name="setup-suite")
@@ -126,20 +132,6 @@ def show(setupname):
     for a given simulation name.
     """
     api.show_tests(setupName=setupname)
-
-
-@flashxtest.command(name="benchmark")
-@click.argument("test_list", nargs=-1, required=False)
-@click.option("--all", is_flag=True, help="Benchmark all tests")
-def benchmark(test_list, all):
-    """
-    \b
-    Benchmark all or specific tests from the current run
-
-    \b
-    This command creates a benchmark for tests
-    """
-    api.benchmark(testList=test_list, allTests=all)
 
 
 @flashxtest.command(name="compile")

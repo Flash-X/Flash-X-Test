@@ -21,7 +21,7 @@ def run_suite(**apiDict):
     apiDict["pathToInfo"] = apiDict["testDir"] + "/test.info"
 
     # Set path to exe
-    apiDict["pathToExeScript"] = apiDict["testDir"] + "/exeScript"
+    apiDict["pathToExeScript"] = apiDict["testDir"] + "/execfile"
 
     # Environment variable for OpenMP
     # Set the default value. Each test
@@ -43,3 +43,8 @@ def run_suite(**apiDict):
 
     # Run flashTest - actually call the backend flashTest.py here
     lib.run.flashTest(mainDict, jobList)
+
+    # Check suite
+    lib.suite.checkSuite(
+        mainDict, backend.FlashTest.lib.xmlNode.parseXml(apiDict["pathToInfo"])
+    )

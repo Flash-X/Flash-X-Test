@@ -73,16 +73,16 @@ def setConfig(apiDict):
         # Iterate over lines and set values defined in apiDict
         for line in lines:
 
+            # Set default baseLineDir
+            line = line.replace(
+                "pathToMainArchive:",
+                str("pathToMainArchive:  " + apiDict["pathToMainArchive"]),
+            )
+
             # Set path to Archive
             line = line.replace(
                 "pathToLocalArchive:",
-                str("pathToLocalArchive: " + apiDict["testDir"] + "/TestArchive"),
-            )
-
-            # Set default baseLineDir
-            line = line.replace(
-                "baselineDir:",
-                str("baselineDir:        " + apiDict["baselineDir"]),
+                str("pathToLocalArchive: " + apiDict["pathToLocalArchive"]),
             )
 
             # Set default pathToOutdir

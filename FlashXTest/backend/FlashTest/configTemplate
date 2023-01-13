@@ -10,8 +10,8 @@
 #
 # Comments begin with a '#'
 
+pathToMainArchive:
 pathToLocalArchive:
-baselineDir:
 pathToOutdir:
 pathToFlash:
 pathToGmake:        make
