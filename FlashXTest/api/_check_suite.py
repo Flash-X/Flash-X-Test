@@ -5,7 +5,7 @@ from .. import lib
 from .. import backend
 
 
-def run_suite(**apiDict):
+def check_suite(**apiDict):
     """
     Run a list of tests from test.info in current working directory
     """
@@ -20,29 +20,8 @@ def run_suite(**apiDict):
     # Set path to Info
     apiDict["pathToInfo"] = apiDict["testDir"] + "/test.info"
 
-    # Set path to exe
-    apiDict["pathToExeScript"] = apiDict["testDir"] + "/execfile"
-
-    # Environment variable for OpenMP
-    # Set the default value. Each test
-    # can override this from xml file
-    os.environ["OMP_NUM_THREADS"] = str(1)
-
     # Get mainDict
     mainDict = lib.config.getMainDict(apiDict)
-
-    # Parse test.info and create a testList
-    jobList = []
-    lib.info.jobListFromNode(
-        backend.FlashTest.lib.xmlNode.parseXml(apiDict["pathToInfo"]), jobList
-    )
-
-    # Build sfocu for performing checks with baseline data
-    # for Composite and Comparison tests
-    lib.run.buildSFOCU(mainDict)
-
-    # Run flashTest - actually call the backend flashTest.py here
-    lib.run.flashTest(mainDict, jobList)
 
     # Check suite
     lib.suite.checkSuite(

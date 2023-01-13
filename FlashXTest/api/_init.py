@@ -29,7 +29,7 @@ def __setExeScript(apiDict):
     ---------
     apiDict: Dictionary to populate Config file
     """
-    apiDict["pathToExeScript"] = apiDict["testDir"] + "/exeScript"
+    apiDict["pathToExeScript"] = apiDict["testDir"] + "/execfile"
 
     # Check if pathToExeScript already exists and
     # skip the setup process

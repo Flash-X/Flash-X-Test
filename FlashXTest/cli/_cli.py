@@ -32,10 +32,10 @@ def flashxtest(ctx, version):
 @flashxtest.command(name="init")
 @click.option("--source", "-z", default=None, help="Flash-X source directory")
 @click.option("--site", "-s", default=None, help="Flash-X site name")
-@click.option(
-    "--baseline", "-b", default=None, help="Path to baseline directory on local machine"
-)
-def init(source, site, baseline):
+@click.option("--local-archive", "-a", default=None, help="Path to local archive")
+@click.option("--main-archive", "-m", default=None, help="Path to main archive")
+@click.option("--mpi-path", "-mpi", default="mpiexec", help="Name for MPI executable")
+def init(source, site, local_archive, main_archive, mpi_path):
     """
     \b
     Initialize site specific configuration.
@@ -59,10 +59,18 @@ def init(source, site, baseline):
     # site: Flash-X site name
     if (not source) or ("$PWD" in source) or ("$pwd" in source):
         source = os.getcwd()
-    if not baseline:
-        baseline = os.getcwd() + "/TestBaseline"
+    if not local_archive:
+        local_archive = os.getcwd() + "/TestLocalArchive"
+    if not main_archive:
+        main_archive = os.getcwd() + "/TestMainArchive"
 
-    api.init(flashSite=site, pathToFlash=source, baselineDir=baseline)
+    api.init(
+        flashSite=site,
+        pathToFlash=source,
+        pathToLocalArchive=local_archive,
+        pathToMainArchive=main_archive,
+        pathToMPI=mpi_path,
+    )
 
 
 @flashxtest.command(name="setup-suite")
@@ -114,6 +122,20 @@ def run_suite():
     api.run_suite()
 
 
+@flashxtest.command(name="check-suite")
+def check_suite():
+    """
+    \b
+    Check and report changes to "test.info".
+
+    \b
+    This command will compare "test.info"
+    with "suite" files and report if changes
+    are detected
+    """
+    api.check_suite()
+
+
 @flashxtest.command(name="show")
 @click.argument("setupname", type=str, required=True)
 def show(setupname):
@@ -126,20 +148,6 @@ def show(setupname):
     for a given simulation name.
     """
     api.show_tests(setupName=setupname)
-
-
-@flashxtest.command(name="benchmark")
-@click.argument("test_list", nargs=-1, required=False)
-@click.option("--all", is_flag=True, help="Benchmark all tests")
-def benchmark(test_list, all):
-    """
-    \b
-    Benchmark all or specific tests from the current run
-
-    \b
-    This command creates a benchmark for tests
-    """
-    api.benchmark(testList=test_list, allTests=all)
 
 
 @flashxtest.command(name="compile")

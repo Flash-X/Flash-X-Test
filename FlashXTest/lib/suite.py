@@ -10,6 +10,29 @@ import shlex
 from .. import backend
 from .. import lib
 
+# Create a test suite parser
+SuiteParser = argparse.ArgumentParser(description="Parser for test suite")
+SuiteParser.add_argument("-t", "--test", help="Test node", type=str)
+SuiteParser.add_argument("-np", "--nprocs", help="Num procs", type=int)
+SuiteParser.add_argument(
+    "-cbase", "--cbase", help="Date for comparison benchmark", type=str
+)
+SuiteParser.add_argument(
+    "-rbase", "--rbase", help="Date for restart benchmark", type=str
+)
+SuiteParser.add_argument(
+    "-e", "--env", action="append", nargs="+", help="Environment variable", type=str
+)
+SuiteParser.add_argument("--debug", action="store_true")
+SuiteParser.set_defaults(
+    debug=False,
+    nprocs=1,
+    test="",
+    env=None,
+    cbase=None,
+    rbase=None,
+)
+
 
 class TestSpec:
     """
@@ -41,7 +64,7 @@ class TestSpec:
         ]:
             setattr(self, attr, None)
 
-    def getXmlText(self, mainDict):
+    def getXmlText(self):
         """
         get Xml text from test specifications
         """
@@ -87,13 +110,15 @@ class TestSpec:
             self.restartNumber = "0002"
 
             if self.cbase:
-                self.comparisonBenchmark = f'{mainDict["baselineDir"]}/<siteDir>/{self.cbase}/<buildDir>/<runDir>/<checkpointBasename><comparisonNumber>'
+                self.comparisonBenchmark = f"<siteDir>/{self.cbase}/<buildDir>/<runDir>/<checkpointBasename><comparisonNumber>"
 
             if self.rbase:
-                self.restartBenchmark = f'{mainDict["baselineDir"]}/<siteDir>/{self.rbase}/<buildDir>/<runDir>/<checkpointBasename><restartNumber>'
+                self.restartBenchmark = f"<siteDir>/{self.rbase}/<buildDir>/<runDir>/<checkpointBasename><restartNumber>"
 
         if self.nodeName.split("/")[0] == "Comparison" and self.cbase:
-            self.shortPathToBenchmark = f'{mainDict["baselineDir"]}/<siteDir>/{self.cbase}/<buildDir>/<runDir>/<chkMax>'
+            self.shortPathToBenchmark = (
+                f"<siteDir>/{self.cbase}/<buildDir>/<runDir>/<chkMax>"
+            )
 
         # Deal with environment variables
         if self.environment:
@@ -134,29 +159,6 @@ def parseSuite(mainDict):
     if not mainDict["pathToSuites"]:
         mainDict["pathToSuites"] = glob.glob("*.suite")
 
-    # Create a test suite parser
-    suiteParser = argparse.ArgumentParser(description="Parser for test suite")
-    suiteParser.add_argument("-t", "--test", help="Test node", type=str)
-    suiteParser.add_argument("-np", "--nprocs", help="Num procs", type=int)
-    suiteParser.add_argument(
-        "-cbase", "--cbase", help="Date for comparison benchmark", type=str
-    )
-    suiteParser.add_argument(
-        "-rbase", "--rbase", help="Date for restart benchmark", type=str
-    )
-    suiteParser.add_argument(
-        "-e", "--env", action="append", nargs="+", help="Environment variable", type=str
-    )
-    suiteParser.add_argument("--debug", action="store_true")
-    suiteParser.set_defaults(
-        debug=False,
-        nprocs=1,
-        test="",
-        env=None,
-        cbase=None,
-        rbase=None,
-    )
-
     # Loop over all suite files and populate
     # suite dictionary
     for suiteFile in mainDict["pathToSuites"]:
@@ -184,7 +186,7 @@ def parseSuite(mainDict):
             testSpec = TestSpec()
             testSpec.setupName = shlex.split(spec)[0]
 
-            testArgs = suiteParser.parse_args(shlex.split(spec)[1:])
+            testArgs = SuiteParser.parse_args(shlex.split(spec)[1:])
             testSpec.nodeName = testArgs.test
 
             for currSpec in specList:
@@ -203,3 +205,102 @@ def parseSuite(mainDict):
             specList.append(testSpec)
 
     return specList
+
+
+def checkSuite(mainDict, infoNode):
+    """
+    Arguments
+    ---------
+    mainDict : Dicitionary for the API
+    """
+    infoNode = infoNode.findChild(f'{mainDict["flashSite"]}')
+    mainDict["pathToSuites"] = glob.glob("*.suite")
+
+    update_list = []
+
+    # Loop over all suite files and populate
+    # suite dictionary
+    for suiteFile in mainDict["pathToSuites"]:
+
+        # Handle exceptions
+        if not suiteFile.endswith(".suite"):
+            raise ValueError(
+                lib.colors.FAIL
+                + f'[FlashXTest] File {suiteFile} must have a ".suite" suffix'
+            )
+
+        if not os.path.exists(suiteFile):
+            raise ValueError(lib.colors.FAIL + f"[FlashXTest] Cannot find {suiteFile}")
+
+        with open(suiteFile, "r") as sfile:
+
+            # loop over lines
+            for line in __continuationLines(sfile):
+                if line.split("#")[0]:
+                    spec = shlex.split(line.split("#")[0])
+                    testArgs = SuiteParser.parse_args(spec[1:])
+                    if testArgs.test.split("/")[0] in ["Composite", "Comparison"]:
+                        xmlText = infoNode.findChildrenWithPath(testArgs.test)[0].text
+                        for entries in xmlText:
+                            if entries.split(":")[0] == "restartBenchmark":
+                                rbase = [
+                                    value
+                                    for value in entries.split(":")[1]
+                                    .replace(" ", "")
+                                    .split("/")
+                                    if value
+                                    not in [
+                                        "<siteDir>",
+                                        "<buildDir>",
+                                        "<runDir>",
+                                        "<checkpointBasename><restartNumber>",
+                                    ]
+                                ][0]
+                                if (not testArgs.rbase) or (testArgs.rbase != rbase):
+                                    update_list.append(
+                                        f'Update rbase to "{rbase}" for "{testArgs.test}" in "{sfile.name}"'
+                                    )
+
+                            elif entries.split(":")[0] == "comparisonBenchmark":
+                                cbase = [
+                                    value
+                                    for value in entries.split(":")[1]
+                                    .replace(" ", "")
+                                    .split("/")
+                                    if value
+                                    not in [
+                                        "<siteDir>",
+                                        "<buildDir>",
+                                        "<runDir>",
+                                        "<checkpointBasename><comparisonNumber>",
+                                    ]
+                                ][0]
+                                if (not testArgs.cbase) or (testArgs.cbase != cbase):
+                                    update_list.append(
+                                        f'Update cbase to "{cbase}" for "{testArgs.test}" in "{sfile.name}"'
+                                    )
+
+                            elif entries.split(":")[0] == "shortPathToBenchmark":
+                                cbase = [
+                                    value
+                                    for value in entries.split(":")[1]
+                                    .replace(" ", "")
+                                    .split("/")
+                                    if value
+                                    not in [
+                                        "<siteDir>",
+                                        "<buildDir>",
+                                        "<runDir>",
+                                        "<chkMax>",
+                                    ]
+                                ][0]
+                                if (not testArgs.cbase) or (testArgs.cbase != cbase):
+                                    update_list.append(
+                                        f'Update cbase to "{cbase}" for "{testArgs.test}" in "{sfile.name}"'
+                                    )
+
+    print(lib.colors.WARNING + "[FlashXTest] TODO: ")
+    with open(mainDict["testDir"] + os.sep + "TODO", "w") as update_file:
+        for line in update_list:
+            print("[FlashXTest] " + line)
+            update_file.write(line + "\n")

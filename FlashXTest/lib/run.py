@@ -26,7 +26,7 @@ def flashTest(mainDict, jobList):
     subprocess.run("mkdir -pv {0}".format(mainDict["pathToLocalArchive"]), shell=True)
 
     # Create baseLine directory if it does not exist
-    subprocess.run("mkdir -pv {0}".format(mainDict["baselineDir"]), shell=True)
+    subprocess.run("mkdir -pv {0}".format(mainDict["pathToMainArchive"]), shell=True)
 
     optString = __getOptString(mainDict)
 
@@ -47,6 +47,16 @@ def flashTest(mainDict, jobList):
     os.environ["RESULTS_DIR"] = (
         mainDict["pathToOutdir"] + os.sep + mainDict["flashSite"]
     )
+
+    with open(
+        mainDict["pathToOutdir"]
+        + os.sep
+        + mainDict["flashSite"]
+        + os.sep
+        + "archive.log"
+    ) as logfile:
+        line = logfile.readlines()[0]
+        os.environ["INVOCATION_DIR"] = line.split(" ")[-1].replace(":\n", "")
 
     # try:
     checkProcess = subprocess.run(
