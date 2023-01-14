@@ -105,7 +105,7 @@ class TestSpec:
 
         if self.nodeName.split("/")[0] == "Composite":
 
-            self.checkpointBasename = "flash_hdf5_chk_"
+            self.checkpointBasename = "flashx_hdf5_chk_"
             self.comparisonNumber = "0001"
             self.restartNumber = "0002"
 

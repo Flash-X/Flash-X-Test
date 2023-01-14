@@ -1,0 +1,198 @@
+#!/usr/bin/env python3
+
+"""
+A simple parser to split test.info into YAML files for individual
+simulation directories and test.suite file for Private-Testing repo
+"""
+import click
+import FlashXTest
+
+pathToFlashX = "/home/akash/Desktop/Akash/Workbench/Flash-X"
+
+
+@click.group(name="infosplit")
+def infosplit():
+    """
+    \b
+    Command to split info files.
+    Will be moved to FlashXTest when mature
+    """
+
+
+@infosplit.command(name="create-suite")
+@click.argument("filename", type=str)
+def create_suite(filename):
+    """
+    Create suite file
+    """
+    # Parse test.info from the working directory
+    # using xml parser from FlashTest backend
+    infoNode = FlashXTest.backend.FlashTest.lib.xmlNode.parseXml(filename)
+    infoNode = infoNode.findChild("gce")
+
+    # test type list
+    testTypeList = ["UnitTest", "Composite", "Comparison"]
+
+    # Create list of keys from existing test.info and
+    # designated where they should belong
+    # in "tests.yaml" or test suite
+    suitekeys = ["numProcs"]
+
+    for testType in testTypeList:
+
+        # loopNode
+        loopNode = infoNode.findChild(testType)
+
+        # Create a dictionary for test nodes
+        # using the recursive function createSuiteDict
+        specList = []
+        FlashXTest.lib.info.specListFromNode(loopNode, specList)
+
+        for testInfo in specList:
+            testInfo["nodeName"] = testInfo["nodeName"].replace("gce/", "")
+
+        # Create a list of setupNames using information
+        # from specList
+        setupList = []
+        for testInfo in specList:
+            setupList.append(testInfo["setupName"])
+
+        # Remove duplicates from the list
+
+        # METHOD 1 - using set, creates random order
+        # setupList = [*set(setupList)]
+
+        # METHOD 2 - fixed order
+        tempList = []
+        for setupName in setupList:
+            if setupName not in tempList:
+                tempList.append(setupName)
+        setupList = tempList
+
+        # Open *.suite file and start populating test suite
+        with open(f"{testType}.suite", "w") as suitefile:
+
+            suitefile.write("# Test suite file for test gce\n")
+            suitefile.write('# comments start with "#"')
+
+            # Loop over setupList
+            for setupName in setupList:
+
+                suitefile.write("\n")
+                suitefile.write(f"\n#------------------------------------------------")
+                suitefile.write(f"\n# Tests for - {setupName}")
+                suitefile.write(f"\n#------------------------------------------------")
+
+                # Get list of test nodes matching
+                # the setup name
+                tempSpecList = [
+                    testInfo
+                    for testInfo in specList
+                    if testInfo["setupName"] == setupName
+                ]
+
+                # Loop over nodeList and start populating
+                for testInfo in tempSpecList:
+
+                    testSpec = (
+                        f'{setupName} -t "{testInfo["nodeName"]}" '
+                        + f'-np {testInfo["numProcs"]}'
+                    )
+
+                    if "environment" in testInfo.keys():
+                        envlist = testInfo["environment"].split()
+                        testSpec = testSpec + " \\\n"
+                        for env in envlist:
+                            testSpec = testSpec + f" -e {env}"
+                        testSpec = f"{testSpec}\n"
+
+                    # Write line to suitefile
+                    suitefile.write(f"\n{testSpec}")
+
+
+@infosplit.command(name="create-yaml")
+@click.argument("filename", type=str)
+def create_yaml(filename):
+    """
+    Create YAML files in pathToFlash
+    """
+    # Parse test.info from the working directory
+    # using xml parser from FlashTest backend
+    infoNode = FlashXTest.backend.FlashTest.lib.xmlNode.parseXml(filename)
+    infoNode = infoNode.findChild("gce")
+
+    # Create list of keys from existing test.info and
+    # designated where they should belong
+    # in "tests.yaml" or test suite
+    yamlkeys = ["setupOptions", "parfiles", "restartParfiles", "transfers"]
+
+    # Create a dictionary for test nodes
+    # using the recursive function createSuiteDict
+    specList = []
+    FlashXTest.lib.info.specListFromNode(infoNode, specList)
+
+    for testInfo in specList:
+        testInfo["nodeName"] = testInfo["nodeName"].replace("gce/", "")
+
+    # Create a list of setupNames using information
+    # from specList
+    setupList = []
+    for testInfo in specList:
+        setupList.append(testInfo["setupName"])
+
+    tempList = []
+    for setupName in setupList:
+        if setupName not in tempList:
+            tempList.append(setupName)
+    setupList = tempList
+
+    # Loop over setupList
+    for setupName in setupList:
+
+        # Open a tests.yaml file in setupName/tests folder and
+        # start adding tests
+        with open(
+            f"{pathToFlashX}/source/Simulation/SimulationMain/{setupName}/tests/tests.yaml",
+            "w",
+        ) as yamlfile:
+
+            # Get list of test nodes matching
+            # the setup name
+            tempSpecList = [
+                testInfo for testInfo in specList if testInfo["setupName"] == setupName
+            ]
+
+            yamlfile.write("# YAML file for test information\n")
+            yamlfile.write('# comments start with "#"\n')
+
+            # Loop over nodeList and start populating
+            for testInfo in tempSpecList:
+
+                # Write information to yaml file
+                # This logic is a bit hacky to
+                # to manage paths for parfiles and restartParfiles
+                # TODO: ?? How will paths for transfers be handled ??
+                yamlfile.write(f'\n{testInfo["nodeName"]}:\n')
+                for key in yamlkeys:
+                    if key in testInfo.keys():
+                        if key in ["parfiles", "restartParfiles"]:
+                            if f"{setupName}/tests/" in testInfo[key]:
+                                testInfo[key] = testInfo[key].replace(
+                                    "<pathToSimulations>/" + setupName + "/tests/",
+                                    "",
+                                )
+                            elif f"<setupName>" in testInfo[key]:
+                                testInfo[key] = testInfo[key].replace(
+                                    "<pathToSimulations>/" + "<setupName>/",
+                                    "",
+                                )
+                            else:
+                                testInfo[key] = testInfo[key].replace(
+                                    "<pathToSimulations>/" + setupName + "/", ""
+                                )
+
+                        yamlfile.write(f"  {key}: {testInfo[key]}\n")
+
+
+if __name__ == "__main__":
+    infosplit()
