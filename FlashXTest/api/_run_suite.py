@@ -43,8 +43,3 @@ def run_suite(**apiDict):
 
     # Run flashTest - actually call the backend flashTest.py here
     lib.run.flashTest(mainDict, jobList)
-
-    # Check suite
-    lib.suite.checkSuite(
-        mainDict, backend.FlashTest.lib.xmlNode.parseXml(apiDict["pathToInfo"])
-    )
