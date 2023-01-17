@@ -93,7 +93,11 @@ def setup_suite(suitelist):
     defined as,
 
     \b
-    incompFlow/LidDrivenCavity -t "UnitTest/LidDrivenCavity/AMReX/2d" -np 4 --debug
+        incompFlow/LidDrivenCavity -t "UnitTest/LidDrivenCavity/AMReX/2d" -np 4 --debug
+    \b
+        Sod -t "Composite/Sod/PseudoUG/2d/AMReX/simpleUnsplit" -np 4 -cbase 2023-01-13 -rbase 2023-01-14
+    \b
+        Sod -t "Comparison/Sod/UG/2d/simpleUnsplit" -np 1 -e OMP_NUM_THREADS=1 -e OMP_STACKSIZE=16M -cbase 2023-01-13
 
     \b
     The first value represents a Flash-X setup defined in
@@ -101,10 +105,12 @@ def setup_suite(suitelist):
     options,
 
     \b
-    -t, --test TEXT	Defined in */tests/tests.yaml)
-    -np, --nprocs TEXT	Number of processors
-    --debug BOOLEAN	Debug test
-
+    -t, --test		TEXT	Defined in */tests/tests.yaml)
+    -np, --nprocs	TEXT	Number of processors
+    -cbase, --cbase	TEXT	Date for comparsion benchmark
+    -rbase, --rbase	TEXT	Date for restart benchmark 
+    -e, --env		TEXT	Environment variables
+    --debug		BOOLEAN	Debug test
     """
     api.setup_suite(pathToSuites=suitelist)
 
@@ -123,7 +129,8 @@ def run_suite():
 
 
 @flashxtest.command(name="check-suite")
-def check_suite():
+@click.argument("suitelist", type=str, nargs=-1)
+def check_suite(suitelist):
     """
     \b
     Check and report changes to "test.info".
@@ -133,7 +140,7 @@ def check_suite():
     with "suite" files and report if changes
     are detected
     """
-    api.check_suite()
+    api.check_suite(pathToSuites=suitelist)
 
 
 @flashxtest.command(name="show")

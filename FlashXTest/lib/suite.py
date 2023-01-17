@@ -105,7 +105,7 @@ class TestSpec:
 
         if self.nodeName.split("/")[0] == "Composite":
 
-            self.checkpointBasename = "flash_hdf5_chk_"
+            self.checkpointBasename = "flashx_hdf5_chk_"
             self.comparisonNumber = "0001"
             self.restartNumber = "0002"
 
@@ -214,7 +214,11 @@ def checkSuite(mainDict, infoNode):
     mainDict : Dicitionary for the API
     """
     infoNode = infoNode.findChild(f'{mainDict["flashSite"]}')
-    mainDict["pathToSuites"] = glob.glob("*.suite")
+
+    # Check if pathToSuites is defined, if not use
+    # all *.suite files from the working directory
+    if not mainDict["pathToSuites"]:
+        mainDict["pathToSuites"] = glob.glob("*.suite")
 
     update_list = []
 
@@ -300,7 +304,7 @@ def checkSuite(mainDict, infoNode):
                                     )
 
     print(lib.colors.WARNING + "[FlashXTest] TODO: ")
-    with open(mainDict["testDir"] + os.sep + "TODO", "w") as update_file:
+    with open(mainDict["testDir"] + os.sep + "TODO.FlashXTest", "w") as update_file:
         for line in update_list:
             print("[FlashXTest] " + line)
             update_file.write(line + "\n")

@@ -2,7 +2,7 @@
 import sys, os
 import cgi, pickle, tempfile
 import purgeTmp
-sys.path.insert(0, "lib")
+sys.path.insert(0, os.path.join(os.path.abspath(os.path.dirname(sys.argv[0])), "lib"))
 import invocations, littleParser
 
 fileMap = "fileMap"
@@ -37,7 +37,7 @@ print("<meta http-equiv=\"cache-control\" content=\"no-cache\">")
 print("<meta http-equiv=\"Pragma\" content=\"no-cache\">")
 print("<meta http-equiv=\"Expires\" content=\"-1\">")
 
-print(open("style.css","r").read())
+print(open(f'{os.path.join(os.path.abspath(os.path.dirname(sys.argv[0])), "style.css")}',"r").read())
 print("<script src=\"lib/vanishPleaseWait.js\"></script>")
 print("<script src=\"lib/statsWindow.js\"></script>")
 print("<script src=\"lib/redirect.js\"></script>")
