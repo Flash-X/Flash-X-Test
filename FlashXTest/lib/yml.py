@@ -64,6 +64,7 @@ def parseYaml(mainDict, setupName):
                 "parfiles",
                 "restartParfiles",
                 "transfers",
+                "errTol",
             ]:
                 raise ValueError(
                     lib.colors.FAIL

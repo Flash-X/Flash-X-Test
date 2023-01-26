@@ -61,6 +61,7 @@ class TestSpec:
             "debug",
             "cbase",
             "rbase",
+            "errTol",
         ]:
             setattr(self, attr, None)
 
