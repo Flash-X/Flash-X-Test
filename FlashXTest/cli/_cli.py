@@ -109,6 +109,7 @@ def setup_suite(suitelist):
     -np, --nprocs	TEXT	Number of processors
     -cbase, --cbase	TEXT	Date for comparsion benchmark
     -rbase, --rbase	TEXT	Date for restart benchmark
+    -tol, --tolerance	FLOAT	Tolerance for comparsion and composite tests
     -e, --env		TEXT	Environment variables
     --debug		BOOLEAN	Debug test
     """

@@ -20,6 +20,7 @@ SuiteParser.add_argument(
 SuiteParser.add_argument(
     "-rbase", "--rbase", help="Date for restart benchmark", type=str
 )
+SuiteParser.add_argument("-tol", "--tolerance", help="Error tolerance", type=float)
 SuiteParser.add_argument(
     "-e", "--env", action="append", nargs="+", help="Environment variable", type=str
 )
@@ -31,6 +32,7 @@ SuiteParser.set_defaults(
     env=None,
     cbase=None,
     rbase=None,
+    tolerance=0.0,
 )
 
 
@@ -61,6 +63,7 @@ class TestSpec:
             "debug",
             "cbase",
             "rbase",
+            "errTol",
         ]:
             setattr(self, attr, None)
 
@@ -201,6 +204,7 @@ def parseSuite(mainDict):
             testSpec.debug = testArgs.debug
             testSpec.cbase = testArgs.cbase
             testSpec.rbase = testArgs.rbase
+            testSpec.errTol = testArgs.tolerance
 
             specList.append(testSpec)
 
