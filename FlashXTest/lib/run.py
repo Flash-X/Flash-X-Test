@@ -1,6 +1,7 @@
 """FlashXTest library to interface with backend.FlashTest"""
 
 import os, sys, subprocess
+import toml
 
 from .. import backend
 from .. import lib
@@ -48,15 +49,16 @@ def flashTest(mainDict, jobList):
         mainDict["pathToOutdir"] + os.sep + mainDict["flashSite"]
     )
 
-    with open(
+    invocationDict = toml.load(
         mainDict["pathToOutdir"]
         + os.sep
         + mainDict["flashSite"]
         + os.sep
-        + "archive.log"
-    ) as logfile:
-        line = logfile.readlines()[0]
-        os.environ["INVOCATION_DIR"] = line.split(" ")[-1].replace(":\n", "")
+        + "invocation.toml"
+    )
+
+    for key, value in invocationDict.items():
+        os.environ[key] = value
 
     # try:
     checkProcess = subprocess.run(
@@ -121,5 +123,8 @@ def __getOptString(mainDict):
     for option in optDict:
         if option in mainDict:
             optString = optString + "{0} {1} ".format(optDict[option], mainDict[option])
+
+    if not mainDict["saveToMainArchive"]:
+        optString = optString + "-t "
 
     return optString

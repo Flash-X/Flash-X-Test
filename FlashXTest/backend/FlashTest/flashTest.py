@@ -1117,6 +1117,9 @@ def main():
                 log.err("%s\n" % e + "No log files sent to log archive.")
             else:
                 log.stp("Log files sent to log archive.")
+
+    with open(os.path.join(pathToSiteDir,"invocation.toml"), "w") as invocationToml:
+        invocationToml.write(f'INVOCATION_DIR="{invocationDir}"\n')
         
     if "-t" in flashTestOpts:
         log.stp("No archiving done for test-run. FlashTest complete. End of Logfile.")
