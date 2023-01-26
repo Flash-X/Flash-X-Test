@@ -108,7 +108,7 @@ def setup_suite(suitelist):
     -t, --test		TEXT	Defined in */tests/tests.yaml)
     -np, --nprocs	TEXT	Number of processors
     -cbase, --cbase	TEXT	Date for comparsion benchmark
-    -rbase, --rbase	TEXT	Date for restart benchmark 
+    -rbase, --rbase	TEXT	Date for restart benchmark
     -e, --env		TEXT	Environment variables
     --debug		BOOLEAN	Debug test
     """
@@ -116,7 +116,8 @@ def setup_suite(suitelist):
 
 
 @flashxtest.command(name="run-suite")
-def run_suite():
+@click.option("--archive", is_flag=True, help="Save results to main archive")
+def run_suite(archive):
     """
     \b
     Run the test suite using "test.info".
@@ -125,7 +126,7 @@ def run_suite():
     This command runs all the tests defined in
     "test.info", and conveys errors
     """
-    api.run_suite()
+    api.run_suite(saveToMainArchive=archive)
 
 
 @flashxtest.command(name="check-suite")

@@ -196,7 +196,7 @@ def parseSuite(mainDict):
                         + f"[FlashXTest] Duplicate for {testSpec.nodeName!r} detected in suite files"
                     )
 
-            testSpec.numProcs = int(testArgs.nprocs)
+            testSpec.numProcs = testArgs.nprocs
             testSpec.environment = testArgs.env
             testSpec.debug = testArgs.debug
             testSpec.cbase = testArgs.cbase
