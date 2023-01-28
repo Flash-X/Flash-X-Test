@@ -43,14 +43,13 @@ def init(source, site, local_archive, main_archive, mpi_path):
     \b
     This command is used to setup site specific
     configuration for your testing environment
-    using "config" and "execScript" files. At
-    present only "config" file is created since
-    this feature is under development.
+    using "config" and "execfile".
 
     \b
-    This command will not work if "config" file
-    is present in the working directory. To edit
-    existing site specific configuration, "config"
+    This command will not replace exisiting
+    "config" or "execfile" in the working 
+    directory. To edit existing site specific 
+    configuration, "config" and "execfile"
     should be edited directly.
     """
     # Arguments
@@ -105,7 +104,7 @@ def setup_suite(suitelist):
     options,
 
     \b
-    -t, --test		TEXT	Defined in */tests/tests.yaml)
+    -t, --test		TEXT	Defined in */tests/tests.yaml
     -np, --nprocs	TEXT	Number of processors
     -cbase, --cbase	TEXT	Date for comparsion benchmark
     -rbase, --rbase	TEXT	Date for restart benchmark
