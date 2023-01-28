@@ -1,7 +1,0 @@
-# Test suite file for test gce
-# comments start with "#"
-
-#------------------------------------------------
-# Tests for - Sod
-#------------------------------------------------
-Sod -t "Comparison/Sod/UG/2d/simpleUnsplit" -np 1 -e OMP_NUM_THREADS=1 -cbase 2023-01-12
