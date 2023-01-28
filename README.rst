@@ -11,9 +11,9 @@ installation of the application. The documentation here provides
 instructions for installation and a guide for developers who wish to
 contribute to the functionality of the toolkit.
 
-``flashxtest`` is a user-friendly wrapper over legacy FlashTest and
-FlashTestView applications that have been succesffuly used before for
-managing FLASH and Flash-X development.
+``FlashXTest`` is a user-friendly wrapper over legacy ``FlashTest`` and
+``FlashTestView`` applications that have been used before for managing
+FLASH and Flash-X development.
 
 Note that Flash-X-Test depends on ``python3+`` and consquently ``pip``
 should point to ``python3+`` installation package ``pip3``.
@@ -37,6 +37,21 @@ using,
 
    pip install --upgrade git+ssh://git@github.com/Flash-X/Flash-X-Test.git@<tag> --user
    pip uninstall FlashXTest
+
+It is recommended to install in ``--user`` mode to avoid root privilege
+issues with ``pip``.
+
+``FlashXTest`` provides both command line and python interface. The
+command line script ``flashxtest``, is copied to the
+``$HOME/.local/bin`` directory and therefore the ``PATH`` variable
+should be updated to access ``flashxtest`` as a terminal command.
+
+The python interface can be accessed directly without any ``PATH``
+modifications by simply importing the module as,
+
+.. code::
+
+   import FlashXTest
 
 *****************
  Developer Guide
