@@ -33,4 +33,4 @@ Located under ``FlashXTest/backend``, consists of ``FlashTest`` and
 ************
 
 Version of stable releases are determined using the year and month and
-follow the format ``YY.MM``
+follow the format ``YYYY.MM``
