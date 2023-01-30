@@ -43,6 +43,17 @@ def flashTest(mainDict, jobList):
         check=True,
     )
 
+    if mainDict["setInitialBenchmarks"]:
+        testProcess = subprocess.run(
+            "python3 {0}/FlashTest/flashTest.py \
+                                              {1} \
+                                              {2}".format(
+                os.path.dirname(backend.__file__), optString, " ".join(jobList)
+            ),
+            shell=True,
+            check=True,
+        )
+
     os.environ["EXITSTATUS"] = str(testProcess.returncode)
     os.environ["FLASH_BASE"] = mainDict["pathToFlash"]
     os.environ["RESULTS_DIR"] = (
