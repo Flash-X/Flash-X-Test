@@ -24,7 +24,7 @@ SuiteParser.add_argument("-tol", "--tolerance", help="Error tolerance", type=flo
 SuiteParser.add_argument(
     "-e", "--env", action="append", nargs="+", help="Environment variable", type=str
 )
-SuiteParser.add_argument("--debug", action="store_true")
+SuiteParser.add_argument("-debug", "--debug", action="store_true")
 SuiteParser.set_defaults(
     debug=False,
     nprocs=1,

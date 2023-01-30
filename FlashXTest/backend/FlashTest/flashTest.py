@@ -502,7 +502,11 @@ def main():
         # DEV Also, if gethostbyaddr doesn't work, flashTest.py will
         # crash even tho it's not necessary - FQHostname only needs
         # to be defined if 'site' is not (see below)
-        FQHostname = socket.gethostbyaddr(socket.gethostname())[0]
+        try:
+            FQHostname = socket.gethostbyaddr(socket.gethostname())[0]
+        except:
+            FQHostName = "<NONAME>"
+
         masterDict["FQHostname"] = FQHostname
     # Determine value of "site". This will be the first element of
     # 'FQHostname' unless the user has specified it with the "-s"

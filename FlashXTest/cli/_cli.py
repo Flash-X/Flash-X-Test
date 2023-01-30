@@ -47,8 +47,8 @@ def init(source, site, local_archive, main_archive, mpi_path):
 
     \b
     This command will not replace exisiting
-    "config" or "execfile" in the working 
-    directory. To edit existing site specific 
+    "config" or "execfile" in the working
+    directory. To edit existing site specific
     configuration, "config" and "execfile"
     should be edited directly.
     """
@@ -110,14 +110,15 @@ def setup_suite(suitelist):
     -rbase, --rbase	TEXT	Date for restart benchmark
     -tol, --tolerance	FLOAT	Tolerance for comparsion and composite tests
     -e, --env		TEXT	Environment variables
-    --debug		BOOLEAN	Debug test
+    -debug, --debug	BOOLEAN	Debug test
     """
     api.setup_suite(pathToSuites=suitelist)
 
 
 @flashxtest.command(name="run-suite")
 @click.option("--archive", is_flag=True, help="Save results to main archive")
-def run_suite(archive):
+@click.option("--initial", is_flag=True, help="Initial run to set benchmarks")
+def run_suite(archive, initial):
     """
     \b
     Run the test suite using "test.info".
@@ -126,7 +127,10 @@ def run_suite(archive):
     This command runs all the tests defined in
     "test.info", and conveys errors
     """
-    api.run_suite(saveToMainArchive=archive)
+    if initial:
+        archive = True
+
+    api.run_suite(saveToMainArchive=archive, setInitialBenchmarks=initial)
 
 
 @flashxtest.command(name="check-suite")

@@ -727,6 +727,12 @@ class SfocuTester(ComparisonTester):
       log.err("A key \"shortPathToBenchmark\", whose value is a relative path from\n" +
               "the local archive to a benchmark file against which the results of\n" +
               "this run can be compared, should be provided in your \"test.info\" file.")
+
+      if "-t" not in self.masterDict["flashTestOpts"]:
+          log.stp("Setting current run as benchmark, updating xml file...")
+          self.masterDict["testXmlNode"].text.append("shortPathToBenchmark: <siteDir>/%s/<buildDir>/<runDir>/<chkMax>" % self.masterDict["dateStr"])
+          self.masterDict["testXmlNode"].smudge()
+
       return False
 
     # else
@@ -1750,6 +1756,12 @@ class CompositeTester(ComparisonTester):
       pathSeedInfo = self.masterDict.get("benchmarkSeedInfo", None)
       if not pathSeedInfo:
         logerr("No comparisonBenchmark specified and benchmarkSeedInfo not set, so no comparisons being done.")
+
+        if "-t" not in self.masterDict["flashTestOpts"]:
+            logmsg("Setting current run as benchmark, updating xml file...")
+            self.masterDict["testXmlNode"].text.append("comparisonBenchmark: <siteDir>/%s/<buildDir>/<runDir>/<checkpointBasename><comparisonNumber>" % self.masterDict["dateStr"])
+            self.masterDict["testXmlNode"].smudge()
+
         return False
       locSeedInfo = pullfile(pathSeedInfo,log) # bring seed info file local if its remote
       if not locSeedInfo:
