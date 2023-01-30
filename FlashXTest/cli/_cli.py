@@ -110,7 +110,7 @@ def setup_suite(suitelist):
     -rbase, --rbase	TEXT	Date for restart benchmark
     -tol, --tolerance	FLOAT	Tolerance for comparsion and composite tests
     -e, --env		TEXT	Environment variables
-    --debug		BOOLEAN	Debug test
+    -debug, --debug	BOOLEAN	Debug test
     """
     api.setup_suite(pathToSuites=suitelist)
 
