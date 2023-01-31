@@ -117,8 +117,10 @@ def setup_suite(suitelist):
 
 @flashxtest.command(name="run-suite")
 @click.option("--archive", is_flag=True, help="Save results to main archive")
-@click.option("--initial", is_flag=True, help="Initial run to set benchmarks")
-def run_suite(archive, initial):
+@click.option(
+    "--set-benchmarks", is_flag=True, help="Set benchmarks for tests if not present"
+)
+def run_suite(archive, set_benchmarks):
     """
     \b
     Run the test suite using "test.info".
@@ -127,10 +129,10 @@ def run_suite(archive, initial):
     This command runs all the tests defined in
     "test.info", and conveys errors
     """
-    if initial:
+    if set_benchmarks:
         archive = True
 
-    api.run_suite(saveToMainArchive=archive, setInitialBenchmarks=initial)
+    api.run_suite(saveToMainArchive=archive, setBenchmarks=set_benchmarks)
 
 
 @flashxtest.command(name="check-suite")

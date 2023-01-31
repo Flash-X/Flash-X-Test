@@ -30,6 +30,8 @@ explicitly supplied by editing respective fields in your ``config`` and
 
    flashxtest run-suite
 
+Use ``--archive`` to save a tarball for the results to main archive
+
 *******************************
  Setting Up Initial Benchmarks
 *******************************
@@ -37,17 +39,22 @@ explicitly supplied by editing respective fields in your ``config`` and
 To setup initial benchmarks do the following after running ``flashxtest
 init`` and ``flashxtest setup-suite``
 
--  Run the suite in with ``--initial`` option
+-  Run the suite in with ``--set-benchmarks`` option
 
 .. code::
 
-   flashxtest run-suite --initial
+   flashxtest run-suite --set-benchmarks
 
-This will execute two consecutive runs, update ``test.info``, and create
-a tarball of your results, and store it in main archive defined in
-``pathToMainArchive`` in your ``config`` file
+This will execute two consecutive runs for tests that do not contain
+benchmark information, update ``test.info``, create a tarball of
+results, and store it in main archive defined in ``pathToMainArchive``
+in your ``config`` file
 
--  Next update ``Example.suite`` to set ``-cbase <yyyy-mm-dd>`` and
-   ``-rbase <yyyy-mm-dd>_2`` to create a tag for comparison and restart
-   benchmarks for subsquent test suite runs, so that new ``test.info``
-   contains correct values for benchmarks
+-  Check the suite
+
+.. code::
+
+   flashxtest check-suite Example.suite
+
+This will check updates to ``test.info`` and tell you what values to set
+for ``-cbase`` and ``-rbase`` in ``Example.suite``

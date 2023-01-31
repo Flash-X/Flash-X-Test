@@ -34,8 +34,12 @@ def run_suite(**apiDict):
     # Parse test.info and create a testList
     jobList = []
     lib.info.jobListFromNode(
-        backend.FlashTest.lib.xmlNode.parseXml(apiDict["pathToInfo"]), jobList
+        backend.FlashTest.lib.xmlNode.parseXml(apiDict["pathToInfo"]),
+        jobList,
+        setBenchmarks=mainDict["setBenchmarks"],
     )
+
+    print(jobList)
 
     # Build sfocu for performing checks with baseline data
     # for Composite and Comparison tests
