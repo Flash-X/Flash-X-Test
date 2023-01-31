@@ -36,7 +36,8 @@ def flashxtest(ctx, version):
 @click.option("--main-archive", "-m", default=None, help="Path to main archive")
 @click.option("--outdir", "-o", default=None, help="Path to results directory")
 @click.option("--mpi-path", "-mpi", default="mpiexec", help="Name for MPI executable")
-def init(source, site, local_archive, main_archive, outdir, mpi_path):
+@click.option("--make-jobs", "-make-j", default=1, type=int, help="Gmake jobs")
+def init(source, site, local_archive, main_archive, outdir, mpi_path, make_jobs):
     """
     \b
     Initialize site specific configuration.
@@ -73,6 +74,7 @@ def init(source, site, local_archive, main_archive, outdir, mpi_path):
         pathToMainArchive=main_archive,
         pathToOutdir=outdir,
         pathToMPI=mpi_path,
+        pathToGmake=f"make -j{make_jobs}",
     )
 
 

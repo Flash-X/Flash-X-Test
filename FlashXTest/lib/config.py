@@ -102,6 +102,12 @@ def setConfig(apiDict):
                     str("pathToFlash:        " + str(apiDict["pathToFlash"])),
                 )
 
+            # Set default pathToGmake
+            line = line.replace(
+                "pathToGmake:",
+                str("pathToGmake:        " + apiDict["pathToGmake"]),
+            )
+
             # Set 'flashSite' if define in apiDict
             if "flashSite" in apiDict:
                 line = line.replace(

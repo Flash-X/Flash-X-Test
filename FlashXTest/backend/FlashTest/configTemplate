@@ -14,7 +14,7 @@ pathToMainArchive:
 pathToLocalArchive:
 pathToOutdir:
 pathToFlash:
-pathToGmake:        make
+pathToGmake:
 defaultParfile:     <pathToFlash>/object/flash.par
 pathToSimulations:  <pathToFlash>/source/Simulation/SimulationMain
 flashSite:
