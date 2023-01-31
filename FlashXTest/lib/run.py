@@ -28,6 +28,19 @@ def flashTest(mainDict):
 
     optString = __getOptString(mainDict)
 
+    # Parse test.info and create a testList
+    jobList = []
+
+    # Update jobList
+    lib.info.jobListFromNode(
+        backend.FlashTest.lib.xmlNode.parseXml(mainDict["pathToInfo"]),
+        jobList,
+        setBenchmarks=mainDict["setBenchmarks"],
+    )
+
+    # remove site from jobList
+    jobList = [job.replace(f'{mainDict["flashSite"]}/', "") for job in jobList]
+
     # Set number of runs for flashTest
     if mainDict["setBenchmarks"]:
         numRuns = 2
@@ -37,19 +50,6 @@ def flashTest(mainDict):
     for currRun in range(numRuns):
 
         print(f"[FlashXTest]: Run No #{currRun}")
-
-        # Parse test.info and create a testList
-        jobList = []
-
-        # Update jobList
-        lib.info.jobListFromNode(
-            backend.FlashTest.lib.xmlNode.parseXml(mainDict["pathToInfo"]),
-            jobList,
-            setBenchmarks=mainDict["setBenchmarks"],
-        )
-
-        # remove site from jobList
-        jobList = [job.replace(f'{mainDict["flashSite"]}/', "") for job in jobList]
 
         # run backend/FlashTest/flashTest.py with desired configuration
         #
