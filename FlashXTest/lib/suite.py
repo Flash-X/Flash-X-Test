@@ -193,7 +193,7 @@ def parseSuite(mainDict):
             testSpec.nodeName = testArgs.test
 
             for currSpec in specList:
-                if testSpec.nodeName.lower() == currSpec.nodeName.lower():
+                if testSpec.nodeName == currSpec.nodeName:
                     raise ValueError(
                         lib.colors.FAIL
                         + f"[FlashXTest] Duplicate for {testSpec.nodeName!r} detected in suite files"

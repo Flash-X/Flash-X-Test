@@ -363,7 +363,7 @@ class FlashCompiler(CompilerTemplate):
       os.remove(pathToDotSuccess)
 
     # determine gmake invocation and record it in "gmake_call" file and in log
-    script = "%s -j EXE=%s" % (pathToGmake, os.path.join(pathToBuildDir, exeName))
+    script = "%s EXE=%s" % (pathToGmake, os.path.join(pathToBuildDir, exeName))
     _write_to_file(os.path.join(pathToBuildDir, "gmake_call"), "w",
                    script,
                    errors="backslashreplace")
