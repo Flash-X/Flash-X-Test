@@ -308,7 +308,7 @@ def checkSuite(mainDict, infoNode):
                                     )
 
     print(lib.colors.WARNING + "[FlashXTest] TODO: ")
-    with open(mainDict["testDir"] + os.sep + "TODO.FlashXTest", "w") as update_file:
+    with open(mainDict["testDir"] + os.sep + "TODO.fxt", "w") as update_file:
         for line in update_list:
             print("[FlashXTest] " + line)
             update_file.write(line + "\n")

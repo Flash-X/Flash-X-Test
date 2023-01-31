@@ -92,7 +92,7 @@ def setConfig(apiDict):
             # Set default pathToOutdir
             line = line.replace(
                 "pathToOutdir:",
-                str("pathToOutdir:       " + apiDict["testDir"] + "/TestResults"),
+                str("pathToOutdir:       " + apiDict["pathToOutdir"]),
             )
 
             # Set 'pathToFlash' if defined in apiDict

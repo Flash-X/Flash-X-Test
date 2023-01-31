@@ -31,17 +31,9 @@ def run_suite(**apiDict):
     # Get mainDict
     mainDict = lib.config.getMainDict(apiDict)
 
-    # Parse test.info and create a testList
-    jobList = []
-    lib.info.jobListFromNode(
-        backend.FlashTest.lib.xmlNode.parseXml(apiDict["pathToInfo"]),
-        jobList,
-        setBenchmarks=mainDict["setBenchmarks"],
-    )
-
     # Build sfocu for performing checks with baseline data
     # for Composite and Comparison tests
     lib.run.buildSFOCU(mainDict)
 
     # Run flashTest - actually call the backend flashTest.py here
-    lib.run.flashTest(mainDict, jobList)
+    lib.run.flashTest(mainDict)
