@@ -39,8 +39,6 @@ def run_suite(**apiDict):
         setBenchmarks=mainDict["setBenchmarks"],
     )
 
-    print(jobList)
-
     # Build sfocu for performing checks with baseline data
     # for Composite and Comparison tests
     lib.run.buildSFOCU(mainDict)
