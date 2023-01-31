@@ -1374,6 +1374,9 @@ class CompositeExecuter(FlashExecuter):
         if "restartBenchmark" in self.masterDict or restartParfile == "none":
           iteration += 1
           continue # skip iteration
+        elif "comparisonBenchmark" not in self.masterDict:
+          iteration +=1
+          continue # skip because it is redudnant to run when comparisonBenchmark not present
         else: # must verify transparency restart for auto approved restart benchmark
           log.stp("restartBenchmark not present, performing long-run to verify transparent restart.\n")
           def readpar(path):

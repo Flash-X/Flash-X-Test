@@ -7,7 +7,7 @@ from .. import backend
 from .. import lib
 
 
-def flashTest(mainDict, jobList):
+def flashTest(mainDict):
     """
     Run flashTest.py from backend/FlashTest
 
@@ -15,10 +15,7 @@ def flashTest(mainDict, jobList):
     ----------
     Arguments:
     mainDict  : Main dictionary
-    jobList   : List of jobs
     """
-    # remove site from jobList
-    jobList = [job.replace(f'{mainDict["flashSite"]}/', "") for job in jobList]
 
     # Create output directory for TestResults if it does not exist
     subprocess.run("mkdir -pv {0}".format(mainDict["pathToOutdir"]), shell=True)
@@ -31,19 +28,31 @@ def flashTest(mainDict, jobList):
 
     optString = __getOptString(mainDict)
 
-    # run backend/FlashTest/flashTest.py with desired configuration
-    #
-    testProcess = subprocess.run(
-        "python3 {0}/FlashTest/flashTest.py \
-                                          {1} \
-                                          {2}".format(
-            os.path.dirname(backend.__file__), optString, " ".join(jobList)
-        ),
-        shell=True,
-        check=True,
-    )
-
+    # Set number of runs for flashTest
     if mainDict["setBenchmarks"]:
+        numRuns = 2
+    else:
+        numRuns = 1
+
+    for currRun in range(numRuns):
+
+        print(f"[FlashXTest]: Run No #{currRun}")
+
+        # Parse test.info and create a testList
+        jobList = []
+
+        # Update jobList
+        lib.info.jobListFromNode(
+            backend.FlashTest.lib.xmlNode.parseXml(mainDict["pathToInfo"]),
+            jobList,
+            setBenchmarks=mainDict["setBenchmarks"],
+        )
+
+        # remove site from jobList
+        jobList = [job.replace(f'{mainDict["flashSite"]}/', "") for job in jobList]
+
+        # run backend/FlashTest/flashTest.py with desired configuration
+        #
         testProcess = subprocess.run(
             "python3 {0}/FlashTest/flashTest.py \
                                               {1} \

@@ -51,7 +51,6 @@ def jobListFromNode(infoNode, jobList, setBenchmarks=False):
             for params in infoNode.text:
                 if params.split(":")[0] in [
                     "shortPathToBenchmark",
-                    "comparisonBenchmark",
                     "restartBenchmark",
                 ]:
                     skipNode = True

@@ -42,6 +42,8 @@ using,
 It is recommended to install in ``--user`` mode to avoid root privilege
 issues with ``pip``.
 
+To get the latest bleeding-edge updates you can replace ``<tag>`` with ``main``.
+
 ``FlashXTest`` provides both Command Line Interface (CLI) and Python
 Application Programming Interface (API). The CLI script, ``flashxtest``,
 is copied to the ``$HOME/.local/bin`` directory, and therefore the
