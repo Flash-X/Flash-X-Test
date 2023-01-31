@@ -30,7 +30,7 @@ def specListFromNode(infoNode, specList):
         specList.append(xmlDict)
 
 
-def jobListFromNode(infoNode, jobList):
+def jobListFromNode(infoNode, jobList, setBenchmarks=False):
     """
     Create a list of node paths by recursively searching
     till the end of the tree
@@ -40,11 +40,29 @@ def jobListFromNode(infoNode, jobList):
     infoNode : FlashTest node object
     jobList  : Empty jobList
     """
+    skipNode = False
+
     if infoNode.subNodes:
         for subNode in infoNode.subNodes:
-            jobListFromNode(subNode, jobList)
+            jobListFromNode(subNode, jobList, setBenchmarks)
+
     else:
-        jobList.append(infoNode.getPathBelowRoot())
+        if setBenchmarks:
+            for params in infoNode.text:
+                if params.split(":")[0] in [
+                    "shortPathToBenchmark",
+                    "comparisonBenchmark",
+                    "restartBenchmark",
+                ]:
+                    skipNode = True
+
+            if infoNode.getPathBelowRoot().split("/")[1] == "UnitTest":
+                skipNode = True
+
+            if not skipNode:
+                jobList.append(infoNode.getPathBelowRoot())
+        else:
+            jobList.append(infoNode.getPathBelowRoot())
 
 
 def addNodeFromPath(infoNode, nodePath):

@@ -43,7 +43,7 @@ def flashTest(mainDict, jobList):
         check=True,
     )
 
-    if mainDict["setInitialBenchmarks"]:
+    if mainDict["setBenchmarks"]:
         testProcess = subprocess.run(
             "python3 {0}/FlashTest/flashTest.py \
                                               {1} \
