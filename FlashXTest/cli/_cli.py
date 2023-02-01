@@ -30,14 +30,50 @@ def flashxtest(ctx, version):
 
 
 @flashxtest.command(name="init")
-@click.option("--source", "-z", default=None, help="Flash-X source directory")
-@click.option("--site", "-s", default=None, help="Flash-X site name")
-@click.option("--local-archive", "-a", default=None, help="Path to local archive")
-@click.option("--main-archive", "-m", default=None, help="Path to main archive")
-@click.option("--outdir", "-o", default=None, help="Path to results directory")
-@click.option("--mpi-path", "-mpi", default="mpiexec", help="Name for MPI executable")
-@click.option("--make-jobs", "-make-j", default=1, type=int, help="Gmake jobs")
-def init(source, site, local_archive, main_archive, outdir, mpi_path, make_jobs):
+@click.option(
+    "--source",
+    "-z",
+    default=None,
+    type=click.Path(exists=True),
+    help="Flash-X source directory",
+)
+@click.option("--site", "-s", default=None, type=click.STRING, help="Flash-X site name")
+@click.option(
+    "--local-archive",
+    "-a",
+    default=None,
+    type=click.Path(exists=False),
+    help="Path to local archive",
+)
+@click.option(
+    "--main-archive",
+    "-m",
+    default=None,
+    type=click.Path(exists=False),
+    help="Path to main archive",
+)
+@click.option(
+    "--outdir",
+    "-o",
+    default=None,
+    type=click.Path(exists=False),
+    help="Path to results directory",
+)
+@click.option(
+    "--mpi-cmd",
+    "-mpi",
+    default="mpiexec",
+    type=click.STRING,
+    help="MPI command mpiexec/mpirun/aprun",
+)
+@click.option(
+    "--make-cmd-opts",
+    "-make",
+    default="make",
+    type=click.STRING,
+    help="Gmake command and options",
+)
+def init(source, site, local_archive, main_archive, outdir, mpi_cmd, make_cmd_opts):
     """
     \b
     Initialize site specific configuration.
@@ -58,7 +94,7 @@ def init(source, site, local_archive, main_archive, outdir, mpi_path, make_jobs)
     # ---------
     # source: Flash-X source directory
     # site: Flash-X site name
-    if (not source) or ("$PWD" in source) or ("$pwd" in source):
+    if not source:
         source = os.getcwd()
     if not local_archive:
         local_archive = os.getcwd() + "/TestLocalArchive"
@@ -73,13 +109,13 @@ def init(source, site, local_archive, main_archive, outdir, mpi_path, make_jobs)
         pathToLocalArchive=local_archive,
         pathToMainArchive=main_archive,
         pathToOutdir=outdir,
-        pathToMPI=mpi_path,
-        pathToGmake=f"make -j{make_jobs}",
+        pathToMPI=mpi_cmd,
+        pathToGmake=make_cmd_opts,
     )
 
 
 @flashxtest.command(name="setup-suite")
-@click.argument("suitelist", type=str, nargs=-1)
+@click.argument("suitelist", type=click.Path(exists=True), nargs=-1)
 def setup_suite(suitelist):
     """
     \b
@@ -124,9 +160,9 @@ def setup_suite(suitelist):
 @flashxtest.command(name="run-suite")
 @click.option("--archive", is_flag=True, help="Save results to main archive")
 @click.option(
-    "--set-benchmarks", is_flag=True, help="Set benchmarks for tests if not present"
+    "--create-benchmarks", is_flag=True, help="Set benchmarks for tests if not present"
 )
-def run_suite(archive, set_benchmarks):
+def run_suite(archive, create_benchmarks):
     """
     \b
     Run the test suite using "test.info".
@@ -135,14 +171,14 @@ def run_suite(archive, set_benchmarks):
     This command runs all the tests defined in
     "test.info", and conveys errors
     """
-    if set_benchmarks:
+    if create_benchmarks:
         archive = True
 
-    api.run_suite(saveToMainArchive=archive, setBenchmarks=set_benchmarks)
+    api.run_suite(saveToMainArchive=archive, createBenchmarks=create_benchmarks)
 
 
 @flashxtest.command(name="check-suite")
-@click.argument("suitelist", type=str, nargs=-1)
+@click.argument("suitelist", type=click.Path(exists=True), nargs=-1)
 def check_suite(suitelist):
     """
     \b

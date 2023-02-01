@@ -728,10 +728,12 @@ class SfocuTester(ComparisonTester):
               "the local archive to a benchmark file against which the results of\n" +
               "this run can be compared, should be provided in your \"test.info\" file.")
 
-      if "-t" not in self.masterDict["flashTestOpts"]:
-          log.stp("Setting current run as benchmark, updating xml file...")
-          self.masterDict["testXmlNode"].text.append("shortPathToBenchmark: <siteDir>/%s/<buildDir>/<runDir>/<chkMax>" % self.masterDict["dateStr"])
-          self.masterDict["testXmlNode"].smudge()
+      # DEVNOTE: Introduced by A. Dhruv on 2023-01-31
+      # DEVNOTE: May not be necessary anymore
+      # if "-t" not in self.masterDict["flashTestOpts"]:
+      #  log.stp("Setting current run as benchmark, updating xml file...")
+      #  self.masterDict["testXmlNode"].text.append("shortPathToBenchmark: <siteDir>/%s/<buildDir>/<runDir>/<chkMax>" % self.masterDict["dateStr"])
+      #  self.masterDict["testXmlNode"].smudge()
 
       return False
 
@@ -1760,10 +1762,12 @@ class CompositeTester(ComparisonTester):
       if not pathSeedInfo:
         logerr("No comparisonBenchmark specified and benchmarkSeedInfo not set, so no comparisons being done.")
 
-        if "-t" not in self.masterDict["flashTestOpts"]:
-            logmsg("Setting current run as benchmark, updating xml file...")
-            self.masterDict["testXmlNode"].text.append("comparisonBenchmark: <siteDir>/%s/<buildDir>/<runDir>/<checkpointBasename><comparisonNumber>" % self.masterDict["dateStr"])
-            self.masterDict["testXmlNode"].smudge()
+        # DEVNOTE: Added by A. Dhruv on 2023-01-31
+        # DEVNOTE: May not be necessary anymore
+        #if "-t" not in self.masterDict["flashTestOpts"]:
+        #  logmsg("Setting current run as benchmark, updating xml file...")
+        #  self.masterDict["testXmlNode"].text.append("comparisonBenchmark: <siteDir>/%s/<buildDir>/<runDir>/<checkpointBasename><comparisonNumber>" % self.masterDict["dateStr"])
+        #  self.masterDict["testXmlNode"].smudge()
 
         return False
       locSeedInfo = pullfile(pathSeedInfo,log) # bring seed info file local if its remote

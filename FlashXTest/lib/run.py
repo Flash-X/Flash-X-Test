@@ -35,33 +35,23 @@ def flashTest(mainDict):
     lib.info.jobListFromNode(
         backend.FlashTest.lib.xmlNode.parseXml(mainDict["pathToInfo"]),
         jobList,
-        setBenchmarks=mainDict["setBenchmarks"],
+        createBenchmarks=mainDict["createBenchmarks"],
     )
 
     # remove site from jobList
     jobList = [job.replace(f'{mainDict["flashSite"]}/', "") for job in jobList]
 
-    # Set number of runs for flashTest
-    if mainDict["setBenchmarks"]:
-        numRuns = 2
-    else:
-        numRuns = 1
-
-    for currRun in range(numRuns):
-
-        print(f"[FlashXTest]: Run No #{currRun}")
-
-        # run backend/FlashTest/flashTest.py with desired configuration
-        #
-        testProcess = subprocess.run(
-            "python3 {0}/FlashTest/flashTest.py \
-                                              {1} \
-                                              {2}".format(
-                os.path.dirname(backend.__file__), optString, " ".join(jobList)
-            ),
-            shell=True,
-            check=True,
-        )
+    # run backend/FlashTest/flashTest.py with desired configuration
+    #
+    testProcess = subprocess.run(
+        "python3 {0}/FlashTest/flashTest.py \
+                                          {1} \
+                                          {2}".format(
+            os.path.dirname(backend.__file__), optString, " ".join(jobList)
+        ),
+        shell=True,
+        check=True,
+    )
 
     os.environ["EXITSTATUS"] = str(testProcess.returncode)
     os.environ["FLASH_BASE"] = mainDict["pathToFlash"]
@@ -79,6 +69,15 @@ def flashTest(mainDict):
 
     for key, value in invocationDict.items():
         os.environ[key] = value
+
+    if mainDict["createBenchmarks"]:
+        print(
+            "------------------------------------------------------------------------------------------\n"
+            + f"[FlashXTest] Benchmark run complete, verify results in:\n"
+            + f'"{mainDict["pathToOutdir"]}/{mainDict["flashSite"]}/{invocationDict["INVOCATION_DIR"]}"\n'
+            + f"...Before updating test suite..\n"
+            + "------------------------------------------------------------------------------------------"
+        )
 
     # try:
     checkProcess = subprocess.run(

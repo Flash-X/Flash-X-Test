@@ -30,7 +30,7 @@ def specListFromNode(infoNode, specList):
         specList.append(xmlDict)
 
 
-def jobListFromNode(infoNode, jobList, setBenchmarks=False):
+def jobListFromNode(infoNode, jobList, createBenchmarks=False):
     """
     Create a list of node paths by recursively searching
     till the end of the tree
@@ -44,16 +44,24 @@ def jobListFromNode(infoNode, jobList, setBenchmarks=False):
 
     if infoNode.subNodes:
         for subNode in infoNode.subNodes:
-            jobListFromNode(subNode, jobList, setBenchmarks)
+            jobListFromNode(subNode, jobList, createBenchmarks)
 
     else:
-        if setBenchmarks:
+        if createBenchmarks:
+
             for params in infoNode.text:
-                if params.split(":")[0] in [
-                    "shortPathToBenchmark",
-                    "restartBenchmark",
-                ]:
+                if params.split(":")[0] == "shortPathToBenchmark":
                     skipNode = True
+
+                if params.split(":")[0] == "restartBenchmark":
+                    if "comparisonBenchmark" not in [
+                        entry.split(":")[0] for entry in infoNode.text
+                    ]:
+                        raise ValueError(
+                            f'Cannot set "rbase" set before "cbase" for test node {infoNode!r}'
+                        )
+                    else:
+                        skipNode = True
 
             if infoNode.getPathBelowRoot().split("/")[1] == "UnitTest":
                 skipNode = True

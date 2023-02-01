@@ -196,7 +196,7 @@ def parseSuite(mainDict):
                 if testSpec.nodeName in currSpec.nodeName:
                     raise ValueError(
                         lib.colors.FAIL
-                        + f"[FlashXTest] Duplicate for {testSpec.nodeName!r} detected in suite files"
+                        + f"[FlashXTest] Duplicate for {testSpec.nodeName!r} detected in {sfile.name!r}"
                     )
 
             testSpec.numProcs = testArgs.nprocs
@@ -205,6 +205,30 @@ def parseSuite(mainDict):
             testSpec.cbase = testArgs.cbase
             testSpec.rbase = testArgs.rbase
             testSpec.errTol = testArgs.tolerance
+
+            if testSpec.nodeName.split("/")[0] == "UnitTest" and (
+                testSpec.cbase or testSpec.rbase
+            ):
+                raise ValueError(
+                    lib.colors.FAIL
+                    + f"[FlashXTest] {testSpec.nodeName!r} in {sfile.name!r} cannot have cbase, rbase"
+                )
+
+            if testSpec.nodeName.split("/")[0] == "Comparison" and testSpec.rbase:
+                raise ValueError(
+                    lib.colors.FAIL
+                    + f"[FlashXTest] {testSpec.nodeName!r} in {sfile.name!r} cannot have rbase"
+                )
+
+            if (
+                testSpec.nodeName.split("/")[0] == "Composite"
+                and testSpec.rbase
+                and (not testSpec.cbase)
+            ):
+                raise ValueError(
+                    lib.colors.FAIL
+                    + f"[FlashXTest] {testSpec.nodeName!r} in {sfile.name!r} cannot set rbase before cbase"
+                )
 
             specList.append(testSpec)
 
