@@ -6,10 +6,12 @@ from .. import lib
 from .. import backend
 
 
-def show_tests(**apiDict):
+def show_specs(**apiDict):
     """
     Show all tests for a given setupname
     """
+    apiDict["log"] = backend.FlashTest.lib.logfile.ConsoleLog()
+
     # Cache the value to current directory and set it as
     # testDir in apiDict
     apiDict["testDir"] = os.getcwd()
@@ -25,16 +27,19 @@ def show_tests(**apiDict):
     testDict = lib.yml.parseYaml(mainDict, mainDict["setupName"])
 
     for nodeName in testDict:
-        print(f"\n{nodeName}")
+        apiDict["log"].brk()
+        apiDict["log"].info(f"{nodeName}")
 
         for key, value in testDict[nodeName].items():
-            print(f"\t{key}: {value}")
+            apiDict["log"].info(f"\t{key}: {value}")
 
 
 def dry_run(run_test=False, **apiDict):
     """
     Compile a specific test using setupName and testNode
     """
+    apiDict["log"] = backend.FlashTest.lib.logfile.Logfile()
+
     # Cache the value to current directory and set it as
     # testDir in apiDict
     apiDict["testDir"] = os.getcwd()

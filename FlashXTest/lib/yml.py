@@ -7,6 +7,8 @@ import yaml
 from .. import backend
 from .. import lib
 
+sys.tracebacklimit = 1
+
 
 class __YamlLoader(yaml.SafeLoader):
     """
@@ -28,10 +30,8 @@ class __YamlLoader(yaml.SafeLoader):
         for key_node, value_node in node.value:
             key = self.construct_object(key_node, deep=deep)
             if key in mapping:
-                raise ValueError(
-                    lib.colors.FAIL
-                    + f"[FlashXTest] Duplicate {key!r} key found in {self._stream.name!r}."
-                )
+                print(f"ERROR:   Duplicate {key!r} key found in {self._stream.name!r}.")
+                raise ValueError()
             mapping.add(key)
         return super().construct_mapping(node, deep)
 
@@ -65,10 +65,9 @@ def parseYaml(mainDict, setupName):
                 "restartParfiles",
                 "transfers",
             ]:
-                raise ValueError(
-                    lib.colors.FAIL
-                    + f'[FlashXTest] unrecognized key "{key}" for "{nodeName}" '
-                    + f"in {yamlFile}"
+                print(
+                    f'ERROR:   unrecognized key "{key}" for "{nodeName}" in {yamlFile}'
                 )
+                raise ValueError()
 
     return yamlDict

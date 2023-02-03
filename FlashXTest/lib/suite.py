@@ -1,7 +1,7 @@
 """FlashXTest library to interface with backend.FlashTest"""
 
 from datetime import date
-import os, subprocess
+import os, sys, subprocess
 import itertools
 import glob
 import argparse
@@ -9,6 +9,8 @@ import shlex
 
 from .. import backend
 from .. import lib
+
+sys.tracebacklimit = 1
 
 # Create a test suite parser
 SuiteParser = argparse.ArgumentParser(description="Parser for test suite")
@@ -88,10 +90,10 @@ class TestSpec:
                 self.parfiles = " ".join(parFileList)
 
         else:
-            raise ValueError(
-                lib.colors.FAIL
-                + f"'parfiles' not defined for test {self.nodeName!r} for setup {self.setupName!r}"
-            )
+            mainDict["log"].err(
+                f"'parfiles' not defined for test {self.nodeName!r} for setup {self.setupName!r}"
+            ) 
+            raise ValueError()
 
         # Deal with debug flags
         if self.debug:
@@ -168,13 +170,12 @@ def parseSuite(mainDict):
 
         # Handle exceptions
         if not suiteFile.endswith(".suite"):
-            raise ValueError(
-                lib.colors.FAIL
-                + f'[FlashXTest] File {suiteFile} must have a ".suite" suffix'
-            )
+            mainDict["log"].err(f'File {suiteFile} must have a ".suite" suffix')
+            raise ValueError
 
         if not os.path.exists(suiteFile):
-            raise ValueError(lib.colors.FAIL + f"[FlashXTest] Cannot find {suiteFile}")
+            mainDict["log"].err(f"Cannot find {suiteFile}")
+            raise ValueError
 
         suiteList = []
 
@@ -194,10 +195,10 @@ def parseSuite(mainDict):
 
             for currSpec in specList:
                 if testSpec.nodeName in currSpec.nodeName:
-                    raise ValueError(
-                        lib.colors.FAIL
-                        + f"[FlashXTest] Duplicate for {testSpec.nodeName!r} detected in {sfile.name!r}"
+                    mainDict["log"].err(
+                        f"Duplicate for {testSpec.nodeName!r} detected in {sfile.name!r}"
                     )
+                    raise ValueError()
 
             testSpec.numProcs = testArgs.nprocs
             testSpec.environment = testArgs.env
@@ -209,33 +210,33 @@ def parseSuite(mainDict):
             if testSpec.nodeName.split("/")[0] == "UnitTest" and (
                 testSpec.cbase or testSpec.rbase
             ):
-                raise ValueError(
-                    lib.colors.FAIL
-                    + f"[FlashXTest] {testSpec.nodeName!r} in {sfile.name!r} cannot have cbase, rbase"
+                mainDict["log"].err(
+                    f"{testSpec.nodeName!r} in {sfile.name!r} cannot have cbase, rbase"
                 )
+                raise ValueError()
 
             if testSpec.nodeName.split("/")[0] == "Comparison" and testSpec.rbase:
-                raise ValueError(
-                    lib.colors.FAIL
-                    + f"[FlashXTest] {testSpec.nodeName!r} in {sfile.name!r} cannot have rbase"
+                mainDict["log"].err(
+                    f"{testSpec.nodeName!r} in {sfile.name!r} cannot have rbase"
                 )
+                raise ValueError()
 
             if (
                 testSpec.nodeName.split("/")[0] == "Composite"
                 and testSpec.rbase
                 and (not testSpec.cbase)
             ):
-                raise ValueError(
-                    lib.colors.FAIL
-                    + f"[FlashXTest] {testSpec.nodeName!r} in {sfile.name!r} cannot set rbase before cbase"
+                mainDict["log"].err(
+                    f"{testSpec.nodeName!r} in {sfile.name!r} cannot set rbase before cbase"
                 )
+                raise ValueError()
 
             specList.append(testSpec)
 
     return specList
 
 
-def checkSuite(mainDict, infoNode):
+def checkSuiteWithInfo(mainDict, infoNode):
     """
     Arguments
     ---------
@@ -248,7 +249,8 @@ def checkSuite(mainDict, infoNode):
     if not mainDict["pathToSuites"]:
         mainDict["pathToSuites"] = glob.glob("*.suite")
 
-    update_list = []
+    mainDict["log"].note('Comparing changes to "test.info" with "*.suite* files:')
+    mainDict["log"].brk()
 
     # Loop over all suite files and populate
     # suite dictionary
@@ -256,13 +258,12 @@ def checkSuite(mainDict, infoNode):
 
         # Handle exceptions
         if not suiteFile.endswith(".suite"):
-            raise ValueError(
-                lib.colors.FAIL
-                + f'[FlashXTest] File {suiteFile} must have a ".suite" suffix'
-            )
+            mainDict["log"].err(f'File {suiteFile!r} must have a ".suite" suffix')
+            raise ValueError()
 
         if not os.path.exists(suiteFile):
-            raise ValueError(lib.colors.FAIL + f"[FlashXTest] Cannot find {suiteFile}")
+            mainDict["log"].err(f"Cannot find {suiteFile!r}")
+            raise ValueError()
 
         with open(suiteFile, "r") as sfile:
 
@@ -289,8 +290,8 @@ def checkSuite(mainDict, infoNode):
                                     ]
                                 ][0]
                                 if (not testArgs.rbase) or (testArgs.rbase != rbase):
-                                    update_list.append(
-                                        f'Update rbase to "{rbase}" for "{testArgs.test}" in "{sfile.name}"'
+                                    mainDict["log"].note(
+                                        f'Set "rbase" to "{rbase}" for "{testArgs.test}" in "{sfile.name}"'
                                     )
 
                             elif entries.split(":")[0] == "comparisonBenchmark":
@@ -308,8 +309,8 @@ def checkSuite(mainDict, infoNode):
                                     ]
                                 ][0]
                                 if (not testArgs.cbase) or (testArgs.cbase != cbase):
-                                    update_list.append(
-                                        f'Update cbase to "{cbase}" for "{testArgs.test}" in "{sfile.name}"'
+                                    mainDict["log"].note(
+                                        f'Update "cbase" to "{cbase}" for "{testArgs.test}" in "{sfile.name}"'
                                     )
 
                             elif entries.split(":")[0] == "shortPathToBenchmark":
@@ -327,12 +328,6 @@ def checkSuite(mainDict, infoNode):
                                     ]
                                 ][0]
                                 if (not testArgs.cbase) or (testArgs.cbase != cbase):
-                                    update_list.append(
-                                        f'Update cbase to "{cbase}" for "{testArgs.test}" in "{sfile.name}"'
+                                    mainDict["log"].note(
+                                        f'Update "cbase" to "{cbase}" for "{testArgs.test}" in "{sfile.name}"'
                                     )
-
-    print(lib.colors.WARNING + "[FlashXTest] TODO: ")
-    with open(mainDict["testDir"] + os.sep + "TODO.fxt", "w") as update_file:
-        for line in update_list:
-            print("[FlashXTest] " + line)
-            update_file.write(line + "\n")

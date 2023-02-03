@@ -12,7 +12,7 @@ import flashTestParser as parser
 
 ######################################
 ##  PRE-PROCESS, SETUP, COMPILE, &  ##
-##  EXECUTE FOR ALL FLASH PROBLEMS  ##
+##  EXECUTE FOR ALL Flash-X PROBLEMS  ##
 ######################################
 
 def __abort(msg):
@@ -117,12 +117,12 @@ class FlashEntryPoint(EntryPointTemplate):
     flashTestOpts = self.masterDict["flashTestOpts"]  # guaranteed to exist by flashTest.py
 
     ##############################
-    ##  CHECK FOR FLASH SOURCE  ##
+    ##  CHECK FOR Flash-X SOURCE  ##
     ##############################
 
     pathToFlash = flashTestOpts.get("-z","")
     if not pathToFlash:
-      # check if we got a path to FLASH from the config file
+      # check if we got a path to Flash-X from the config file
       pathToFlash = self.masterDict.get("pathToFlash","")
       # make sure we have an absolute path
       if pathToFlash and not os.path.isabs(pathToFlash):
@@ -133,7 +133,7 @@ class FlashEntryPoint(EntryPointTemplate):
         pathToFlash = os.path.join(os.getcwd(), pathToFlash)
 
     if not pathToFlash:
-      log.err("You must provide a path to a copy of the FLASH source\n" +
+      log.err("You must provide a path to a copy of the Flash-X source\n" +
               "either in a \"config\" file or with the \"-z\" option.")
       return False
     elif not os.path.isdir(pathToFlash):
@@ -145,7 +145,7 @@ class FlashEntryPoint(EntryPointTemplate):
     self.masterDict["pathToFlash"] = pathToFlash
 
     ####################################
-    ##  UPDATE FLASH SOURCE IF ASKED  ##
+    ##  UPDATE Flash-X SOURCE IF ASKED  ##
     ####################################
 
     pathToInvocationDir = self.masterDict["pathToInvocationDir"]  # guaranteed to exist by flashTest.py
@@ -178,7 +178,7 @@ class FlashEntryPoint(EntryPointTemplate):
         else:
           diffOut = ""
 
-        log.stp("Attempting to update FLASH source at \"%s\" with \"%s\"" % (pathToFlash, updateScript))
+        log.stp("Attempting to update Flash-X source at \"%s\" with \"%s\"" % (pathToFlash, updateScript))
 
         cwd = os.getcwd()
         if (updateScript[0:3] != "rm "): os.chdir(pathToFlash)
@@ -189,14 +189,14 @@ class FlashEntryPoint(EntryPointTemplate):
                "w",
           ).write(diffOut)
           if (updateScript[0:3] != "rm "): os.chdir(cwd)
-          log.err("Exit status %s indicates error updating FLASH source..." % exitStatus)
+          log.err("Exit status %s indicates error updating Flash-X source..." % exitStatus)
           if (err != ""):
             log.info("stderr: " + err)
           if (out != "") and (out != err):
             log.info("stdout: " + out)
           return False
         else:
-          log.info("FLASH source was successfully updated")
+          log.info("Flash-X source was successfully updated")
           open(os.path.join(pathToInvocationDir, "update_output"),
                "w",
           ).write(diffOut + out)
@@ -204,10 +204,10 @@ class FlashEntryPoint(EntryPointTemplate):
         os.chdir(cwd)
       else:
         log.err("\"-u\" passed to command line but no key \"updateScript\"\n" +
-                "found in \"config\". Unable to update FLASH source")
+                "found in \"config\". Unable to update Flash-X source")
         return False
     else:
-      log.warn("FLASH source at \"%s\" was not updated" % pathToFlash)
+      log.warn("Flash-X source at \"%s\" was not updated" % pathToFlash)
 
     return True
 
@@ -268,11 +268,11 @@ class FlashEntryPoint(EntryPointTemplate):
 class FlashSetupper(SetupperTemplate):
   def setup(self):
     """
-    run the FLASH setup script
+    run the Flash-X setup script
 
                 log: pointer to FlashTest logfile object
-        pathToFlash: abs path to top-level FLASH directory
-                     containing all code pertaining to FLASH setups
+        pathToFlash: abs path to top-level Flash-X directory
+                     containing all code pertaining to Flash-X setups
      pathToBuildDir: abs path to the output dir for this build
     pathToFlashTest: abs path to the top-level FlashTest directory
           setupName: name of this Flash setup (Sod, Sedov, etc.)
@@ -314,7 +314,7 @@ class FlashSetupper(SetupperTemplate):
     # log timestamp of command
     log.stp(script)
 
-    # cd to FLASH source
+    # cd to Flash-X source
     os.chdir(pathToFlash)
 
     # get stdout/stderr and duration of setup and write to file
@@ -343,12 +343,12 @@ class FlashSetupper(SetupperTemplate):
 class FlashCompiler(CompilerTemplate):
   def compile(self):
     """
-    compile FLASH
+    compile Flash-X
 
-       pathToFlash: abs path up to the top-level FLASH directory
+       pathToFlash: abs path up to the top-level Flash-X directory
     pathToBuildDir: abs path up to the output dir for this build
        pathToGmake: abs path to the gmake utility
-           exeName: name to be given to the FLASH executable
+           exeName: name to be given to the Flash-X executable
     """
     log             = self.masterDict["log"]              # guaranteed to exist by flashTest.py
     pathToFlash     = self.masterDict["pathToFlash"]      # guaranteed to exist by flashTest.py
@@ -376,7 +376,7 @@ class FlashCompiler(CompilerTemplate):
 
     while numTries < 3:
 
-      # cd to FLASH source object directory for compilation
+      # cd to Flash-X source object directory for compilation
       os.chdir(os.path.join(pathToFlash, "object"))
 
       # get stdout/stderr and duration of compilation and write to file
@@ -425,7 +425,7 @@ class FlashCompiler(CompilerTemplate):
 class FlashExecuter(ExecuterTemplate):
   def execute(self, timeout=None):
     """
-    run the FLASH executable piping output and other data into 'runDir'
+    run the Flash-X executable piping output and other data into 'runDir'
 
     pathToRunDir: abs path to output dir for this unique executable/parfile combination
         numProcs: number of processors used for this run
@@ -727,14 +727,6 @@ class SfocuTester(ComparisonTester):
       log.err("A key \"shortPathToBenchmark\", whose value is a relative path from\n" +
               "the local archive to a benchmark file against which the results of\n" +
               "this run can be compared, should be provided in your \"test.info\" file.")
-
-      # DEVNOTE: Introduced by A. Dhruv on 2023-01-31
-      # DEVNOTE: May not be necessary anymore
-      # if "-t" not in self.masterDict["flashTestOpts"]:
-      #  log.stp("Setting current run as benchmark, updating xml file...")
-      #  self.masterDict["testXmlNode"].text.append("shortPathToBenchmark: <siteDir>/%s/<buildDir>/<runDir>/<chkMax>" % self.masterDict["dateStr"])
-      #  self.masterDict["testXmlNode"].smudge()
-
       return False
 
     # else
@@ -1376,9 +1368,6 @@ class CompositeExecuter(FlashExecuter):
         if "restartBenchmark" in self.masterDict or restartParfile == "none":
           iteration += 1
           continue # skip iteration
-        elif "comparisonBenchmark" not in self.masterDict:
-          iteration +=1
-          continue # skip because it is redudnant to run when comparisonBenchmark not present
         else: # must verify transparency restart for auto approved restart benchmark
           log.stp("restartBenchmark not present, performing long-run to verify transparent restart.\n")
           def readpar(path):
@@ -1761,14 +1750,6 @@ class CompositeTester(ComparisonTester):
       pathSeedInfo = self.masterDict.get("benchmarkSeedInfo", None)
       if not pathSeedInfo:
         logerr("No comparisonBenchmark specified and benchmarkSeedInfo not set, so no comparisons being done.")
-
-        # DEVNOTE: Added by A. Dhruv on 2023-01-31
-        # DEVNOTE: May not be necessary anymore
-        #if "-t" not in self.masterDict["flashTestOpts"]:
-        #  logmsg("Setting current run as benchmark, updating xml file...")
-        #  self.masterDict["testXmlNode"].text.append("comparisonBenchmark: <siteDir>/%s/<buildDir>/<runDir>/<checkpointBasename><comparisonNumber>" % self.masterDict["dateStr"])
-        #  self.masterDict["testXmlNode"].smudge()
-
         return False
       locSeedInfo = pullfile(pathSeedInfo,log) # bring seed info file local if its remote
       if not locSeedInfo:

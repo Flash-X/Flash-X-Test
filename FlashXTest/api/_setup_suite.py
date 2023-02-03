@@ -13,6 +13,8 @@ def setup_suite(**apiDict):
     ---------
     testSuite : Name of the testSuite file
     """
+    apiDict["log"] = backend.FlashTest.lib.logfile.ConsoleLog()
+
     # Cache the value to current directory and set it as
     # testDir in apiDict
     apiDict["testDir"] = os.getcwd()

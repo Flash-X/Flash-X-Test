@@ -7,7 +7,6 @@ import pkg_resources
 
 from .. import api
 
-
 @click.group(name="flashxtest", invoke_without_command=True)
 @click.pass_context
 @click.option("--version", "-v", is_flag=True)
@@ -90,19 +89,6 @@ def init(source, site, local_archive, main_archive, outdir, mpi_cmd, make_cmd_op
     configuration, "config" and "execfile"
     should be edited directly.
     """
-    # Arguments
-    # ---------
-    # source: Flash-X source directory
-    # site: Flash-X site name
-    if not source:
-        source = os.getcwd()
-    if not local_archive:
-        local_archive = os.getcwd() + "/TestLocalArchive"
-    if not main_archive:
-        main_archive = os.getcwd() + "/TestMainArchive"
-    if not outdir:
-        outdir = os.getcwd() + "/TestResults"
-
     api.init(
         flashSite=site,
         pathToFlash=source,
@@ -116,7 +102,10 @@ def init(source, site, local_archive, main_archive, outdir, mpi_cmd, make_cmd_op
 
 @flashxtest.command(name="setup-suite")
 @click.argument("suitelist", type=click.Path(exists=True), nargs=-1)
-def setup_suite(suitelist):
+@click.option(
+    "--overwrite", is_flag=True, help="Overwrite current test.info in working directory"
+)
+def setup_suite(suitelist, overwrite):
     """
     \b
     Create a "test.info" from a list of suite files.
@@ -147,22 +136,19 @@ def setup_suite(suitelist):
 
     \b
     -t, --test		TEXT	Defined in */tests/tests.yaml
-    -np, --nprocs	TEXT	Number of processors
+    -np, --nprocs	INTEGER	Number of processors
     -cbase, --cbase	TEXT	Date for comparsion benchmark
     -rbase, --rbase	TEXT	Date for restart benchmark
     -tol, --tolerance	FLOAT	Tolerance for comparsion and composite tests
     -e, --env		TEXT	Environment variables
     -debug, --debug	BOOLEAN	Debug test
     """
-    api.setup_suite(pathToSuites=suitelist)
+    api.setup_suite(pathToSuites=suitelist, overwriteCurrInfo=overwrite)
 
 
 @flashxtest.command(name="run-suite")
 @click.option("--archive", is_flag=True, help="Save results to main archive")
-@click.option(
-    "--create-benchmarks", is_flag=True, help="Set benchmarks for tests if not present"
-)
-def run_suite(archive, create_benchmarks):
+def run_suite(archive):
     """
     \b
     Run the test suite using "test.info".
@@ -171,10 +157,7 @@ def run_suite(archive, create_benchmarks):
     This command runs all the tests defined in
     "test.info", and conveys errors
     """
-    if create_benchmarks:
-        archive = True
-
-    api.run_suite(saveToMainArchive=archive, createBenchmarks=create_benchmarks)
+    api.run_suite(saveToMainArchive=archive)
 
 
 @flashxtest.command(name="check-suite")
@@ -192,9 +175,9 @@ def check_suite(suitelist):
     api.check_suite(pathToSuites=suitelist)
 
 
-@flashxtest.command(name="show")
+@flashxtest.command(name="show-specs")
 @click.argument("setupname", type=str, required=True)
-def show(setupname):
+def show_specs(setupname):
     """
     \b
     Show available tests for a given setup name
@@ -203,43 +186,46 @@ def show(setupname):
     This command prints tests located in tests/test.yaml
     for a given simulation name.
     """
-    api.show_tests(setupName=setupname)
+    api.show_specs(setupName=setupname)
 
 
-@flashxtest.command(name="compile")
-@click.argument("setupname", type=str, required=True)
-@click.option("--test", "-t", type=str, required=True)
-@click.option("-objdir", type=str, default="object")
-def compile(setupname, test, objdir):
-    """
-    \b
-    Compile a test defined for a specific setup
+#@flashxtest.command(name="compile")
+#@click.argument("setupname", type=str, required=True)
+#@click.option("--test", "-t", type=str, required=True)
+#@click.option("-objdir", type=str, default="object")
+#def compile(setupname, test, objdir):
+#    """
+#    \b
+#    Compile a test defined for a specific setup
+#
+#    \b
+#    This command compiles a test defined
+#    in tests.yaml for a specific setup
+#    """
+#    api.dry_run(
+#        setupName=setupname,
+#        nodeName=test,
+#        objDir=os.path.join(os.getcwd(), objdir),
+#        run_test=False,
+#    )
 
-    \b
-    This command compiles a test defined
-    in tests.yaml for a specific setup
-    """
-    api.dry_run(
-        setupName=setupname,
-        nodeName=test,
-        objDir=os.path.join(os.getcwd(), objdir),
-        run_test=False,
-    )
 
-
-@flashxtest.command(name="run")
+@flashxtest.command(name="dry-run")
 @click.argument("setupname", type=str, required=True)
 @click.option("--test", "-t", type=str, required=True)
 @click.option("--nprocs", "-np", type=str, required=True)
 @click.option("-objdir", type=str, default="object")
-def run(setupname, test, nprocs, objdir):
+def dry_run(setupname, test, nprocs, objdir):
     """
     \b
     Compile and run a test defined for a specific setup
 
     \b
     This command compiles and runs a test defined
-    in tests.yaml for a specific setup
+    in tests.yaml for a specific setup. Note that
+    this command does not perform testing for
+    "cbase" and "rbase" benchmarks. Use "run-suite"
+    command for that.
     """
     api.dry_run(
         setupName=setupname,
@@ -248,3 +234,15 @@ def run(setupname, test, nprocs, objdir):
         objDir=os.path.join(os.getcwd(), objdir),
         run_test=True,
     )
+
+
+@flashxtest.command(name="webview")
+def webview():
+    """
+    \b
+    Launch FlashTestView
+
+    \b
+    This command will launch FlashTestView web interface
+    """
+    api.webview()

@@ -46,6 +46,7 @@ def setExe(apiDict):
             line = line.replace("mpiexec", apiDict["pathToMPI"])
             efile.write(line)
 
+    apiDict["log"].note('Initialized "execfile"')
 
 def setConfig(apiDict):
     """
@@ -129,4 +130,4 @@ def setConfig(apiDict):
         for line in lines:
             cfile.write(line)
 
-    print(lib.colors.OKGREEN + "[FlashXTest] Initialized configuration")
+    apiDict["log"].note('Initialized "config"')

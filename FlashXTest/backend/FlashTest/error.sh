@@ -21,13 +21,13 @@ if [[ $NDIR -ne 1 ]]; then
 fi
 
 # An error occurred if this file is not empty
-ERROR_LOG=$(ls -d $RESULTS_DIR/$INVOCATION_DIR* )/errors
+ERROR_LOG=$(ls -d $RESULTS_DIR/$INVOCATION_DIR*)/errors
 echo
-echo "------------------------------------------------------------"
+echo "--------------------------------------------------------------------------------"
 echo "FlashTest Error Log = $ERROR_LOG"
 if [[ ! -f $ERROR_LOG ]]; then
 	echo "FlashTest error log not found"
-	echo "------------------------------------------------------------"
+	echo "--------------------------------------------------------------------------------"
 	echo
 	exit 4
 elif [[ -s $ERROR_LOG ]]; then
@@ -35,16 +35,15 @@ elif [[ -s $ERROR_LOG ]]; then
 	echo
 	cat $ERROR_LOG
 	echo
-	echo "------------------------------------------------------------"
+	echo "--------------------------------------------------------------------------------"
 	echo
 	exit 5
 elif [ $EXITSTATUS -ne 0 ]; then
 	echo "FlashTest returned exit status $EXITSTATUS"
-	echo "------------------------------------------------------------"
+	echo "--------------------------------------------------------------------------------"
 	echo
 	exit 6
 else
 	echo "FlashTest reports SUCCESS"
 fi
-echo "------------------------------------------------------------"
-echo
+echo "--------------------------------------------------------------------------------"
