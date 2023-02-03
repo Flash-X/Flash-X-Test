@@ -150,8 +150,8 @@ def __getOptString(mainDict):
 
     optString = optString + " -v -L "
     
-    if not mainDict["saveToMainArchive"]:
-        optString = optString + "-t "
+    # if not mainDict["saveToMainArchive"]:
+    #     optString = optString + "-t "
         
     for option in optDict2:
         if option in mainDict:
