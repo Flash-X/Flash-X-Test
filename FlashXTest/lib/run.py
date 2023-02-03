@@ -129,23 +129,32 @@ def __getOptString(mainDict):
 
     mainDict: Dictionary with configuration values
     """
-    optDict = {
+    optDict1 = {
         "pathToFlash": "-z",
-        "pathToViewArchive": "-vv",
-        "pathToInfo": "-i",
         "pathToOutdir": "-o",
         "pathToConfig": "-c",
         "flashSite": "-s",
         "pathToExeScript": "-e",
     }
 
-    optString = "-v -L "
+    optDict2 = {
+        "pathToInfo": "-i",
+        "pathToViewArchive": "-vv",
+    }
 
-    for option in optDict:
+    optString = ""
+
+    for option in optDict1:
         if option in mainDict:
-            optString = optString + "{0} {1} ".format(optDict[option], mainDict[option])
+            optString = optString + "{0} {1} ".format(optDict1[option], mainDict[option])
 
+    optString = optString + " -v -L "
+    
     if not mainDict["saveToMainArchive"]:
         optString = optString + "-t "
+        
+    for option in optDict2:
+        if option in mainDict:
+            optString = optString + "{0} {1} ".format(optDict2[option], mainDict[option])
 
     return optString
