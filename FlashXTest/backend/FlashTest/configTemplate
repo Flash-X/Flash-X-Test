@@ -12,6 +12,8 @@
 
 pathToMainArchive:
 pathToLocalArchive:
+pathToInfo:
+pathToViewArchive:
 pathToOutdir:
 pathToFlash:
 pathToGmake:        make

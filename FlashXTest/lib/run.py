@@ -131,6 +131,7 @@ def __getOptString(mainDict):
     """
     optDict = {
         "pathToFlash": "-z",
+        "pathToViewArchive": "-vv",
         "pathToInfo": "-i",
         "pathToOutdir": "-o",
         "pathToConfig": "-c",

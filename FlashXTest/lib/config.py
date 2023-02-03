@@ -102,6 +102,20 @@ def setConfig(apiDict):
                     str("pathToFlash:        " + str(apiDict["pathToFlash"])),
                 )
 
+            # Set 'pathToViewArchive' if defined in apiDict
+            if "pathToViewArchive" in apiDict:
+                line = line.replace(
+                    "pathToViewArchive:",
+                    str("pathToViewArchive:  " + str(apiDict["pathToViewArchive"])),
+                )
+
+            # Set 'pathToInfo' if defined in apiDict
+            if "pathToInfo" in apiDict:
+                line = line.replace(
+                    "pathToInfo:",
+                    str("pathToInfo:         " + str(apiDict["pathToInfo"])),
+                )
+
             # Set 'flashSite' if define in apiDict
             if "flashSite" in apiDict:
                 line = line.replace(

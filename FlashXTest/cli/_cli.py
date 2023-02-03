@@ -34,9 +34,11 @@ def flashxtest(ctx, version):
 @click.option("--site", "-s", default=None, help="Flash-X site name")
 @click.option("--local-archive", "-a", default=None, help="Path to local archive")
 @click.option("--main-archive", "-m", default=None, help="Path to main archive")
+@click.option("--view-archive", "-vv", default=None, help="Path to view archive")
+@click.option("--pathtoinfo", "-i", default=None, help="Path to info file")
 @click.option("--outdir", "-o", default=None, help="Path to results directory")
 @click.option("--mpi-path", "-mpi", default="mpiexec", help="Name for MPI executable")
-def init(source, site, local_archive, main_archive, outdir, mpi_path):
+def init(source, site, local_archive, main_archive, view_archive, pathtoinfo, outdir, mpi_path):
     """
     \b
     Initialize site specific configuration.
@@ -71,6 +73,8 @@ def init(source, site, local_archive, main_archive, outdir, mpi_path):
         pathToFlash=source,
         pathToLocalArchive=local_archive,
         pathToMainArchive=main_archive,
+        pathToViewArchive=view_archive,
+        pathToInfo=pathtoinfo,
         pathToOutdir=outdir,
         pathToMPI=mpi_path,
     )
