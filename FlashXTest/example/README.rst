@@ -93,7 +93,7 @@ recommendations for updating ``rbase`` values.
    WARNING: Verify results in - <pathToOutdir>/<flashSite>/<YYYY-MM-DD>_2
    --------------------------------------------------------------------------------
    NOTE!    Suggested changes to "*.suite" files:
-   NOTE!    Set "rbase" to "2023-02-03_3" for "Composite/Sod/PseudoUG/2d/Paramesh/simpleUnsplit"
+   NOTE!    Set "rbase" to "2023-02-03_2" for "Composite/Sod/PseudoUG/2d/Paramesh/simpleUnsplit"
    --------------------------------------------------------------------------------
 
 If the run fails, check
