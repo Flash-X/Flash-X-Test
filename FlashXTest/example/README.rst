@@ -49,28 +49,33 @@ overwrite, use ``--overwrite`` option.
 Use ``--archive`` to save a tarball for the results to main archive
 
 *******************************
- Setting Up Initial Benchmarks
+ Setting Up Benchmarks
 *******************************
 
 To setup initial benchmarks do the following after running ``flashxtest
 init`` and ``flashxtest setup-suite``
 
--  Run the suite in with ``--create-benchmarks`` option
+-  Run the suite in with ``--archive`` option
 
 .. code::
 
-   flashxtest run-suite --create-benchmarks
+   flashxtest run-suite --archive
 
-This option will pick ``Composite`` and ``Comparison`` tests from
-``*.suite`` files that do not contain ``cbase`` and ``rbase`` values,
-and run them. The initial run will fail, and a message will be display
-stating the location of results. You can verify the results and accept
-the run as new benchmark by simply setting ``-cbase
-<yyyy-mm-dd>_[version]`` date string from the output message.
+The initial run will fail, and messages will be displayed
+stating the location of results and recommendations for ``cbase`` values in ``*.suite`` files.
+The messages can also be view in ``flashxtest_api.log``.
 
-This will execute for tests that do not contain benchmark information,
-update ``test.info``, create a tarball of results, and store it in main
-archive defined in ``pathToMainArchive`` in your ``config`` file
+Here is an example output from ``flashxtest_api.log``
+
+.. code::
+
+   --------------------------------------------------------------------------------
+   WARNING: Verify results in - /home/akash/jobs/flash-x-testing/TestResults/sedona/2023-02-03
+   --------------------------------------------------------------------------------
+   NOTE!    Suggested changes to "*.suite" files:
+   NOTE!    Set "cbase" to "2023-02-03" for "Comparison/Sod/UG/2d/simpleUnsplit"
+   NOTE!    Set "cbase" to "2023-02-03" for "Composite/Sod/PseudoUG/2d/Paramesh/simpleUnsplit"
+   --------------------------------------------------------------------------------
 
 -  Check the suite
 
