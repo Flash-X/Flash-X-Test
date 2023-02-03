@@ -1,9 +1,94 @@
 """FlashXTest library to interface with backend.FlashTest"""
 
-import os, subprocess
+import os, sys, subprocess
 
 from .. import backend
 from .. import lib
+
+sys.tracebacklimit = 1
+
+
+def __fileToList(filePath):
+    """
+    Static method to convert a file to a list of lines
+
+    Arguments
+    ---------
+    filePath: string (name of file - full path)
+
+    Returns
+    -------
+    fileList: list of lines
+    """
+    # Create an empty list
+    # to populate as the file is passed
+    fileList = []
+
+    # Open the input file in read-only mode
+    with open(filePath, "r") as workingFile:
+
+        # loop over lines
+        # in working file
+        for line in workingFile:
+            # append to
+            # file list
+            fileList.append(line.strip())
+
+    return fileList
+
+
+def checkBenchmarks(mainDict, infoNode, jobList):
+    """
+    Check and populate TODO
+
+    mainDict : Main Dictonary
+    infoNode : FlashTest node object
+    jobList  : List of jobs
+    """
+    invocationDir = f'{mainDict["pathToOutdir"]}/{mainDict["flashSite"]}/{os.getenv("INVOCATION_DIR")}'
+
+    mainDict["log"].warn(f"Verify results in - {invocationDir}")
+    mainDict["log"].brk()
+    mainDict["log"].note('Suggested changes to "*.suite" files:')
+
+    for nodeName in jobList:
+        testType = nodeName.split("/")[0]
+        xmlText = infoNode.findChildrenWithPath(nodeName)[0].text
+        xmlKeys = [entry.split(":")[0] for entry in xmlText]
+
+        if testType == "Comparison":
+            if "shortPathToBenchmark" not in xmlKeys:
+                mainDict["log"].note(
+                    f'Set "cbase" to "{os.getenv("INVOCATION_DIR")}" for "{nodeName}"'
+                )
+
+        elif testType == "Composite":
+            if "comparisonBenchmark" not in xmlKeys:
+                mainDict["log"].note(
+                    f'Set "cbase" to "{os.getenv("INVOCATION_DIR")}" for "{nodeName}"'
+                )
+
+    invocationLog = __fileToList(f"{invocationDir}/flash_test.log")
+
+    approvedIndex = []
+    for index, entry in enumerate(invocationLog):
+        if (
+            "Restart transparency confirmed, approving restart benchmark in test xml file."
+            in entry
+        ):
+            approvedIndex.append(index)
+
+    approvedTests = []
+    for index in approvedIndex:
+        for ind in range(index, -1, -1):
+            if "test.info" in invocationLog[ind]:
+                approvedTests.append(invocationLog[ind + 2].split(":")[1].replace(" ", ""))
+                break
+
+    for nodeName in approvedTests:
+        mainDict["log"].note(
+            f'Set "rbase" to "{os.getenv("INVOCATION_DIR")}" for "{nodeName}"'
+        )
 
 
 def specListFromNode(infoNode, specList):
@@ -30,7 +115,7 @@ def specListFromNode(infoNode, specList):
         specList.append(xmlDict)
 
 
-def jobListFromNode(infoNode, jobList, setBenchmarks=False):
+def jobListFromNode(infoNode, jobList):
     """
     Create a list of node paths by recursively searching
     till the end of the tree
@@ -44,24 +129,10 @@ def jobListFromNode(infoNode, jobList, setBenchmarks=False):
 
     if infoNode.subNodes:
         for subNode in infoNode.subNodes:
-            jobListFromNode(subNode, jobList, setBenchmarks)
+            jobListFromNode(subNode, jobList)
 
     else:
-        if setBenchmarks:
-            for params in infoNode.text:
-                if params.split(":")[0] in [
-                    "shortPathToBenchmark",
-                    "restartBenchmark",
-                ]:
-                    skipNode = True
-
-            if infoNode.getPathBelowRoot().split("/")[1] == "UnitTest":
-                skipNode = True
-
-            if not skipNode:
-                jobList.append(infoNode.getPathBelowRoot())
-        else:
-            jobList.append(infoNode.getPathBelowRoot())
+        jobList.append(infoNode.getPathBelowRoot())
 
 
 def addNodeFromPath(infoNode, nodePath):
@@ -90,17 +161,18 @@ def createInfo(mainDict, specList):
     # Set variables for site Info
     pathToInfo = str(mainDict["testDir"]) + "/test.info"
 
-    if os.path.exists(pathToInfo):
-        overwrite = input(
-            lib.colors.WARNING
-            + f"[FlashXTest] {pathToInfo!r} already exits. Replace? (Y/n) "
-        )
-
+    if os.path.exists(pathToInfo) and not mainDict["overwriteCurrInfo"]:
+        mainDict["log"].warn(f"{pathToInfo!r} already exits. Replace? (Y/n):")
+        overwrite = input()
         if overwrite == "y" or overwrite == "Y":
-            print(lib.colors.OKGREEN + "OVERWRITING")
+            mainDict["log"].note('OVERWRITING current "test.info"')
+
         else:
-            print(lib.colors.OKGREEN + "SKIPPING")
+            mainDict["log"].note('SKIPPING "test.info" overwrite')
             return
+
+    elif mainDict["overwriteCurrInfo"]:
+        mainDict["log"].note('OVERWRITING current "test.info"')
 
     # Get uniquie setup names
     setupList = []
@@ -135,10 +207,11 @@ def createInfo(mainDict, specList):
                 if hasattr(testSpec, key):
                     setattr(testSpec, key, setupInfo[key])
                 else:
-                    raise ValueError(
+                    mainDict["log"].err(
                         f"{key!r} defined for test {testSpec.nodeName!r}"
-                        + f" in {testSpec.setupName!r} does exist in TestSpec"
+                        + f" in {testSpec.setupName!r} does not exist in TestSpec"
                     )
+                    raise ValueError()
 
             infoNode.findChildrenWithPath(testSpec.nodeName)[
                 0
@@ -150,4 +223,4 @@ def createInfo(mainDict, specList):
 
     mainDict["pathToInfo"] = pathToInfo
 
-    print(lib.colors.OKGREEN + "[FlashXText] test.info is setup")
+    mainDict["log"].note("test.info is setup")
