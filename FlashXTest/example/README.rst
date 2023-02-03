@@ -71,8 +71,8 @@ Here is an example output from ``flashxtest_api.log``
    WARNING: Verify results in - <pathToOutdir>/<flashSite>/<YYYY-MM-DD>
    --------------------------------------------------------------------------------
    NOTE!    Suggested changes to "*.suite" files:
-   NOTE!    Set "cbase" to "2023-02-03" for "Comparison/Sod/UG/2d/simpleUnsplit"
-   NOTE!    Set "cbase" to "2023-02-03" for "Composite/Sod/PseudoUG/2d/Paramesh/simpleUnsplit"
+   NOTE!    Set "cbase" to "<YYYY-MM-DD>" for "Comparison/Sod/UG/2d/simpleUnsplit"
+   NOTE!    Set "cbase" to "<YYYY-MM-DD>" for "Composite/Sod/PseudoUG/2d/Paramesh/simpleUnsplit"
    --------------------------------------------------------------------------------
 
 -  Manually update ``Example.suite`` after verifying ``cbase`` values,
@@ -93,7 +93,7 @@ recommendations for updating ``rbase`` values.
    WARNING: Verify results in - <pathToOutdir>/<flashSite>/<YYYY-MM-DD>_2
    --------------------------------------------------------------------------------
    NOTE!    Suggested changes to "*.suite" files:
-   NOTE!    Set "rbase" to "2023-02-03_2" for "Composite/Sod/PseudoUG/2d/Paramesh/simpleUnsplit"
+   NOTE!    Set "rbase" to "<YYYY-MM-DD>_2" for "Composite/Sod/PseudoUG/2d/Paramesh/simpleUnsplit"
    --------------------------------------------------------------------------------
 
 If the run fails, check
