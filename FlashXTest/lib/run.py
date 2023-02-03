@@ -6,6 +6,8 @@ import toml
 from .. import backend
 from .. import lib
 
+sys.tracebacklimit = 1
+
 
 def flashTest(mainDict):
     """
@@ -28,43 +30,32 @@ def flashTest(mainDict):
 
     optString = __getOptString(mainDict)
 
-    # Set number of runs for flashTest
-    if mainDict["setBenchmarks"]:
-        numRuns = 2
-    else:
-        numRuns = 1
+    # Parse test.info and create a testList
+    jobList = []
+    infoNode = backend.FlashTest.lib.xmlNode.parseXml(mainDict["pathToInfo"]).findChild(
+        mainDict["flashSite"]
+    )
 
-    for currRun in range(numRuns):
+    # Update jobList
+    lib.info.jobListFromNode(infoNode, jobList)
+    jobList = [job.replace(f'{mainDict["flashSite"]}/', "") for job in jobList]
 
-        print(f"[FlashXTest]: Run No #{currRun}")
+    # run backend/FlashTest/flashTest.py with desired configuration
+    testProcess = subprocess.run(
+        "python3 {0}/FlashTest/flashTest.py \
+                                          {1} \
+                                          {2}".format(
+            os.path.dirname(backend.__file__), optString, " ".join(jobList)
+        ),
+        shell=True,
+        check=True,
+    )
 
-        # Parse test.info and create a testList
-        jobList = []
-
-        # Update jobList
-        lib.info.jobListFromNode(
-            backend.FlashTest.lib.xmlNode.parseXml(mainDict["pathToInfo"]),
-            jobList,
-            setBenchmarks=mainDict["setBenchmarks"],
-        )
-
-        # remove site from jobList
-        jobList = [job.replace(f'{mainDict["flashSite"]}/', "") for job in jobList]
-
-        # run backend/FlashTest/flashTest.py with desired configuration
-        #
-        testProcess = subprocess.run(
-            "python3 {0}/FlashTest/flashTest.py \
-                                              {1} \
-                                              {2}".format(
-                os.path.dirname(backend.__file__), optString, " ".join(jobList)
-            ),
-            shell=True,
-            check=True,
-        )
+    mainDict["log"].brk()
 
     os.environ["EXITSTATUS"] = str(testProcess.returncode)
     os.environ["FLASH_BASE"] = mainDict["pathToFlash"]
+    os.environ["FLASHTEST_OUTPUT"] = mainDict["pathToOutdir"]
     os.environ["RESULTS_DIR"] = (
         mainDict["pathToOutdir"] + os.sep + mainDict["flashSite"]
     )
@@ -80,12 +71,14 @@ def flashTest(mainDict):
     for key, value in invocationDict.items():
         os.environ[key] = value
 
+    lib.info.checkBenchmarks(mainDict, infoNode, jobList)
+
+    mainDict["log"].brk()
+
     # try:
     checkProcess = subprocess.run(
         "bash $FLASHTEST_BASE/error.sh", shell=True, check=True
     )
-
-    print(lib.colors.OKGREEN + "[FlashXTest] SUCCESS")
 
     # except checkProcess.CalledProcessError as e:
     #    #print(lib.colors.FAIL + f"{e.output}")

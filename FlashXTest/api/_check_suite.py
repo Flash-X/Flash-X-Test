@@ -13,6 +13,9 @@ def check_suite(**apiDict):
     # testDir in apiDict
     apiDict["testDir"] = os.getcwd()
 
+    # Logfile 
+    apiDict["log"] = backend.FlashTest.lib.logfile.Logfile(apiDict["testDir"], "flashxtest_api.log", verbose=True)
+
     # Cache the value of user Config file and store it as
     # pathToConfig in apiDict
     apiDict["pathToConfig"] = apiDict["testDir"] + "/config"
@@ -24,6 +27,6 @@ def check_suite(**apiDict):
     mainDict = lib.config.getMainDict(apiDict)
 
     # Check suite
-    lib.suite.checkSuite(
+    lib.suite.checkSuiteWithInfo(
         mainDict, backend.FlashTest.lib.xmlNode.parseXml(apiDict["pathToInfo"])
     )
