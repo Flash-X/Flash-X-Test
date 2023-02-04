@@ -84,7 +84,7 @@ def flashxtest(ctx, version):
     help="Path to info file",
 )
 
-def init(source, site, local_archive, main_archive, outdir, mpi_cmd, make_cmd_opts):
+def init(source, site, local_archive, main_archive, view_archive, pathtoinfo, outdir, mpi_cmd, make_cmd_opts):
     """
     \b
     Initialize site specific configuration.
