@@ -20,18 +20,29 @@ def flashTest(mainDict):
     """
 
     # Create output directory for TestResults if it does not exist
-    subprocess.run("mkdir -pv {0}".format(mainDict["pathToOutdir"]), shell=True)
+    subprocess.run(
+        "mkdir -pv {0}".format(mainDict["pathToOutdir"]), shell=True, check=True
+    )
 
     # Create local archive directory if it does not exist
-    subprocess.run("mkdir -pv {0}".format(mainDict["pathToLocalArchive"]), shell=True)
+    subprocess.run(
+        "mkdir -pv {0}".format(mainDict["pathToLocalArchive"]), shell=True, check=True
+    )
 
     # Create main archive directory if it does not exist
-    subprocess.run("mkdir -pv {0}".format(mainDict["pathToMainArchive"]), shell=True)
+    if mainDict["pathToMainArchive"]:
+        subprocess.run(
+            "mkdir -pv {0}".format(mainDict["pathToMainArchive"]),
+            shell=True,
+            check=True,
+        )
 
     # Create view archive directory if it does not exist
     if mainDict["pathToViewArchive"]:
         subprocess.run(
-            "mkdir -pv {0}".format(mainDict["pathToViewArchive"]), shell=True
+            "mkdir -pv {0}".format(mainDict["pathToViewArchive"]),
+            shell=True,
+            check=True,
         )
 
     optString = __getOptString(mainDict)
@@ -56,6 +67,18 @@ def flashTest(mainDict):
         shell=True,
         check=True,
     )
+
+    if mainDict["pathToViewArchive"] and mainDict["saveToArchive"]:
+        subprocess.run(
+            "cp {0} {1}".format(
+                mainDict["pathToInfo"],
+                os.path.join(
+                    mainDict["pathToViewArchive"], mainDict["flashSite"], "test.info"
+                ),
+            ),
+            shell=True,
+            check=True,
+        )
 
     mainDict["log"].brk()
 
@@ -129,11 +152,8 @@ def __getOptString(mainDict):
     mainDict: Dictionary with configuration values
     """
     optDict = {
-        "pathToFlash": "-z",
         "pathToInfo": "-i",
-        "pathToOutdir": "-o",
         "pathToConfig": "-c",
-        "flashSite": "-s",
         "pathToExeScript": "-e",
     }
 
@@ -143,7 +163,7 @@ def __getOptString(mainDict):
         if option in mainDict:
             optString = optString + "{0} {1} ".format(optDict[option], mainDict[option])
 
-    if not mainDict["saveToMainArchive"]:
-        optString = optString + "-t -vv"
+    if not mainDict["saveToArchive"]:
+        optString = optString + "-t"
 
     return optString
