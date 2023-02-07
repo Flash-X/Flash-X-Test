@@ -48,6 +48,7 @@ def setExe(apiDict):
 
     apiDict["log"].note('Initialized "execfile"')
 
+
 def setConfig(apiDict):
     """
     Setup configuration
@@ -97,11 +98,16 @@ def setConfig(apiDict):
             )
 
             # Set 'pathToFlash' if defined in apiDict
-            if "pathToFlash" in apiDict:
-                line = line.replace(
-                    "pathToFlash:",
-                    str("pathToFlash:        " + str(apiDict["pathToFlash"])),
-                )
+            line = line.replace(
+                "pathToFlash:",
+                str("pathToFlash:        " + str(apiDict["pathToFlash"])),
+            )
+
+            # Set 'pathToViewArchive' if defined in apiDict
+            line = line.replace(
+                "pathToViewArchive:",
+                str("pathToViewArchive:  " + str(apiDict["pathToViewArchive"])),
+            )
 
             # Set default pathToGmake
             line = line.replace(

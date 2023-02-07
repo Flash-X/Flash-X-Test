@@ -22,11 +22,17 @@ def flashTest(mainDict):
     # Create output directory for TestResults if it does not exist
     subprocess.run("mkdir -pv {0}".format(mainDict["pathToOutdir"]), shell=True)
 
-    # Create archive directory if it does not exist
+    # Create local archive directory if it does not exist
     subprocess.run("mkdir -pv {0}".format(mainDict["pathToLocalArchive"]), shell=True)
 
-    # Create baseLine directory if it does not exist
+    # Create main archive directory if it does not exist
     subprocess.run("mkdir -pv {0}".format(mainDict["pathToMainArchive"]), shell=True)
+
+    # Create view archive directory if it does not exist
+    if mainDict["pathToViewArchive"]:
+        subprocess.run(
+            "mkdir -pv {0}".format(mainDict["pathToViewArchive"]), shell=True
+        )
 
     optString = __getOptString(mainDict)
 
@@ -138,6 +144,6 @@ def __getOptString(mainDict):
             optString = optString + "{0} {1} ".format(optDict[option], mainDict[option])
 
     if not mainDict["saveToMainArchive"]:
-        optString = optString + "-t "
+        optString = optString + "-t -vv"
 
     return optString

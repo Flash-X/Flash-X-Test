@@ -12,6 +12,7 @@
 
 pathToMainArchive:
 pathToLocalArchive:
+pathToViewArchive:
 pathToOutdir:
 pathToFlash:
 pathToGmake:

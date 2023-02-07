@@ -7,6 +7,7 @@ import pkg_resources
 
 from .. import api
 
+
 @click.group(name="flashxtest", invoke_without_command=True)
 @click.pass_context
 @click.option("--version", "-v", is_flag=True)
@@ -72,7 +73,22 @@ def flashxtest(ctx, version):
     type=click.STRING,
     help="Gmake command and options",
 )
-def init(source, site, local_archive, main_archive, outdir, mpi_cmd, make_cmd_opts):
+@click.option(
+    "--view-archive",
+    "-vv",
+    default=None,
+    help="Path to view archive",
+)
+def init(
+    source,
+    site,
+    local_archive,
+    main_archive,
+    view_archive,
+    outdir,
+    mpi_cmd,
+    make_cmd_opts,
+):
     """
     \b
     Initialize site specific configuration.
@@ -94,6 +110,7 @@ def init(source, site, local_archive, main_archive, outdir, mpi_cmd, make_cmd_op
         pathToFlash=source,
         pathToLocalArchive=local_archive,
         pathToMainArchive=main_archive,
+        pathToViewArchive=view_archive,
         pathToOutdir=outdir,
         pathToMPI=mpi_cmd,
         pathToGmake=make_cmd_opts,
@@ -189,11 +206,11 @@ def show_specs(setupname):
     api.show_specs(setupName=setupname)
 
 
-#@flashxtest.command(name="compile")
-#@click.argument("setupname", type=str, required=True)
-#@click.option("--test", "-t", type=str, required=True)
-#@click.option("-objdir", type=str, default="object")
-#def compile(setupname, test, objdir):
+# @flashxtest.command(name="compile")
+# @click.argument("setupname", type=str, required=True)
+# @click.option("--test", "-t", type=str, required=True)
+# @click.option("-objdir", type=str, default="object")
+# def compile(setupname, test, objdir):
 #    """
 #    \b
 #    Compile a test defined for a specific setup
