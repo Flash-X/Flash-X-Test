@@ -29,7 +29,10 @@ def flashTest(mainDict):
     subprocess.run("mkdir -pv {0}".format(mainDict["pathToMainArchive"]), shell=True)
 
     # Create view archive directory if it does not exist
-    subprocess.run("mkdir -pv {0}".format(mainDict["pathToViewArchive"]), shell=True)
+    if mainDict["pathToViewArchive"]:
+        subprocess.run(
+            "mkdir -pv {0}".format(mainDict["pathToViewArchive"]), shell=True
+        )
 
     optString = __getOptString(mainDict)
 
@@ -134,13 +137,13 @@ def __getOptString(mainDict):
         "pathToExeScript": "-e",
     }
 
-    optString = "-v -L -vv "
+    optString = "-v -L "
 
     for option in optDict:
         if option in mainDict:
             optString = optString + "{0} {1} ".format(optDict[option], mainDict[option])
 
     if not mainDict["saveToMainArchive"]:
-        optString = optString + "-t "
+        optString = optString + "-t -vv"
 
     return optString
