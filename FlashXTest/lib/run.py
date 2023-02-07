@@ -38,11 +38,26 @@ def flashTest(mainDict):
         )
 
     # Create view archive directory if it does not exist
-    if mainDict["pathToViewArchive"]:
+    if mainDict["pathToViewArchive"] and mainDict["saveToArchive"]:
         subprocess.run(
-            "mkdir -pv {0}".format(mainDict["pathToViewArchive"]),
+            "mkdir -pv {0}".format(os.path.join(mainDict["pathToViewArchive"],mainDict["flashSite"])),
             shell=True,
             check=True,
+        )
+
+        subprocess.run(
+            "cp {0} {1}".format(
+                mainDict["pathToInfo"],
+                os.path.join(
+                    mainDict["pathToViewArchive"], mainDict["flashSite"], "test.info"
+                ),
+            ),
+            shell=True,
+            check=True,
+        )
+
+        mainDict["pathToInfo"] = os.path.join(
+            mainDict["pathToViewArchive"], mainDict["flashSite"], "test.info"
         )
 
     optString = __getOptString(mainDict)
@@ -67,18 +82,6 @@ def flashTest(mainDict):
         shell=True,
         check=True,
     )
-
-    if mainDict["pathToViewArchive"] and mainDict["saveToArchive"]:
-        subprocess.run(
-            "cp {0} {1}".format(
-                mainDict["pathToInfo"],
-                os.path.join(
-                    mainDict["pathToViewArchive"], mainDict["flashSite"], "test.info"
-                ),
-            ),
-            shell=True,
-            check=True,
-        )
 
     mainDict["log"].brk()
 
@@ -154,6 +157,7 @@ def __getOptString(mainDict):
     optDict = {
         "pathToInfo": "-i",
         "pathToConfig": "-c",
+        "flashSite": "-s",
         "pathToExeScript": "-e",
     }
 
