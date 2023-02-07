@@ -22,11 +22,14 @@ def flashTest(mainDict):
     # Create output directory for TestResults if it does not exist
     subprocess.run("mkdir -pv {0}".format(mainDict["pathToOutdir"]), shell=True)
 
-    # Create archive directory if it does not exist
+    # Create local archive directory if it does not exist
     subprocess.run("mkdir -pv {0}".format(mainDict["pathToLocalArchive"]), shell=True)
 
-    # Create baseLine directory if it does not exist
+    # Create main archive directory if it does not exist
     subprocess.run("mkdir -pv {0}".format(mainDict["pathToMainArchive"]), shell=True)
+
+    # Create view archive directory if it does not exist
+    subprocess.run("mkdir -pv {0}".format(mainDict["pathToViewArchive"]), shell=True)
 
     optString = __getOptString(mainDict)
 
@@ -122,32 +125,22 @@ def __getOptString(mainDict):
 
     mainDict: Dictionary with configuration values
     """
-    optDict1 = {
+    optDict = {
         "pathToFlash": "-z",
+        "pathToInfo": "-i",
         "pathToOutdir": "-o",
         "pathToConfig": "-c",
         "flashSite": "-s",
         "pathToExeScript": "-e",
     }
 
-    optDict2 = {
-        "pathToInfo": "-i",
-        "pathToViewArchive": "-vv",
-    }
+    optString = "-v -L -vv "
 
-    optString = ""
-
-    for option in optDict1:
+    for option in optDict:
         if option in mainDict:
-            optString = optString + "{0} {1} ".format(optDict1[option], mainDict[option])
+            optString = optString + "{0} {1} ".format(optDict[option], mainDict[option])
 
-    optString = optString + " -v -L "
-    
-    # if not mainDict["saveToMainArchive"]:
-    #     optString = optString + "-t "
-        
-    for option in optDict2:
-        if option in mainDict:
-            optString = optString + "{0} {1} ".format(optDict2[option], mainDict[option])
+    if not mainDict["saveToMainArchive"]:
+        optString = optString + "-t "
 
     return optString

@@ -28,6 +28,9 @@ def init(**apiDict):
     if not apiDict["pathToOutdir"]:
         apiDict["pathToOutdir"] = os.getcwd() + "/TestResults"
 
+    if not apiDict["pathToViewArchive"]:
+        apiDict["pathToViewArchive"] = ""
+
     # Cache the value to current directory and set it as
     # testDir in apiDict
     apiDict["testDir"] = os.getcwd()
@@ -50,9 +53,7 @@ def __setExeScript(apiDict):
     # Check if pathToExeScript already exists and
     # skip the setup process
     if os.path.exists(apiDict["pathToExeScript"]):
-        apiDict["log"].err(
-            '"execfile" already exists in working directory'
-        )
+        apiDict["log"].err('"execfile" already exists in working directory')
 
     # Setup configuration if pathToConfig does not exist
     else:
@@ -72,9 +73,7 @@ def __setConfig(apiDict):
     # Check if pathToConfig already exists and
     # skip the setup process
     if os.path.exists(apiDict["pathToConfig"]):
-        apiDict["log"].err(
-            '"config" already exists in working directory'
-        )
+        apiDict["log"].err('"config" already exists in working directory')
 
     # Setup configuration if pathToConfig does not exist
     else:
