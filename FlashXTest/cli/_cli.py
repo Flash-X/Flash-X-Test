@@ -174,7 +174,7 @@ def run_suite(archive):
     This command runs all the tests defined in
     "test.info", and conveys errors
     """
-    api.run_suite(saveToMainArchive=archive)
+    api.run_suite(saveToArchive=archive)
 
 
 @flashxtest.command(name="check-suite")
