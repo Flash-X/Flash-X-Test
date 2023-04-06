@@ -27,6 +27,9 @@ SuiteParser.add_argument(
     "-e", "--env", action="append", nargs="+", help="Environment variable", type=str
 )
 SuiteParser.add_argument("-debug", "--debug", action="store_true")
+SuiteParser.add_argument(
+    "-as", "--addSetupOptions", help="Additional setup options", type=str
+)
 SuiteParser.set_defaults(
     debug=False,
     nprocs=1,
@@ -35,6 +38,7 @@ SuiteParser.set_defaults(
     cbase=None,
     rbase=None,
     tolerance=0.0,
+    addSetupOptions="",
 )
 
 
@@ -99,6 +103,10 @@ class TestSpec:
         if self.debug:
             self.setupOptions = self.setupOptions + " -debug"
 
+        if self.addSetupOptions:
+            self.setupOptions = " ".join([self.setupOptions,
+                                          self.addSetupOptions.strip()])
+
         # Deal with restartParfiles path
         if self.restartParfiles:
             parFileList = self.restartParfiles.split(" ")
@@ -133,7 +141,7 @@ class TestSpec:
 
         # append to xmlText
         for xmlKey in list(self.__dict__.keys()):
-            if (getattr(self, xmlKey)) and (xmlKey not in ["cbase", "rbase", "debug"]):
+            if (getattr(self, xmlKey)) and (xmlKey not in ["cbase", "rbase", "debug", "addSetupOptions"]):
                 xmlText.append(f"{xmlKey}: {getattr(self, xmlKey)}")
 
         return xmlText
@@ -206,6 +214,7 @@ def parseSuite(mainDict):
             testSpec.cbase = testArgs.cbase
             testSpec.rbase = testArgs.rbase
             testSpec.errTol = testArgs.tolerance
+            testSpec.addSetupOptions = testArgs.addSetupOptions
 
             if testSpec.nodeName.split("/")[0] == "UnitTest" and (
                 testSpec.cbase or testSpec.rbase
