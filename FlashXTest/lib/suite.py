@@ -194,7 +194,7 @@ def parseSuite(mainDict):
             testSpec.nodeName = testArgs.test
 
             for currSpec in specList:
-                if testSpec.nodeName in currSpec.nodeName:
+                if testSpec.nodeName == currSpec.nodeName:
                     mainDict["log"].err(
                         f"Duplicate for {testSpec.nodeName!r} detected in {sfile.name!r}"
                     )
