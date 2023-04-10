@@ -122,7 +122,11 @@ def init(
 @click.option(
     "--overwrite", is_flag=True, help="Overwrite current test.info in working directory"
 )
-def setup_suite(suitelist, overwrite):
+@click.option(
+    "--setup-opts", default=None, help="Add common setup options to all tests"
+)
+@click.option("--seed", default=None, help="Seed info file")
+def setup_suite(suitelist, overwrite, setup_opts, seed):
     """
     \b
     Create a "test.info" from a list of suite files.
@@ -160,7 +164,12 @@ def setup_suite(suitelist, overwrite):
     -e, --env		TEXT	Environment variables
     -debug, --debug	BOOLEAN	Debug test
     """
-    api.setup_suite(pathToSuites=suitelist, overwriteCurrInfo=overwrite)
+    api.setup_suite(
+        pathToSuites=suitelist,
+        overwriteCurrInfo=overwrite,
+        setupOptions=setup_opts,
+        seedInfo=seed,
+    )
 
 
 @flashxtest.command(name="run-suite")

@@ -82,7 +82,9 @@ def checkBenchmarks(mainDict, infoNode, jobList):
     for index in approvedIndex:
         for ind in range(index, -1, -1):
             if "test.info" in invocationLog[ind]:
-                approvedTests.append(invocationLog[ind + 2].split(":")[1].replace(" ", ""))
+                approvedTests.append(
+                    invocationLog[ind + 2].split(":")[1].replace(" ", "")
+                )
                 break
 
     for nodeName in approvedTests:
@@ -212,6 +214,11 @@ def createInfo(mainDict, specList):
                         + f" in {testSpec.setupName!r} does not exist in TestSpec"
                     )
                     raise ValueError()
+
+            if mainDict["setupOptions"]:
+                testSpec.setupOptions = (
+                    testSpec.setupOptions + " " + mainDict["setupOptions"]
+                )
 
             infoNode.findChildrenWithPath(testSpec.nodeName)[
                 0
