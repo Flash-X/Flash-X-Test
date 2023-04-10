@@ -44,5 +44,6 @@ jobs:
     - name: Run flashxtest checks
       run: |
           maple container pour --image=flash_x_test
-          maple container execute "cd FlashXTest/example && ~/.local/bin/flashxtest init -z $PWD -s None"
+          maple container execute "cd FlashXTest/example && ~/.local/bin/flashxtest init -z /home/mount/FlashXTest/example -s None"
           maple container rinse
+

@@ -1,7 +1,9 @@
 """Python API for FlashXTest"""
 
 import os
+
 from .. import lib
+from .. import backend
 
 
 def init(**apiDict):
@@ -12,6 +14,23 @@ def init(**apiDict):
     ---------
     apiDict : Dictionary to populate Config file
     """
+    apiDict["log"] = backend.FlashTest.lib.logfile.ConsoleLog()
+
+    if not apiDict["pathToFlash"]:
+        apiDict["pathToFlash"] = os.getcwd()
+
+    if not apiDict["pathToLocalArchive"]:
+        apiDict["pathToLocalArchive"] = os.getcwd() + "/TestLocalArchive"
+
+    if not apiDict["pathToMainArchive"]:
+        apiDict["pathToMainArchive"] = os.getcwd() + "/TestMainArchive"
+
+    if not apiDict["pathToOutdir"]:
+        apiDict["pathToOutdir"] = os.getcwd() + "/TestResults"
+
+    if not apiDict["pathToViewArchive"]:
+        apiDict["pathToViewArchive"] = ""
+
     # Cache the value to current directory and set it as
     # testDir in apiDict
     apiDict["testDir"] = os.getcwd()
@@ -34,10 +53,7 @@ def __setExeScript(apiDict):
     # Check if pathToExeScript already exists and
     # skip the setup process
     if os.path.exists(apiDict["pathToExeScript"]):
-        print(
-            lib.colors.WARNING
-            + "[FlashXTest] Skipping initialization: Exec script already exists!"
-        )
+        apiDict["log"].err('"execfile" already exists in working directory')
 
     # Setup configuration if pathToConfig does not exist
     else:
@@ -57,10 +73,7 @@ def __setConfig(apiDict):
     # Check if pathToConfig already exists and
     # skip the setup process
     if os.path.exists(apiDict["pathToConfig"]):
-        print(
-            lib.colors.WARNING
-            + "[FlashXTest] Skipping initialization: Config file already exists!"
-        )
+        apiDict["log"].err('"config" already exists in working directory')
 
     # Setup configuration if pathToConfig does not exist
     else:
