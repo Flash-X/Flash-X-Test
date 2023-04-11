@@ -122,7 +122,14 @@ def init(
 @click.option(
     "--overwrite", is_flag=True, help="Overwrite current test.info in working directory"
 )
-def setup_suite(suitelist, overwrite):
+@click.option(
+    "--add-setup-opts",
+    "-as",
+    default=None,
+    help="Add common setup options to all tests",
+)
+@click.option("--seed-from-info", "-i", default=None, help="Seed info file")
+def setup_suite(suitelist, overwrite, add_setup_opts, seed_from_info):
     """
     \b
     Create a "test.info" from a list of suite files.
@@ -160,7 +167,12 @@ def setup_suite(suitelist, overwrite):
     -e, --env		TEXT	Environment variables
     -debug, --debug	BOOLEAN	Debug test
     """
-    api.setup_suite(pathToSuites=suitelist, overwriteCurrInfo=overwrite)
+    api.setup_suite(
+        pathToSuites=suitelist,
+        overwriteCurrInfo=overwrite,
+        addSetupOptions=add_setup_opts,
+        seedFromInfo=seed_from_info,
+    )
 
 
 @flashxtest.command(name="run-suite")
@@ -231,7 +243,7 @@ def show_specs(setupname):
 @click.argument("setupname", type=str, required=True)
 @click.option("--test", "-t", type=str, required=True)
 @click.option("--nprocs", "-np", type=str, required=True)
-@click.option("-objdir", type=str, default="object")
+@click.option("--objdir", "-ob", type=str, default="object")
 def dry_run(setupname, test, nprocs, objdir):
     """
     \b

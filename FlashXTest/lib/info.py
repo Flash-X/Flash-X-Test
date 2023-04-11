@@ -82,7 +82,9 @@ def checkBenchmarks(mainDict, infoNode, jobList):
     for index in approvedIndex:
         for ind in range(index, -1, -1):
             if "test.info" in invocationLog[ind]:
-                approvedTests.append(invocationLog[ind + 2].split(":")[1].replace(" ", ""))
+                approvedTests.append(
+                    invocationLog[ind + 2].split(":")[1].replace(" ", "")
+                )
                 break
 
     for nodeName in approvedTests:
@@ -174,6 +176,12 @@ def createInfo(mainDict, specList):
     elif mainDict["overwriteCurrInfo"]:
         mainDict["log"].note('OVERWRITING current "test.info"')
 
+    if mainDict["seedFromInfo"]:
+        seedNode = backend.FlashTest.lib.xmlNode.XmlNode(mainDict["seedFromInfo"])
+        seedNode = seedNode.findChild(seedNode.getXml()[0].strip("<").strip(">"))
+    else:
+        seedNode = None
+
     # Get uniquie setup names
     setupList = []
     for testSpec in specList:
@@ -212,6 +220,11 @@ def createInfo(mainDict, specList):
                         + f" in {testSpec.setupName!r} does not exist in TestSpec"
                     )
                     raise ValueError()
+
+            if mainDict["addSetupOptions"]:
+                testSpec.setupOptions = (
+                    testSpec.setupOptions + " " + mainDict["addSetupOptions"]
+                )
 
             infoNode.findChildrenWithPath(testSpec.nodeName)[
                 0
