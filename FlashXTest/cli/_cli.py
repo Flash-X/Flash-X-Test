@@ -152,13 +152,14 @@ def setup_suite(suitelist, overwrite):
     options,
 
     \b
-    -t, --test		TEXT	Defined in */tests/tests.yaml
-    -np, --nprocs	INTEGER	Number of processors
-    -cbase, --cbase	TEXT	Date for comparsion benchmark
-    -rbase, --rbase	TEXT	Date for restart benchmark
-    -tol, --tolerance	FLOAT	Tolerance for comparsion and composite tests
-    -e, --env		TEXT	Environment variables
-    -debug, --debug	BOOLEAN	Debug test
+    -t, --test             TEXT     Defined in */tests/tests.yaml
+    -np, --nprocs          INTEGER  Number of processors
+    -cbase, --cbase        TEXT     Date for comparsion benchmark
+    -rbase, --rbase        TEXT     Date for restart benchmark
+    -tol, --tolerance      FLOAT    Tolerance for comparsion and composite tests
+    -e, --env              TEXT     Environment variables
+    -debug, --debug        BOOLEAN  Debug test
+    -as, --add-setup-opts  TEXT     Additional setup options
     """
     api.setup_suite(pathToSuites=suitelist, overwriteCurrInfo=overwrite)
 
