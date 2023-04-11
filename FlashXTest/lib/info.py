@@ -176,6 +176,12 @@ def createInfo(mainDict, specList):
     elif mainDict["overwriteCurrInfo"]:
         mainDict["log"].note('OVERWRITING current "test.info"')
 
+    if mainDict["seedFromInfo"]:
+        seedNode = backend.FlashTest.lib.xmlNode.XmlNode(mainDict["seedFromInfo"])
+        seedNode = seedNode.findChild(seedNode.getXml()[0].strip("<").strip(">"))
+    else:
+        seedNode = None
+
     # Get uniquie setup names
     setupList = []
     for testSpec in specList:
@@ -215,9 +221,9 @@ def createInfo(mainDict, specList):
                     )
                     raise ValueError()
 
-            if mainDict["setupOptions"]:
+            if mainDict["addSetupOptions"]:
                 testSpec.setupOptions = (
-                    testSpec.setupOptions + " " + mainDict["setupOptions"]
+                    testSpec.setupOptions + " " + mainDict["addSetupOptions"]
                 )
 
             infoNode.findChildrenWithPath(testSpec.nodeName)[

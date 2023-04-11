@@ -123,10 +123,13 @@ def init(
     "--overwrite", is_flag=True, help="Overwrite current test.info in working directory"
 )
 @click.option(
-    "--setup-opts", default=None, help="Add common setup options to all tests"
+    "--add-setup-opts",
+    "-as",
+    default=None,
+    help="Add common setup options to all tests",
 )
-@click.option("--seed", default=None, help="Seed info file")
-def setup_suite(suitelist, overwrite, setup_opts, seed):
+@click.option("--seed-from-info", "-i", default=None, help="Seed info file")
+def setup_suite(suitelist, overwrite, add_setup_opts, seed_from_info):
     """
     \b
     Create a "test.info" from a list of suite files.
@@ -167,8 +170,8 @@ def setup_suite(suitelist, overwrite, setup_opts, seed):
     api.setup_suite(
         pathToSuites=suitelist,
         overwriteCurrInfo=overwrite,
-        setupOptions=setup_opts,
-        seedInfo=seed,
+        addSetupOptions=add_setup_opts,
+        seedFromInfo=seed_from_info,
     )
 
 
@@ -240,7 +243,7 @@ def show_specs(setupname):
 @click.argument("setupname", type=str, required=True)
 @click.option("--test", "-t", type=str, required=True)
 @click.option("--nprocs", "-np", type=str, required=True)
-@click.option("-objdir", type=str, default="object")
+@click.option("--objdir", "-ob", type=str, default="object")
 def dry_run(setupname, test, nprocs, objdir):
     """
     \b

@@ -40,7 +40,9 @@ def flashTest(mainDict):
     # Create view archive directory if it does not exist
     if mainDict["pathToViewArchive"] and mainDict["saveToArchive"]:
         subprocess.run(
-            "mkdir -pv {0}".format(os.path.join(mainDict["pathToViewArchive"],mainDict["flashSite"])),
+            "mkdir -pv {0}".format(
+                os.path.join(mainDict["pathToViewArchive"], mainDict["flashSite"])
+            ),
             shell=True,
             check=True,
         )
