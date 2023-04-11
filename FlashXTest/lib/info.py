@@ -163,6 +163,12 @@ def createInfo(mainDict, specList):
     # Set variables for site Info
     pathToInfo = str(mainDict["testDir"]) + "/test.info"
 
+    if mainDict["seedFromInfo"]:
+        seedNode = backend.FlashTest.lib.xmlNode.parseXml(mainDict["seedFromInfo"])
+        seedNode = seedNode.findChild(seedNode.getXml()[0].strip("<").strip(">"))
+    else:
+        seedNode = None
+
     if os.path.exists(pathToInfo) and not mainDict["overwriteCurrInfo"]:
         mainDict["log"].warn(f"{pathToInfo!r} already exits. Replace? (Y/n):")
         overwrite = input()
@@ -175,12 +181,6 @@ def createInfo(mainDict, specList):
 
     elif mainDict["overwriteCurrInfo"]:
         mainDict["log"].note('OVERWRITING current "test.info"')
-
-    if mainDict["seedFromInfo"]:
-        seedNode = backend.FlashTest.lib.xmlNode.XmlNode(mainDict["seedFromInfo"])
-        seedNode = seedNode.findChild(seedNode.getXml()[0].strip("<").strip(">"))
-    else:
-        seedNode = None
 
     # Get uniquie setup names
     setupList = []
@@ -223,8 +223,57 @@ def createInfo(mainDict, specList):
 
             if mainDict["addSetupOptions"]:
                 testSpec.setupOptions = (
-                    testSpec.setupOptions + " " + mainDict["addSetupOptions"]
+                    testSpec.setupOptions + " " + mainDict["addSetupOptions"].strip()
                 )
+
+            if seedNode:
+                if seedNode.findChildrenWithPath(testSpec.nodeName):
+                    xmlText = seedNode.findChildrenWithPath(testSpec.nodeName)[0].text
+                    for entries in xmlText:
+                        if entries.split(":")[0] == "restartBenchmark":
+                            testSpec.rbase = [
+                                value
+                                for value in entries.split(":")[1]
+                                .replace(" ", "")
+                                .split("/")
+                                if value
+                                not in [
+                                    "<siteDir>",
+                                    "<buildDir>",
+                                    "<runDir>",
+                                    "<checkpointBasename><restartNumber>",
+                                ]
+                            ][0]
+
+                        elif entries.split(":")[0] == "comparisonBenchmark":
+                            testSpec.cbase = [
+                                value
+                                for value in entries.split(":")[1]
+                                .replace(" ", "")
+                                .split("/")
+                                if value
+                                not in [
+                                    "<siteDir>",
+                                    "<buildDir>",
+                                    "<runDir>",
+                                    "<checkpointBasename><comparisonNumber>",
+                                ]
+                            ][0]
+
+                        elif entries.split(":")[0] == "shortPathToBenchmark":
+                            testSpec.cbase = [
+                                value
+                                for value in entries.split(":")[1]
+                                .replace(" ", "")
+                                .split("/")
+                                if value
+                                not in [
+                                    "<siteDir>",
+                                    "<buildDir>",
+                                    "<runDir>",
+                                    "<chkMax>",
+                                ]
+                            ][0]
 
             infoNode.findChildrenWithPath(testSpec.nodeName)[
                 0
