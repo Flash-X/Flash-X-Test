@@ -227,7 +227,7 @@ def createInfo(mainDict, specList):
                 )
 
             if seedNode:
-                if seedNode.findChildrenWithPath(testSpec.nodeName):
+                if seedNode.findChildrenWithPath(testSpec.nodeName)[0]:
                     xmlText = seedNode.findChildrenWithPath(testSpec.nodeName)[0].text
                     for entries in xmlText:
                         if entries.split(":")[0] == "restartBenchmark":
