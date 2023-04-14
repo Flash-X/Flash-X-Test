@@ -281,7 +281,7 @@ def createInfo(mainDict, specList):
                             ][0]
 
                     nlist = testSpec.getXmlText()
-                    nlist += xmlText # This list mnow has items from the
+                    nlist += xmlText # This list now has items from the
                     # test spec, followed by items from the seed-info file
 
                     # Now turn the combined list into a dict. Last
@@ -291,9 +291,12 @@ def createInfo(mainDict, specList):
                         fieldName = entries.split(":")[0].strip()
                         fieldVal  = entries.split(":")[1].strip()
                         if fieldName:
-                          ndict[fieldName] = fieldVal
+                            if (fieldName in ndict and ndict[fieldName] != None  and
+                                fieldName == "setupOptins" and mainDict["addSetupOptions"]):
+                                fieldVal = fieldVal + " " + mainDict["addSetupOptions"].strip()
+                            ndict[fieldName] = fieldVal
 
-                    # back fro ma dict to something like a list:
+                    # back from a dict to something like a list:
                     infoNode.findChildrenWithPath(testSpec.nodeName)[
                         0
                     ].text = (": ".join(it) for it in ndict.items())
