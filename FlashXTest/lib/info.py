@@ -163,6 +163,12 @@ def createInfo(mainDict, specList):
     # Set variables for site Info
     pathToInfo = str(mainDict["testDir"]) + "/test.info"
 
+    if mainDict["seedFromInfo"]:
+        seedNode = backend.FlashTest.lib.xmlNode.parseXml(mainDict["seedFromInfo"])
+        seedNode = seedNode.findChild(seedNode.getXml()[0].strip("<").strip(">"))
+    else:
+        seedNode = None
+
     if os.path.exists(pathToInfo) and not mainDict["overwriteCurrInfo"]:
         mainDict["log"].warn(f"{pathToInfo!r} already exits. Replace? (Y/n):")
         overwrite = input()
@@ -175,12 +181,6 @@ def createInfo(mainDict, specList):
 
     elif mainDict["overwriteCurrInfo"]:
         mainDict["log"].note('OVERWRITING current "test.info"')
-
-    if mainDict["seedFromInfo"]:
-        seedNode = backend.FlashTest.lib.xmlNode.XmlNode(mainDict["seedFromInfo"])
-        seedNode = seedNode.findChild(seedNode.getXml()[0].strip("<").strip(">"))
-    else:
-        seedNode = None
 
     # Get uniquie setup names
     setupList = []
@@ -223,12 +223,93 @@ def createInfo(mainDict, specList):
 
             if mainDict["addSetupOptions"]:
                 testSpec.setupOptions = (
-                    testSpec.setupOptions + " " + mainDict["addSetupOptions"]
+                    testSpec.setupOptions + " " + mainDict["addSetupOptions"].strip()
                 )
 
-            infoNode.findChildrenWithPath(testSpec.nodeName)[
-                0
-            ].text = testSpec.getXmlText()
+            if seedNode:
+                if seedNode.findChildrenWithPath(testSpec.nodeName)[0]:
+                    xmlText = seedNode.findChildrenWithPath(testSpec.nodeName)[0].text
+                    for entries in xmlText: # first pass through this
+                        # list - probably ineffective, its resulting
+                        # changes in testSpec will effectively be
+                        # overwritten below.
+                        fieldName = entries.split(":")[0]
+                        fieldVal  = entries.split(":")[1].strip()
+                        if fieldName == "restartBenchmark":
+                            testSpec.rbase = [
+                                value
+                                for value in fieldVal
+                                .replace(" ", "")
+                                .split("/")
+                                if value
+                                not in [
+                                    "<siteDir>",
+                                    "<buildDir>",
+                                    "<runDir>",
+                                    "<checkpointBasename><restartNumber>",
+                                ]
+                            ][0]
+
+                        elif fieldName == "comparisonBenchmark":
+                            testSpec.cbase = [
+                                value
+                                for value in fieldVal
+                                .replace(" ", "")
+                                .split("/")
+                                if value
+                                not in [
+                                    "<siteDir>",
+                                    "<buildDir>",
+                                    "<runDir>",
+                                    "<checkpointBasename><comparisonNumber>",
+                                ]
+                            ][0]
+
+                        elif fieldName == "shortPathToBenchmark":
+                            testSpec.cbase = [
+                                value
+                                for value in fieldVal
+                                .replace(" ", "")
+                                .split("/")
+                                if value
+                                not in [
+                                    "<siteDir>",
+                                    "<buildDir>",
+                                    "<runDir>",
+                                    "<chkMax>",
+                                ]
+                            ][0]
+
+                    nlist = testSpec.getXmlText()
+                    nlist += xmlText # This list now has items from the
+                    # test spec, followed by items from the seed-info file
+
+                    # Now turn the combined list into a dict. Last
+                    # occurrence of a field name wins!
+                    ndict = {}
+                    for entries in nlist:
+                        fieldName = entries.split(":")[0].strip()
+                        fieldVal  = entries.split(":")[1].strip()
+                        if fieldName:
+                            if (fieldName in ndict and ndict[fieldName] != None  and
+                                fieldName == "setupOptins" and mainDict["addSetupOptions"]):
+                                fieldVal = fieldVal + " " + mainDict["addSetupOptions"].strip()
+                            ndict[fieldName] = fieldVal
+
+                    # back from a dict to something like a list:
+                    infoNode.findChildrenWithPath(testSpec.nodeName)[
+                        0
+                    ].text = (": ".join(it) for it in ndict.items())
+
+                else:
+                    infoNode.findChildrenWithPath(testSpec.nodeName)[
+                        0
+                    ].text = testSpec.getXmlText()
+
+            else:
+                infoNode.findChildrenWithPath(testSpec.nodeName)[
+                    0
+                ].text = testSpec.getXmlText()
 
         # Write xml to file
         for line in infoNode.getXml():
