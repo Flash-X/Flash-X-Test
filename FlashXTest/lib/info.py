@@ -229,11 +229,16 @@ def createInfo(mainDict, specList):
             if seedNode:
                 if seedNode.findChildrenWithPath(testSpec.nodeName)[0]:
                     xmlText = seedNode.findChildrenWithPath(testSpec.nodeName)[0].text
-                    for entries in xmlText:
-                        if entries.split(":")[0] == "restartBenchmark":
+                    for entries in xmlText: # first pass through this
+                        # list - probably ineffective, its resulting
+                        # changes in testSpec will effectively be
+                        # overwritten below.
+                        fieldName = entries.split(":")[0]
+                        fieldVal  = entries.split(":")[1].strip()
+                        if fieldName == "restartBenchmark":
                             testSpec.rbase = [
                                 value
-                                for value in entries.split(":")[1]
+                                for value in fieldVal
                                 .replace(" ", "")
                                 .split("/")
                                 if value
@@ -245,10 +250,10 @@ def createInfo(mainDict, specList):
                                 ]
                             ][0]
 
-                        elif entries.split(":")[0] == "comparisonBenchmark":
+                        elif fieldName == "comparisonBenchmark":
                             testSpec.cbase = [
                                 value
-                                for value in entries.split(":")[1]
+                                for value in fieldVal
                                 .replace(" ", "")
                                 .split("/")
                                 if value
@@ -260,10 +265,10 @@ def createInfo(mainDict, specList):
                                 ]
                             ][0]
 
-                        elif entries.split(":")[0] == "shortPathToBenchmark":
+                        elif fieldName == "shortPathToBenchmark":
                             testSpec.cbase = [
                                 value
-                                for value in entries.split(":")[1]
+                                for value in fieldVal
                                 .replace(" ", "")
                                 .split("/")
                                 if value
@@ -275,9 +280,36 @@ def createInfo(mainDict, specList):
                                 ]
                             ][0]
 
-            infoNode.findChildrenWithPath(testSpec.nodeName)[
-                0
-            ].text = testSpec.getXmlText()
+                    nlist = testSpec.getXmlText()
+                    nlist += xmlText # This list now has items from the
+                    # test spec, followed by items from the seed-info file
+
+                    # Now turn the combined list into a dict. Last
+                    # occurrence of a field name wins!
+                    ndict = {}
+                    for entries in nlist:
+                        fieldName = entries.split(":")[0].strip()
+                        fieldVal  = entries.split(":")[1].strip()
+                        if fieldName:
+                            if (fieldName in ndict and ndict[fieldName] != None  and
+                                fieldName == "setupOptins" and mainDict["addSetupOptions"]):
+                                fieldVal = fieldVal + " " + mainDict["addSetupOptions"].strip()
+                            ndict[fieldName] = fieldVal
+
+                    # back from a dict to something like a list:
+                    infoNode.findChildrenWithPath(testSpec.nodeName)[
+                        0
+                    ].text = (": ".join(it) for it in ndict.items())
+
+                else:
+                    infoNode.findChildrenWithPath(testSpec.nodeName)[
+                        0
+                    ].text = testSpec.getXmlText()
+
+            else:
+                infoNode.findChildrenWithPath(testSpec.nodeName)[
+                    0
+                ].text = testSpec.getXmlText()
 
         # Write xml to file
         for line in infoNode.getXml():
