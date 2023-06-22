@@ -39,7 +39,10 @@ class Logfile:
     if stp:
       msg = "%s %s" % (strftime("%H:%M:%S", localtime()), msg)
 
-    lines = msg.decode(encoding=locale.getpreferredencoding(False),errors="replace").strip().split("\n")
+    try:
+      lines = msg.strip().split("\n")
+    except:
+      lines = msg.decode(encoding=locale.getpreferredencoding(False),errors="replace").strip().split("\n")
     for i in range(len(lines)):
       if i==0 and indent==False:
         continue
