@@ -1,4 +1,4 @@
-import sys, os
+import sys, os, locale
 from time import strftime, localtime
 
 class Logfile:
@@ -39,7 +39,7 @@ class Logfile:
     if stp:
       msg = "%s %s" % (strftime("%H:%M:%S", localtime()), msg)
 
-    lines = msg.strip().split("\n")
+    lines = msg.decode(encoding=locale.getpreferredencoding(False),errors="replace").strip().split("\n")
     for i in range(len(lines)):
       if i==0 and indent==False:
         continue
