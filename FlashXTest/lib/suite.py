@@ -96,7 +96,7 @@ class TestSpec:
         else:
             mainDict["log"].err(
                 f"'parfiles' not defined for test {self.nodeName!r} for setup {self.setupName!r}"
-            ) 
+            )
             raise ValueError()
 
         # Deal with debug flags
@@ -104,8 +104,9 @@ class TestSpec:
             self.setupOptions = self.setupOptions + " -debug"
 
         if self.add_setup_opts:
-            self.setupOptions = " ".join([self.setupOptions,
-                                          self.add_setup_opts.strip()])
+            self.setupOptions = " ".join(
+                [self.setupOptions, self.add_setup_opts.strip()]
+            )
 
         # Deal with restartParfiles path
         if self.restartParfiles:
@@ -141,7 +142,9 @@ class TestSpec:
 
         # append to xmlText
         for xmlKey in list(self.__dict__.keys()):
-            if (getattr(self, xmlKey)) and (xmlKey not in ["cbase", "rbase", "debug", "add_setup_opts"]):
+            if (getattr(self, xmlKey)) and (
+                xmlKey not in ["cbase", "rbase", "debug", "add_setup_opts"]
+            ):
                 xmlText.append(f"{xmlKey}: {getattr(self, xmlKey)}")
 
         return xmlText

@@ -107,9 +107,8 @@ def flashTest(mainDict):
 
     # This removes log file messages for comparison between
     # test.info and suite files
-    #lib.info.checkBenchmarks(mainDict, infoNode, jobList)
-
-    mainDict["log"].brk()
+    # lib.info.checkBenchmarks(mainDict, infoNode, jobList)
+    # mainDict["log"].brk()
 
     # try:
     checkProcess = subprocess.run(

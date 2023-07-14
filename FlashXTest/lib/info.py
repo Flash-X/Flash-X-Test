@@ -173,14 +173,14 @@ def createInfo(mainDict, specList):
         mainDict["log"].warn(f"{pathToInfo!r} already exits. Replace? (Y/n):")
         overwrite = input()
         if overwrite == "y" or overwrite == "Y":
-            mainDict["log"].note('OVERWRITING current "test.info"')
+            mainDict["log"].note(f'OVERWRITING current "test.info" in {pathToInfo}')
 
         else:
-            mainDict["log"].note('SKIPPING "test.info" overwrite')
+            mainDict["log"].note(f'SKIPPING "test.info" overwrite to {pathToInfo}')
             return
 
     elif mainDict["overwriteCurrInfo"]:
-        mainDict["log"].note('OVERWRITING current "test.info"')
+        mainDict["log"].note(f'OVERWRITING current "test.info" in {pathToInfo}')
 
     # Get uniquie setup names
     setupList = []
@@ -229,18 +229,16 @@ def createInfo(mainDict, specList):
             if seedNode:
                 if seedNode.findChildrenWithPath(testSpec.nodeName)[0]:
                     xmlText = seedNode.findChildrenWithPath(testSpec.nodeName)[0].text
-                    for entries in xmlText: # first pass through this
+                    for entries in xmlText:  # first pass through this
                         # list - probably ineffective, its resulting
                         # changes in testSpec will effectively be
                         # overwritten below.
                         fieldName = entries.split(":")[0]
-                        fieldVal  = entries.split(":")[1].strip()
+                        fieldVal = entries.split(":")[1].strip()
                         if fieldName == "restartBenchmark":
                             testSpec.rbase = [
                                 value
-                                for value in fieldVal
-                                .replace(" ", "")
-                                .split("/")
+                                for value in fieldVal.replace(" ", "").split("/")
                                 if value
                                 not in [
                                     "<siteDir>",
@@ -253,9 +251,7 @@ def createInfo(mainDict, specList):
                         elif fieldName == "comparisonBenchmark":
                             testSpec.cbase = [
                                 value
-                                for value in fieldVal
-                                .replace(" ", "")
-                                .split("/")
+                                for value in fieldVal.replace(" ", "").split("/")
                                 if value
                                 not in [
                                     "<siteDir>",
@@ -268,9 +264,7 @@ def createInfo(mainDict, specList):
                         elif fieldName == "shortPathToBenchmark":
                             testSpec.cbase = [
                                 value
-                                for value in fieldVal
-                                .replace(" ", "")
-                                .split("/")
+                                for value in fieldVal.replace(" ", "").split("/")
                                 if value
                                 not in [
                                     "<siteDir>",
@@ -281,7 +275,7 @@ def createInfo(mainDict, specList):
                             ][0]
 
                     nlist = testSpec.getXmlText()
-                    nlist += xmlText # This list now has items from the
+                    nlist += xmlText  # This list now has items from the
                     # test spec, followed by items from the seed-info file
 
                     # Now turn the combined list into a dict. Last
@@ -289,17 +283,23 @@ def createInfo(mainDict, specList):
                     ndict = {}
                     for entries in nlist:
                         fieldName = entries.split(":")[0].strip()
-                        fieldVal  = entries.split(":")[1].strip()
+                        fieldVal = entries.split(":")[1].strip()
                         if fieldName:
-                            if (fieldName in ndict and ndict[fieldName] != None  and
-                                fieldName == "setupOptins" and mainDict["addSetupOptions"]):
-                                fieldVal = fieldVal + " " + mainDict["addSetupOptions"].strip()
+                            if (
+                                fieldName in ndict
+                                and ndict[fieldName] != None
+                                and fieldName == "setupOptins"
+                                and mainDict["addSetupOptions"]
+                            ):
+                                fieldVal = (
+                                    fieldVal + " " + mainDict["addSetupOptions"].strip()
+                                )
                             ndict[fieldName] = fieldVal
 
                     # back from a dict to something like a list:
-                    infoNode.findChildrenWithPath(testSpec.nodeName)[
-                        0
-                    ].text = (": ".join(it) for it in ndict.items())
+                    infoNode.findChildrenWithPath(testSpec.nodeName)[0].text = (
+                        ": ".join(it) for it in ndict.items()
+                    )
 
                 else:
                     infoNode.findChildrenWithPath(testSpec.nodeName)[
@@ -317,4 +317,4 @@ def createInfo(mainDict, specList):
 
     mainDict["pathToInfo"] = pathToInfo
 
-    mainDict["log"].note("test.info is setup")
+    mainDict["log"].note(f'test.info is setup at {mainDict["pathToInfo"]}')
