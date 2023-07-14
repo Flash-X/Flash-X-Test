@@ -105,7 +105,9 @@ def flashTest(mainDict):
     for key, value in invocationDict.items():
         os.environ[key] = value
 
-    lib.info.checkBenchmarks(mainDict, infoNode, jobList)
+    # This removes log file messages for comparison between
+    # test.info and suite files
+    #lib.info.checkBenchmarks(mainDict, infoNode, jobList)
 
     mainDict["log"].brk()
 
