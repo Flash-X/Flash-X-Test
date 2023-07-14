@@ -13,8 +13,10 @@ def run_suite(**apiDict):
     # testDir in apiDict
     apiDict["testDir"] = os.getcwd()
 
-    # Logfile 
-    apiDict["log"] = backend.FlashTest.lib.logfile.Logfile(apiDict["testDir"], "flashxtest_api.log", verbose=True)
+    # Logfile
+    apiDict["log"] = backend.FlashTest.lib.logfile.Logfile(
+        apiDict["testDir"], "flashxtest_api.log", verbose=True
+    )
 
     # Cache the value of user Config file and store it as
     # pathToConfig in apiDict

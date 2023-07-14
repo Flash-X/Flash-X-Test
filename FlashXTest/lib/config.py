@@ -46,7 +46,7 @@ def setExe(apiDict):
             line = line.replace("mpiexec", apiDict["pathToMPI"])
             efile.write(line)
 
-    apiDict["log"].note('Initialized "execfile"')
+    apiDict["log"].note(f'Wrote "execfile" to {exeFile}')
 
 
 def setConfig(apiDict):
@@ -136,4 +136,4 @@ def setConfig(apiDict):
         for line in lines:
             cfile.write(line)
 
-    apiDict["log"].note('Initialized "config"')
+    apiDict["log"].note(f'Wrote "config" to {configFile}')

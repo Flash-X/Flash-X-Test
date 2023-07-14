@@ -53,7 +53,7 @@ def __setExeScript(apiDict):
     # Check if pathToExeScript already exists and
     # skip the setup process
     if os.path.exists(apiDict["pathToExeScript"]):
-        apiDict["log"].err('"execfile" already exists in working directory')
+        apiDict["log"].err(f'"execfile" already exists at {apiDict["pathToExeScript"]}')
 
     # Setup configuration if pathToConfig does not exist
     else:
@@ -73,7 +73,7 @@ def __setConfig(apiDict):
     # Check if pathToConfig already exists and
     # skip the setup process
     if os.path.exists(apiDict["pathToConfig"]):
-        apiDict["log"].err('"config" already exists in working directory')
+        apiDict["log"].err(f'"config" already exists at {apiDict["pathToConfig"]}')
 
     # Setup configuration if pathToConfig does not exist
     else:

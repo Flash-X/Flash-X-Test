@@ -78,13 +78,13 @@ class ConsoleLog:
     self.__msg(msg, True)
 
   def note(self, msg):
-    self.__msg("NOTE!    " + msg)
+    self.__msg("[flashxtest-note]:  " + msg)
 
   def warn(self, msg):
-    self.__msg("WARNING: " + msg)
+    self.__msg("[flashxtest-warn]:  " + msg)
 
   def err(self, msg):
-    self.__msg("ERROR:   " + msg)
+    self.__msg("[flashxtest-error]: " + msg)
 
   def brk(self):
     self.__msg("-"*80)
