@@ -505,7 +505,7 @@ def main():
         try:
             FQHostname = socket.gethostbyaddr(socket.gethostname())[0]
         except:
-            FQHostName = "<HOSTNAME>"
+            FQHostname = "<HOSTNAME>"
 
         masterDict["FQHostname"] = FQHostname
     # Determine value of "site". This will be the first element of
