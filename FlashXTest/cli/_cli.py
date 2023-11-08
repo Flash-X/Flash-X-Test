@@ -4,6 +4,7 @@ import os
 import subprocess
 import click
 import pkg_resources
+import warnings
 
 from .. import api
 
@@ -180,17 +181,32 @@ def setup_suite(suitelist, overwrite, add_setup_opts, seed_from_info):
 @click.option(
     "--archive", is_flag=True, help="Save results to both main and view archive"
 )
-@click.option("--view-archive", is_flag=True, help="Save results to view archive only")
-def run_suite(archive, view_archive):
+@click.option(
+    "--save-viewarchive", is_flag=True, help="Save results to view archive only"
+)
+@click.option(
+    "--save-mainarchive", is_flag=True, help="Save results to main archive only"
+)
+def run_suite(archive, save_viewarchive, save_mainarchive):
     """
     \b
     Run the test suite using "test.info".
 
     \b
     This command runs all the tests defined in
-    "test.info", and conveys errors
+    "test.info", and conveys errors. Note that
+    option "--archive" overrides "--save-viewarchive"
+    and "--save-mainarchive"
     """
-    api.run_suite(saveToArchive=archive, viewArchiveOnly=view_archive)
+    if archive and (save_viewarchive or save_mainrachive):
+        warnings.warn(
+            f'[FlashXTest] Option "archive" overrides "save_viewarchive" and "save_mainarchive"'
+        )
+    api.run_suite(
+        saveToArchive=archive,
+        saveToViewArchive=save_viewarchive,
+        saveToMainArchive=save_mainarchive,
+    )
 
 
 @flashxtest.command(name="check-suite")
