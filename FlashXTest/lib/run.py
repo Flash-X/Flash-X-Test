@@ -182,6 +182,6 @@ def __getOptString(mainDict):
         and (not mainDict["skipViewArchive"])
         and mainDict["skipMainArchive"]
     ):
-        optString = optString + "-vv"
+        optString = optString + " -vv"
 
     return optString
