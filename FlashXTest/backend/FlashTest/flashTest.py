@@ -1080,7 +1080,7 @@ def main():
                 # +-------------------------------------+
 
                 # Check -t
-    if "-vv" in flashTestOpts and "-t" not in flashTestOpts:
+    if "-vv" in flashTestOpts: #and "-t" not in flashTestOpts:
         # send to view archive
 
         if pathToViewArchive:
