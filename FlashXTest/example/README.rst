@@ -49,8 +49,8 @@ Use ``--archive`` to save a tarball for the results to main archive
  Setting Up Benchmarks
 ***********************
 
-To setup initial benchmarks do the following after running ``flashxtest init`` and 
-``flashxtest setup-suite Example.suite``
+To setup initial benchmarks do the following after running ``flashxtest
+init`` and ``flashxtest setup-suite Example.suite``
 
 -  Run the suite in with ``--archive`` option
 
@@ -58,47 +58,27 @@ To setup initial benchmarks do the following after running ``flashxtest init`` a
 
    flashxtest run-suite --archive
 
-The initial run will fail, and messages will be displayed stating the
-location of results and recommendations for ``cbase`` values in
-``*.suite`` files. The messages can also be view in
-``flashxtest_api.log``.
-
-Here is an example output from ``flashxtest_api.log``
+-  The initial run will fail due to missing values of ``cbase`` and
+   ``rbase`` values. These values can be added to the suite file using
 
 .. code::
 
-   --------------------------------------------------------------------------------
-   WARNING: Verify results in - <pathToOutdir>/<flashSite>/<YYYY-MM-DD>
-   --------------------------------------------------------------------------------
-   NOTE!    Suggested changes to "*.suite" files:
-   NOTE!    Set "cbase" to "<YYYY-MM-DD>" for "Comparison/Sod/UG/2d/simpleUnsplit"
-   NOTE!    Set "cbase" to "<YYYY-MM-DD>" for "Composite/Sod/PseudoUG/2d/Paramesh/simpleUnsplit"
-   --------------------------------------------------------------------------------
+   flashxtest add-cbase Example.suite <YYYY-MM-DD>
 
--  Manually update ``Example.suite`` after verifying ``cbase`` values,
-   setup a fresh copy of ``test.info``, and run the test suite again
+-  Next, setup and run test suite again
 
 .. code::
 
    flashxtest setup-suite --overwrite Example.suite
    flashxtest run-suite --archive
 
-If transparent restart passes for ``Composite`` tests, then this run
-will be succesfull and ``flashxtest_api.log`` will contain
-recommendations for updating ``rbase`` values.
+-  If transparent restart passes for ``Composite`` tests, then this run
+   will be succesfull, if not manually verify restart benchmarks and
+   them to suite file
 
 .. code::
 
-   --------------------------------------------------------------------------------
-   WARNING: Verify results in - <pathToOutdir>/<flashSite>/<YYYY-MM-DD>_2
-   --------------------------------------------------------------------------------
-   NOTE!    Suggested changes to "*.suite" files:
-   NOTE!    Set "rbase" to "<YYYY-MM-DD>_2" for "Composite/Sod/PseudoUG/2d/Paramesh/simpleUnsplit"
-   --------------------------------------------------------------------------------
+   flashxtest add-cbase Example.suite <YYYY-MM-DD>_2
 
-If the run fails, check
-``<pathToOutdir>/<flashSite>/<YYYY-MM-DD>_2/flash_test.log`` for
-``ERROR`` messages
-
--  Manually update ``rbase`` in ``Example.suite`` for your subsquent
-   test runs.
+Your test suite is now setup for production runs. You can use the
+commands above to manage it as your tests change.
