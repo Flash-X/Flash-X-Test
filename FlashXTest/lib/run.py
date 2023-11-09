@@ -79,8 +79,8 @@ def flashTest(mainDict):
     jobList = [job.replace(f'{mainDict["flashSite"]}/', "") for job in jobList]
 
     # Clear the ERROR file bit of a hacky way but should work for the time being
-    # with open("{0}/FlashTest/ERROR".format(os.path.dirname(backend.__file__)), "w") as errorFile:
-    #    errorFile.write("\n")
+    with open("{0}/FlashTest/ERROR".format(os.path.dirname(backend.__file__)), "w") as errorFile:
+        pass
 
     # run backend/FlashTest/flashTest.py with desired configuration
     testProcess = subprocess.run(

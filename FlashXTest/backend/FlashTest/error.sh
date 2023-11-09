@@ -1,6 +1,5 @@
 # Try to alert that new messages were just written to the ERRORS file.
-# We do not know for sure whether they are from this run, though.
-if [ \( -r $FLASHTEST_BASE/ERROR \) -a \( "$FLASHTEST_BASE/ERROR" -nt "$FLASHTEST_OUTPUT" \) ]; then
+if [ $(wc -l < $FLASHTEST_BASE/ERROR) -ne 0 ]; then
 	echo "WARNING: $FLASHTEST_BASE/ERROR appears to have some new messages."
 	echo "         Here are the last two lines of them:"
 	tail -n 2 "$FLASHTEST_BASE/ERROR"
