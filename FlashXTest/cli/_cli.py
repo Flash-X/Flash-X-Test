@@ -4,6 +4,7 @@ import os
 import subprocess
 import click
 import pkg_resources
+import warnings
 
 from .. import api
 
@@ -177,17 +178,33 @@ def setup_suite(suitelist, overwrite, add_setup_opts, seed_from_info):
 
 
 @flashxtest.command(name="run-suite")
-@click.option("--archive", is_flag=True, help="Save results to main archive")
-def run_suite(archive):
+@click.option("--archive", is_flag=True, show_default=True, help="Archive test results")
+@click.option(
+    "--skip-viewarchive",
+    is_flag=True,
+    show_default=True,
+    help="Skip saving results to view archive",
+)
+@click.option(
+    "--skip-mainarchive",
+    is_flag=True,
+    show_default=True,
+    help="Skip saving results to main archive",
+)
+def run_suite(archive, skip_viewarchive, skip_mainarchive):
     """
     \b
     Run the test suite using "test.info".
 
     \b
     This command runs all the tests defined in
-    "test.info", and conveys errors
+    "test.info", and conveys errors.
     """
-    api.run_suite(saveToArchive=archive)
+    api.run_suite(
+        saveToArchive=archive,
+        skipViewArchive=skip_viewarchive,
+        skipMainArchive=skip_mainarchive,
+    )
 
 
 @flashxtest.command(name="check-suite")
