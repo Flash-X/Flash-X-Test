@@ -78,6 +78,10 @@ def flashTest(mainDict):
     lib.info.jobListFromNode(infoNode, jobList)
     jobList = [job.replace(f'{mainDict["flashSite"]}/', "") for job in jobList]
 
+    # Clear the ERROR file bit of a hacky way but should work for the time being
+    with open("{0}/FlashTest/ERROR".format(os.path.dirname(backend.__file__)), "w"):
+        pass
+
     # run backend/FlashTest/flashTest.py with desired configuration
     testProcess = subprocess.run(
         "python3 {0}/FlashTest/flashTest.py \
@@ -89,7 +93,7 @@ def flashTest(mainDict):
         check=True,
     )
 
-    mainDict["log"].brk()
+    # mainDict["log"].brk()
 
     os.environ["EXITSTATUS"] = str(testProcess.returncode)
     os.environ["FLASH_BASE"] = mainDict["pathToFlash"]
