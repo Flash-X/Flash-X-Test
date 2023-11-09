@@ -1097,15 +1097,15 @@ def main():
         # special condition to send to view archive
 
         if pathToViewArchive:
-            archiveLog.stp("Sending fat copy of output to view archive...")
+            log.stp("Sending fat copy of output to view archive...")
 
             try:
                 open(os.path.join(pathToInvocationDir, ".lock"), "w").write("")
                 arch.sendToViewArchive(incremental=False)
             except Exception as e:
-                archiveLog.err("%s\n" % e + "No copy of output sent to view archive.")
+                log.err("%s\n" % e + "No copy of output sent to view archive.")
             else:
-                archiveLog.stp("Fat copy of output sent to view archive.")
+                log.stp("Fat copy of output sent to view archive.")
 
             os.remove(os.path.join(pathToInvocationDir, ".lock"))
 

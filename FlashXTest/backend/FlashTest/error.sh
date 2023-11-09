@@ -1,6 +1,5 @@
 # Try to alert that new messages were just written to the ERRORS file.
-# We do not know for sure whether they are from this run, though.
-if [ \( -r $FLASHTEST_BASE/ERROR \) -a \( "$FLASHTEST_BASE/ERROR" -nt "$FLASHTEST_OUTPUT" \) ]; then
+if [ $(wc -l < $FLASHTEST_BASE/ERROR) -ne 0 ]; then
 	echo "WARNING: $FLASHTEST_BASE/ERROR appears to have some new messages."
 	echo "         Here are the last two lines of them:"
 	tail -n 2 "$FLASHTEST_BASE/ERROR"
@@ -27,7 +26,7 @@ echo "--------------------------------------------------------------------------
 echo "FlashTest Error Log = $ERROR_LOG"
 if [[ ! -f $ERROR_LOG ]]; then
 	echo "FlashTest error log not found"
-	echo "--------------------------------------------------------------------------------"
+	#echo "--------------------------------------------------------------------------------"
 	echo
 	exit 4
 elif [[ -s $ERROR_LOG ]]; then
@@ -35,15 +34,15 @@ elif [[ -s $ERROR_LOG ]]; then
 	echo
 	cat $ERROR_LOG
 	echo
-	echo "--------------------------------------------------------------------------------"
+	#echo "--------------------------------------------------------------------------------"
 	echo
 	exit 5
 elif [ $EXITSTATUS -ne 0 ]; then
 	echo "FlashTest returned exit status $EXITSTATUS"
-	echo "--------------------------------------------------------------------------------"
+	#echo "--------------------------------------------------------------------------------"
 	echo
 	exit 6
 else
 	echo "FlashTest reports SUCCESS"
 fi
-echo "--------------------------------------------------------------------------------"
+#echo "--------------------------------------------------------------------------------"

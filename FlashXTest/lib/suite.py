@@ -158,6 +158,165 @@ def __continuationLines(fin):
         yield line
 
 
+def __removeBaseline(line, baseKey):
+    try:
+        baseIndex = line.split().index(baseKey)
+    except:
+        baseIndex = None
+
+    if baseIndex is not None:
+        line = " ".join(line.split()[:baseIndex]) + "\n"
+
+    return line
+
+
+def removeBenchmarks(mainDict):
+    """
+    Remove benchmarks from a list of suite files
+
+    Arguments
+    ---------
+    mainDict : Dicitionary for the API
+    """
+
+    # Check if pathToSuites is defined, if not use
+    # all *.suite files from the working directory
+    if not mainDict["pathToSuites"]:
+        mainDict["pathToSuites"] = glob.glob("*.suite")
+
+    # Loop over suite and start removing benchmarks
+    for suiteFile in mainDict["pathToSuites"]:
+
+        # Handle exceptions
+        if not suiteFile.endswith(".suite"):
+            mainDict["log"].err(f'File {suiteFile} must have a ".suite" suffix')
+            raise ValueError
+
+        if not os.path.exists(suiteFile):
+            mainDict["log"].err(f"Cannot find {suiteFile}")
+            raise ValueError
+
+        # Read lines from the suite file and append to a list
+        origLines = []
+        with open(suiteFile, "r") as sfile:
+            for line in __continuationLines(sfile):
+                origLines.append(line + "\n")
+
+        # Create an empty to list to store new lines and start
+        # looping over original lines and handle conditions to
+        # remove -cbase and -rbase values
+        newLines = []
+        for index, line in enumerate(origLines):
+
+            # Test if the line starts with a comment or is empty
+            # and apply logic for Comparison and Composite tests
+            if line[0] != "#" and line[0] != "\n":
+                if "Comparison" in line:
+                    line = __removeBaseline(line, "-cbase")
+                if "Composite" in line:
+                    line = __removeBaseline(line, "-cbase")
+                    line = __removeBaseline(line, "-rbase")
+
+            # Append the updated line to new lines
+            newLines.append(line)
+
+        # new lines == original line do not rewrite the suite file
+        # to preserve time stamp. Display relevant output
+        if newLines != origLines:
+            with open(suiteFile, "w") as sfile:
+                sfile.writelines(newLines)
+            mainDict["log"].warn(f"{suiteFile} CHANGED")
+        else:
+            mainDict["log"].warn(f"{suiteFile} UNCHANGED")
+
+
+def addBenchmarks(mainDict):
+    """
+    Remove benchmarks from a list of suite files
+
+    Arguments
+    ---------
+    mainDict : Dicitionary for the API
+    """
+
+    # Check if pathToSuites is defined, if not use
+    # all *.suite files from the working directory
+    if not mainDict["pathToSuites"]:
+        mainDict["pathToSuites"] = glob.glob("*.suite")
+
+    # Loop over suite and start removing benchmarks
+    for suiteFile in mainDict["pathToSuites"]:
+
+        # Handle exceptions
+        if not suiteFile.endswith(".suite"):
+            mainDict["log"].err(f'File {suiteFile} must have a ".suite" suffix')
+            raise ValueError
+
+        if not os.path.exists(suiteFile):
+            mainDict["log"].err(f"Cannot find {suiteFile}")
+            raise ValueError
+
+        with open(suiteFile, "r") as sfile:
+            origLines = sfile.readlines()
+
+        newLines = []
+        continuedLine = ""
+
+        for index, line in enumerate(origLines):
+
+            if index > 0:
+                prevLine = origLines[index - 1]
+                if prevLine[0] != "#" and prevLine[0] != "\n":
+                    if prevLine.split("#")[0].split("\\")[0] == prevLine:
+                        continuedLine = ""
+                    else:
+                        continuedLine = continuedLine + prevLine
+                else:
+                    continuedLine = ""
+
+            evalLine = continuedLine + line
+            evalLine = evalLine.replace("\n", "").replace("\\", "")
+
+            if line[0] != "#" and line[0] != "\n":
+
+                lineContd = line.split("#")[0].split("\\")[0] != line
+
+                if "Comparison" in evalLine and not lineContd:
+                    if mainDict["cbaseAdd"]:
+                        if "-cbase" not in evalLine:
+                            line = (
+                                line.strip("\n") + f' -cbase {mainDict["cbaseDate"]}\n'
+                            )
+
+                if "Composite" in evalLine and not lineContd:
+                    if mainDict["cbaseAdd"]:
+                        if "-cbase" not in evalLine:
+                            line = (
+                                line.strip("\n") + f' -cbase {mainDict["cbaseDate"]}\n'
+                            )
+
+                    if mainDict["rbaseAdd"]:
+                        if "-rbase" not in evalLine:
+                            if "-cbase" not in evalLine:
+                                raise ValueError(
+                                    f"Cannot add rbase without cbase in {suiteFile}"
+                                )
+                            else:
+                                line = (
+                                    line.strip("\n")
+                                    + f' -rbase {mainDict["rbaseDate"]}\n'
+                                )
+
+            newLines.append(line)
+
+        if newLines != origLines:
+            with open(suiteFile, "w") as sfile:
+                sfile.writelines(newLines)
+            mainDict["log"].warn(f"{suiteFile} CHANGED")
+        else:
+            mainDict["log"].warn(f"{suiteFile} UNCHANGED")
+
+
 def parseSuite(mainDict):
     """
     Arguments

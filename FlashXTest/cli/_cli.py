@@ -293,3 +293,50 @@ def webview():
     This command will launch FlashTestView web interface
     """
     api.webview()
+
+
+@flashxtest.command(name="remove-benchmarks")
+@click.argument("suitelist", type=click.Path(exists=True), nargs=-1, required=True)
+def remove_benchmarks(suitelist):
+    """
+    \b
+    Remove -cbase and -rbase entries from suite files
+
+    \b
+    This command accepts multiple files with suffix,
+    ".suite" and removes benchmarks for all Comparison
+    and Composite tests.
+    """
+    api.remove_benchmarks(pathToSuites=suitelist)
+
+
+@flashxtest.command(name="add-cbase")
+@click.argument("suitelist", type=click.Path(exists=True), nargs=-1, required=True)
+@click.argument("date", required=True)
+def add_cbase(suitelist, date):
+    """
+    \b
+    Add missing -cbase values in suite files
+
+    \b
+    This command accepts multiple files with suffix,
+    ".suite" and populates missing comparision benchmark
+    tag for Comparison and Composite tests.
+    """
+    api.add_cbase(pathToSuites=suitelist, cbaseDate=date)
+
+
+@flashxtest.command(name="add-rbase")
+@click.argument("suitelist", type=click.Path(exists=True), nargs=-1, required=True)
+@click.argument("date", required=True)
+def add_rbase(suitelist, date):
+    """
+    \b
+    Add missing -rbase values in suite files
+
+    \b
+    This command accepts multiple files with suffix,
+    ".suite" and populates missing restart benchmark
+    tag for Composite tests.
+    """
+    api.add_rbase(pathToSuites=suitelist, rbaseDate=date)
