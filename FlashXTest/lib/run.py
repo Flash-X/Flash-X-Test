@@ -177,4 +177,11 @@ def __getOptString(mainDict):
     if not mainDict["saveToArchive"] or mainDict["skipMainArchive"]:
         optString = optString + "-t"
 
+    if (
+        mainDict["saveToArchive"]
+        and (not mainDict["skipViewArchive"])
+        and mainDict["skipMainArchive"]
+    ):
+        optString = optString + "-vv"
+
     return optString
