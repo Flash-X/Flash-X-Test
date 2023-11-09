@@ -1080,7 +1080,7 @@ def main():
                 # +-------------------------------------+
 
                 # Check -t
-    if "-vv" in flashTestOpts: #and "-t" not in flashTestOpts:
+    if "-vv" in flashTestOpts and "-t" not in flashTestOpts:
         # send to view archive
 
         if pathToViewArchive:
@@ -1092,6 +1092,22 @@ def main():
                 log.err("%s\n" % e + "No copy of output sent to view archive.")
             else:
                 log.stp("Incremental copy of output sent to view archive.")
+
+    if "-vv" in flashTestOpts and "-t" in flashTestOpts:
+        # special condition to send to view archive
+
+        if pathToViewArchive:
+            archiveLog.stp("Sending fat copy of output to view archive...")
+
+            try:
+                open(os.path.join(pathToInvocationDir, ".lock"), "w").write("")
+                arch.sendToViewArchive(incremental=False)
+            except Exception as e:
+                archiveLog.err("%s\n" % e + "No copy of output sent to view archive.")
+            else:
+                archiveLog.stp("Fat copy of output sent to view archive.")
+
+            os.remove(os.path.join(pathToInvocationDir, ".lock"))
 
     #############################
     ##  ARCHIVING AND CLEANUP  ##
