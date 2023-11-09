@@ -38,8 +38,10 @@ def flashTest(mainDict):
         )
 
     # Create view archive directory if it does not exist
-    if mainDict["pathToViewArchive"] and (
-        mainDict["saveToArchive"] or mainDict["saveToViewArchive"]
+    if (
+        mainDict["pathToViewArchive"]
+        and mainDict["saveToArchive"]
+        and not mainDict["skipViewArchive"]
     ):
         subprocess.run(
             "mkdir -pv {0}".format(
@@ -172,7 +174,7 @@ def __getOptString(mainDict):
         if option in mainDict:
             optString = optString + "{0} {1} ".format(optDict[option], mainDict[option])
 
-    if not (mainDict["saveToArchive"] or mainDict["saveToMainArchive"]):
+    if not mainDict["saveToArchive"] or mainDict["skipMainArchive"]:
         optString = optString + "-t"
 
     return optString
