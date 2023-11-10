@@ -158,17 +158,21 @@ def __continuationLines(fin):
         yield line
 
 
-def __removeBaseline(line, baseKey):
+def __removeBaseline(line, baseKey, baseDate):
+
+    lineList = line.split()
+
     try:
-        baseIndex = line.split().index(baseKey)
+        baseIndex = lineList.index(baseKey)
     except:
         baseIndex = None
 
     if baseIndex is not None:
-        line = " ".join(line.split()[:baseIndex]) + "\n"
+        if baseDate is None or baseDate == lineList[baseIndex + 1]:
+            lineList.pop(baseIndex)
+            lineList.pop(baseIndex)
 
-    return line
-
+    return " ".join(lineList) + "\n"
 
 def removeBenchmarks(mainDict):
     """
@@ -212,10 +216,10 @@ def removeBenchmarks(mainDict):
             # and apply logic for Comparison and Composite tests
             if line[0] != "#" and line[0] != "\n":
                 if "Comparison" in line:
-                    line = __removeBaseline(line, "-cbase")
+                    line = __removeBaseline(line, "-cbase", mainDict["cbaseDate"])
                 if "Composite" in line:
-                    line = __removeBaseline(line, "-cbase")
-                    line = __removeBaseline(line, "-rbase")
+                    line = __removeBaseline(line, "-cbase", mainDict["cbaseDate"])
+                    line = __removeBaseline(line, "-rbase", mainDict["cbaseDate"])
 
             # Append the updated line to new lines
             newLines.append(line)

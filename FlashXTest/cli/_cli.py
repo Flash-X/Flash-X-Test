@@ -297,7 +297,8 @@ def webview():
 
 @flashxtest.command(name="remove-benchmarks")
 @click.argument("suitelist", type=click.Path(exists=True), nargs=-1, required=True)
-def remove_benchmarks(suitelist):
+@click.option("--date", "-dd", default=None, help="Date for benchmarks to be removed")
+def remove_benchmarks(suitelist, date):
     """
     \b
     Remove -cbase and -rbase entries from suite files
@@ -307,7 +308,7 @@ def remove_benchmarks(suitelist):
     ".suite" and removes benchmarks for all Comparison
     and Composite tests.
     """
-    api.remove_benchmarks(pathToSuites=suitelist)
+    api.remove_benchmarks(pathToSuites=suitelist, cbaseDate=date, rbaseDate=date)
 
 
 @flashxtest.command(name="add-cbase")
