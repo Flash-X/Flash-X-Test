@@ -38,7 +38,7 @@ def dry_run(run_test=False, **apiDict):
     """
     Compile a specific test using setupName and testNode
     """
-    apiDict["log"] = backend.FlashTest.lib.logfile.Logfile()
+    apiDict["log"] = backend.FlashTest.lib.logfile.ConsoleLog()
 
     # Cache the value to current directory and set it as
     # testDir in apiDict
