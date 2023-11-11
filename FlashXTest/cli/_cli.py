@@ -305,8 +305,10 @@ def remove_benchmarks(suitelist, date):
 
     \b
     This command accepts multiple files with suffix,
-    ".suite" and removes benchmarks for all Comparison
-    and Composite tests.
+    ".suite" and removes benchmarks from Comparison
+    and Composite tests. You can use the --date option
+    to restrict the removal process specific dates.
+    The default behavior is to remove all benchmarks
     """
     api.remove_benchmarks(pathToSuites=suitelist, cbaseDate=date, rbaseDate=date)
 
