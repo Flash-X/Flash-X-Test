@@ -160,7 +160,7 @@ def __continuationLines(fin):
 
 def __removeBaseline(line, baseKey, baseDate):
 
-    lineList = line.split()
+    lineList = line.strip("\n").split(" ")
 
     try:
         baseIndex = lineList.index(baseKey)
@@ -173,6 +173,7 @@ def __removeBaseline(line, baseKey, baseDate):
             lineList.pop(baseIndex)
 
     return " ".join(lineList) + "\n"
+
 
 def removeBenchmarks(mainDict):
     """
@@ -203,21 +204,35 @@ def removeBenchmarks(mainDict):
         # Read lines from the suite file and append to a list
         origLines = []
         with open(suiteFile, "r") as sfile:
-            for line in __continuationLines(sfile):
-                origLines.append(line + "\n")
+            origLines = sfile.readlines()
 
         # Create an empty to list to store new lines and start
         # looping over original lines and handle conditions to
         # remove -cbase and -rbase values
         newLines = []
+        continuedLine = ""
         for index, line in enumerate(origLines):
+
+            if index > 0:
+                prevLine = origLines[index - 1]
+                if prevLine[0] != "#" and prevLine[0] != "\n":
+                    if prevLine.split("#")[0].split("\\")[0] == prevLine:
+                        continuedLine = ""
+                    else:
+                        continuedLine = continuedLine + prevLine
+                else:
+                    continuedLine = ""
+
+            evalLine = continuedLine + line
+            evalLine = evalLine.replace("\n", "").replace("\\", "")
 
             # Test if the line starts with a comment or is empty
             # and apply logic for Comparison and Composite tests
             if line[0] != "#" and line[0] != "\n":
-                if "Comparison" in line:
+
+                if "Comparison" in evalLine:
                     line = __removeBaseline(line, "-cbase", mainDict["cbaseDate"])
-                if "Composite" in line:
+                if "Composite" in evalLine:
                     line = __removeBaseline(line, "-cbase", mainDict["cbaseDate"])
                     line = __removeBaseline(line, "-rbase", mainDict["cbaseDate"])
 
