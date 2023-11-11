@@ -158,9 +158,23 @@ def __continuationLines(fin):
         yield line
 
 
+def __continuedLineFromPrevLine(prevLine, continuedLine):
+    if prevLine[0] != "#" and prevLine[0] != "\n":
+        if prevLine.split("#")[0].split("\\")[0] == prevLine.split("#")[0]:
+            continuedLine = ""
+        else:
+            continuedLine = continuedLine + prevLine.split("#")[0]
+    else:
+        continuedLine = ""
+
+    return continuedLine
+
+
 def __removeBaseline(line, baseKey, baseDate):
 
-    lineList = line.strip("\n").split(" ")
+    line = line.strip("\n")
+    lineComments = line.replace(line.split("#")[0], "")
+    lineList = (line.replace(lineComments, "")).split(" ")
 
     try:
         baseIndex = lineList.index(baseKey)
@@ -172,7 +186,22 @@ def __removeBaseline(line, baseKey, baseDate):
             lineList.pop(baseIndex)
             lineList.pop(baseIndex)
 
-    return " ".join(lineList) + "\n"
+    return " ".join(lineList) + lineComments + "\n"
+
+
+def __addBaseline(line, baseKey, baseDate):
+
+    line = line.strip("\n")
+    lineComments = line.replace(line.split("#")[0], "")
+    line = line.split("#")[0]
+
+    if baseKey not in line:
+        line = line + f" {baseKey} {baseDate}"
+
+    if lineComments:
+        lineComments = " " + lineComments
+
+    return line + lineComments + "\n"
 
 
 def removeBenchmarks(mainDict):
@@ -215,13 +244,7 @@ def removeBenchmarks(mainDict):
 
             if index > 0:
                 prevLine = origLines[index - 1]
-                if prevLine[0] != "#" and prevLine[0] != "\n":
-                    if prevLine.split("#")[0].split("\\")[0] == prevLine:
-                        continuedLine = ""
-                    else:
-                        continuedLine = continuedLine + prevLine
-                else:
-                    continuedLine = ""
+                continuedLine = __continuedLineFromPrevLine(prevLine, continuedLine)
 
             evalLine = continuedLine + line
             evalLine = evalLine.replace("\n", "").replace("\\", "")
@@ -285,45 +308,34 @@ def addBenchmarks(mainDict):
 
             if index > 0:
                 prevLine = origLines[index - 1]
-                if prevLine[0] != "#" and prevLine[0] != "\n":
-                    if prevLine.split("#")[0].split("\\")[0] == prevLine:
-                        continuedLine = ""
-                    else:
-                        continuedLine = continuedLine + prevLine
-                else:
-                    continuedLine = ""
+                continuedLine = __continuedLineFromPrevLine(prevLine, continuedLine)
 
             evalLine = continuedLine + line
             evalLine = evalLine.replace("\n", "").replace("\\", "")
 
             if line[0] != "#" and line[0] != "\n":
 
-                lineContd = line.split("#")[0].split("\\")[0] != line
+                lineContd = line.split("#")[0].split("\\")[0] != line.split("#")[0]
 
                 if "Comparison" in evalLine and not lineContd:
                     if mainDict["cbaseAdd"]:
                         if "-cbase" not in evalLine:
-                            line = (
-                                line.strip("\n") + f' -cbase {mainDict["cbaseDate"]}\n'
-                            )
+                            line = __addBaseline(line, "-cbase", mainDict["cbaseDate"])
 
                 if "Composite" in evalLine and not lineContd:
                     if mainDict["cbaseAdd"]:
                         if "-cbase" not in evalLine:
-                            line = (
-                                line.strip("\n") + f' -cbase {mainDict["cbaseDate"]}\n'
-                            )
+                            line = __addBaseline(line, "-cbase", mainDict["cbaseDate"])
 
                     if mainDict["rbaseAdd"]:
                         if "-rbase" not in evalLine:
                             if "-cbase" not in evalLine:
                                 raise ValueError(
-                                    f"Cannot add rbase without cbase in {suiteFile}"
+                                    f"Cannot add rbase without cbase for {evalLine} in {suiteFile}"
                                 )
                             else:
-                                line = (
-                                    line.strip("\n")
-                                    + f' -rbase {mainDict["rbaseDate"]}\n'
+                                line = __addBaseline(
+                                    line, "-rbase", mainDict["rbaseDate"]
                                 )
 
             newLines.append(line)
