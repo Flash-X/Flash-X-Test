@@ -235,28 +235,6 @@ def show_specs(setupname):
     """
     api.show_specs(setupName=setupname)
 
-
-# @flashxtest.command(name="compile")
-# @click.argument("setupname", type=str, required=True)
-# @click.option("--test", "-t", type=str, required=True)
-# @click.option("-objdir", type=str, default="object")
-# def compile(setupname, test, objdir):
-#    """
-#    \b
-#    Compile a test defined for a specific setup
-#
-#    \b
-#    This command compiles a test defined
-#    in tests.yaml for a specific setup
-#    """
-#    api.dry_run(
-#        setupName=setupname,
-#        nodeName=test,
-#        objDir=os.path.join(os.getcwd(), objdir),
-#        run_test=False,
-#    )
-
-
 @flashxtest.command(name="dry-run")
 @click.argument("setupname", type=str, required=True)
 @click.option("--test", "-t", type=str, required=True)
@@ -279,7 +257,7 @@ def dry_run(setupname, test, nprocs, objdir):
         nodeName=test,
         numProcs=nprocs,
         objDir=os.path.join(os.getcwd(), objdir),
-        run_test=True,
+        runTest=True,
     )
 
 
