@@ -260,7 +260,11 @@ def removeBenchmarks(mainDict):
                     line = __removeBaseline(line, "-rbase", mainDict["cbaseDate"])
 
             # Append the updated line to new lines
-            newLines.append(line)
+            if mainDict["stripComments"]:
+                if line[0] != "#":
+                    newLines.append(line.strip("\n").split("#")[0] + "\n")
+            else:
+                newLines.append(line)
 
         # new lines == original line do not rewrite the suite file
         # to preserve time stamp. Display relevant output

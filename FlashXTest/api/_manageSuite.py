@@ -5,7 +5,9 @@ from .. import lib
 from .. import backend
 
 
-def remove_benchmarks(pathToSuites, cbaseDate=None, rbaseDate=None):
+def remove_benchmarks(
+    pathToSuites, cbaseDate=None, rbaseDate=None, stripComments=False
+):
     """
     Remove benchmarks from a list of suites
 
