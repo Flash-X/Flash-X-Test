@@ -5,14 +5,20 @@ from .. import lib
 from .. import backend
 
 
-def setup_suite(**apiDict):
+def setup_suite(
+    pathToSuites, overwriteCurrInfo=False, addSetupOptions=None, seedFromInfo=None
+):
     """
     Setup test.info from a list of suites
 
     Arguments
     ---------
-    testSuite : Name of the testSuite file
+    pathToSuite		: List of suite files
+    overwriteCurrInfo	: True/False
+    addSetupOptions	: Additional setup options
+    seedFromInfo	: Seed info file
     """
+    apiDict = locals()
     apiDict["log"] = backend.FlashTest.lib.logfile.ConsoleLog()
 
     # Cache the value to current directory and set it as

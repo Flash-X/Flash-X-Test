@@ -236,27 +236,6 @@ def show_specs(setupname):
     api.show_specs(setupName=setupname)
 
 
-# @flashxtest.command(name="compile")
-# @click.argument("setupname", type=str, required=True)
-# @click.option("--test", "-t", type=str, required=True)
-# @click.option("-objdir", type=str, default="object")
-# def compile(setupname, test, objdir):
-#    """
-#    \b
-#    Compile a test defined for a specific setup
-#
-#    \b
-#    This command compiles a test defined
-#    in tests.yaml for a specific setup
-#    """
-#    api.dry_run(
-#        setupName=setupname,
-#        nodeName=test,
-#        objDir=os.path.join(os.getcwd(), objdir),
-#        run_test=False,
-#    )
-
-
 @flashxtest.command(name="dry-run")
 @click.argument("setupname", type=str, required=True)
 @click.option("--test", "-t", type=str, required=True)
@@ -279,7 +258,7 @@ def dry_run(setupname, test, nprocs, objdir):
         nodeName=test,
         numProcs=nprocs,
         objDir=os.path.join(os.getcwd(), objdir),
-        run_test=True,
+        runTest=True,
     )
 
 
@@ -298,7 +277,8 @@ def webview():
 @flashxtest.command(name="remove-benchmarks")
 @click.argument("suitelist", type=click.Path(exists=True), nargs=-1, required=True)
 @click.option("--date", "-dd", default=None, help="Date for benchmarks to be removed")
-def remove_benchmarks(suitelist, date):
+@click.option("--strip-comments", is_flag=True, help="Strip comments")
+def remove_benchmarks(suitelist, date, strip_comments):
     """
     \b
     Remove -cbase and -rbase entries from suite files
@@ -310,7 +290,12 @@ def remove_benchmarks(suitelist, date):
     to restrict the removal process specific dates.
     The default behavior is to remove all benchmarks
     """
-    api.remove_benchmarks(pathToSuites=suitelist, cbaseDate=date, rbaseDate=date)
+    api.remove_benchmarks(
+        pathToSuites=suitelist,
+        cbaseDate=date,
+        rbaseDate=date,
+        stripComments=strip_comments,
+    )
 
 
 @flashxtest.command(name="add-cbase")

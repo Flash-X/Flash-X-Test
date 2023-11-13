@@ -5,10 +5,18 @@ from .. import lib
 from .. import backend
 
 
-def run_suite(**apiDict):
+def run_suite(saveToArchive=False, skipViewArchive=False, skipMainArchive=False):
     """
     Run a list of tests from test.info in current working directory
+
+    Arguments
+    ---------
+    saveToArchive	: True/False
+    skipViewArchive	: True/False
+    skipMainArchive	: True/False
     """
+    apiDict = locals()
+
     # Cache the value to current directory and set it as
     # testDir in apiDict
     apiDict["testDir"] = os.getcwd()

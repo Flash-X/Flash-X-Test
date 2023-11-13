@@ -5,10 +5,16 @@ from .. import lib
 from .. import backend
 
 
-def check_suite(**apiDict):
+def check_suite(pathToSuites):
     """
     Run a list of tests from test.info in current working directory
+
+    Arguments
+    ---------
+    pathToSuites : A list of suite files
     """
+    apiDict = locals()
+
     # Cache the value to current directory and set it as
     # testDir in apiDict
     apiDict["testDir"] = os.getcwd()

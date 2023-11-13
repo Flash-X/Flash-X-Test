@@ -6,10 +6,15 @@ from .. import lib
 from .. import backend
 
 
-def show_specs(**apiDict):
+def show_specs(setupName):
     """
     Show all tests for a given setupname
+
+    Arguments
+    ---------
+    setupName : Name of Flash-X simulation/setup
     """
+    apiDict = locals()
     apiDict["log"] = backend.FlashTest.lib.logfile.ConsoleLog()
 
     # Cache the value to current directory and set it as
@@ -34,10 +39,25 @@ def show_specs(**apiDict):
             apiDict["log"].info(f"\t{key}: {value}")
 
 
-def dry_run(run_test=False, **apiDict):
+def dry_run(
+    setupName,
+    nodeName,
+    numProcs,
+    objDir=os.path.join(os.getcwd(), "objdir"),
+    runTest=True,
+):
     """
     Compile a specific test using setupName and testNode
+
+    Arguments
+    ---------
+    setupName	: Flash-X setup name
+    nodeName	: Test node key
+    numProcs	: Number of processors
+    objDir	: Object directory
+    runTest     : True/False
     """
+    apiDict = locals()
     apiDict["log"] = backend.FlashTest.lib.logfile.ConsoleLog()
 
     # Cache the value to current directory and set it as
@@ -63,7 +83,7 @@ def dry_run(run_test=False, **apiDict):
         check=True,
     )
 
-    if run_test:
+    if runTest:
 
         parfile = "flash.par"
 

@@ -6,14 +6,31 @@ from .. import lib
 from .. import backend
 
 
-def init(**apiDict):
+def init(
+    flashSite=None,
+    pathToFlash=None,
+    pathToLocalArchive=None,
+    pathToMainArchive=None,
+    pathToViewArchive=None,
+    pathToOutdir=None,
+    pathToMPI="mpiexec",
+    pathToGmake="make",
+):
     """
     Initialize test configuration
 
     Arguments
     ---------
-    apiDict : Dictionary to populate Config file
+    flashSite		: Flash-X site name
+    pathToFlash		: Path to Flash-X source directory
+    pathToLocalArchive	: Path to local archive
+    pathToMainArchive	: Path to main archive
+    pathToViewArchive	: Path to view archive
+    pathToOutdir	: Output directory
+    pathToMPI		: Name of mpi executable
+    pathToGmake		: Name of make utility along with options
     """
+    apiDict = locals()
     apiDict["log"] = backend.FlashTest.lib.logfile.ConsoleLog()
 
     if not apiDict["pathToFlash"]:
