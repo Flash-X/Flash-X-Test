@@ -125,7 +125,7 @@ suite.
 .. code::
 
    @software{flashxtest,
-     author       = {Akash Dhruv andm Rajeev Jain and Klaus Weide and Youngjun Lee},
+     author       = {Akash Dhruv and Rajeev Jain and Klaus Weide and Youngjun Lee},
      title        = {Flash-X/Flash-X-Test: Tools for testing Flash-X},
      month        = dec,
      year         = 2023,
