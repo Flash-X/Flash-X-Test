@@ -118,6 +118,23 @@ An example of a test suite is provided under ``FlashXTest/example``
 please refer to the instructions there to understand how to setup a test
 suite.
 
+**********
+ Citation
+**********
+
+.. code::
+
+   @software{flashxtest,
+     author       = {Akash Dhruv andm Rajeev Jain and Klaus Weide and Youngjun Lee},
+     title        = {Flash-X/Flash-X-Test: Tools for testing Flash-X},
+     month        = dec,
+     year         = 2023,
+     publisher    = {Zenodo},
+     version      = {2023.11},
+     doi          = {10.5281/zenodo.10278967},
+     url          = {https://doi.org/10.5281/zenodo.10278967}
+   }
+
 ****************
  Help & Support
 ****************
