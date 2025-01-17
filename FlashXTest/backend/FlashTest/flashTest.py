@@ -1080,7 +1080,7 @@ def main():
                 # +-------------------------------------+
 
                 # Check -t
-    if "-vv" in flashTestOpts:
+    if "-vv" in flashTestOpts and "-t" not in flashTestOpts:
         # send to view archive
 
         if pathToViewArchive:
@@ -1124,9 +1124,14 @@ def main():
 
     with open(os.path.join(pathToSiteDir,"invocation.toml"), "w") as invocationToml:
         invocationToml.write(f'INVOCATION_DIR="{invocationDir}"\n')
-        
-    if "-t" in flashTestOpts:
+
+    errorCreatingTarFile = False
+
+    if "-t" in flashTestOpts and "-vv" not in flashTestOpts:
         log.stp("No archiving done for test-run. FlashTest complete. End of Logfile.")
+        os.remove(os.path.join(pathToInvocationDir, ".lock"))
+    elif "-t" in flashTestOpts and "-vv" in flashTestOpts:
+        log.stp("No main archiving done for test-run.")
         os.remove(os.path.join(pathToInvocationDir, ".lock"))
     elif (not pathToMainArchive) and (not pathToViewArchive):
         log.stp("FlashTest complete. End of Logfile.")
@@ -1143,8 +1148,6 @@ def main():
         # in the next invocation's regular logfile
         archiveLog = Logfile(pathToSiteDir, "archive.log", "-v" in flashTestOpts)
         archiveLog.info("Archiving results for invocation %s:" % invocationDir, False)
-
-        errorCreatingTarFile = False
 
         try:
             # file already removed
@@ -1185,19 +1188,22 @@ def main():
                 __deleteFiles(pathToInvocationDir)
                 archiveLog.stp("Local files deleted.")
 
+    if ("-vv" in flashTestOpts or "-t" not in flashTestOpts):
         if pathToViewArchive:
-            if not pathToMainArchive or errorCreatingTarFile:
+            if "-vv" in flashTestOpts and "-t" not in flashTestOpts:
+                archiveLog.stp("Finishing output to view archive...")
+            elif not pathToMainArchive or errorCreatingTarFile:
                 archiveLog.stp("Sending fat copy of output to view archive...")
             else:
                 archiveLog.stp("Sending slim copy of output to view archive...")
 
             try:
                 open(os.path.join(pathToInvocationDir, ".lock"), "w").write("")
-                arch.sendToViewArchive("-vv" in flashTestOpts)
+                arch.sendToViewArchive("-vv" in flashTestOpts and "-t" not in flashTestOpts)
             except Exception as e:
                 archiveLog.err("%s\n" % e + "No copy of output sent to view archive.")
             else:
-                if not pathToMainArchive or errorCreatingTarFile:
+                if "-t" in flashTestOpts or not pathToMainArchive or errorCreatingTarFile:
                     archiveLog.stp("Fat copy of output sent to view archive.")
                 else:
                     archiveLog.stp("Slim copy of output sent to view archive.")
@@ -1229,7 +1235,10 @@ def usage():
     print("-u       : update FLASH before run")
     print("-v       : verbose output (print logfile as it is written)")
     print(
-        "-vv        : send results to view archive incrementally"
+        "-vv      : send results to view archive incrementally (if -t is not used)"
+    )
+    print(
+        "-vv -t   : view-archiving enabled (non-incremental), but no main-archiving"
     )
     print("-L       : send log files to log archive")
     print("-z <dir> : FLASH source rooted at <dir>")

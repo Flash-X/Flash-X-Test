@@ -257,20 +257,20 @@ for item in items:
       numTestSameErrs = errorLines[5] 
       if errorLines[0] > 0:
         failed = True
-	failedSetup=True
+        failedSetup=True
         exitStatus = "failed in setup"
       elif errorLines[1] > 0:
         failed = True
-	failedCompilation=True
+        failedCompilation=True
         exitStatus = "failed in compilation"
       else:
         if errorLines[2] > 0:
           failed = True
-	  failedExecution=True
+          failedExecution=True
           exitStatus = "%s/%s runs failed in execution" % (errorLines[2], errorLines[4])
         if errorLines[3] > 0:
           failed = True
-	  failedTesting=True
+          failedTesting=True
           if errorLines[2] > 0:
             exitStatus += "; %s/%s failed in testing" % (errorLines[3], errorLines[4])
           else:
@@ -304,10 +304,10 @@ for item in items:
     elif ((displayExitStat) and
           ((displayExitStat == "s" and failed) or
            (displayExitStat == "f" and not failed)or
-	   (displayExitStat == "fs" and not failedSetup)or
-	   (displayExitStat == "fc" and not failedCompilation)or
-	   (displayExitStat == "fe" and not failedExecution)or
-	   (displayExitStat == "ft" and not failedTesting)	)):
+           (displayExitStat == "fs" and not failedSetup)or
+           (displayExitStat == "fc" and not failedCompilation)or
+           (displayExitStat == "fe" and not failedExecution)or
+           (displayExitStat == "ft" and not failedTesting)      )):
       continue
 
     # else
