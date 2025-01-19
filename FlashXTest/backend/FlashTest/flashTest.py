@@ -1194,7 +1194,7 @@ def main():
         if pathToViewArchive:
             if "-vv" in flashTestOpts and "-t" not in flashTestOpts:
                 log.stp("Finishing output to view archive...")
-            elif not pathToMainArchive or errorCreatingTarFile:
+            elif "-t" in flashTestOpts or not pathToMainArchive or errorCreatingTarFile:
                 log.stp("Sending fat copy of output to view archive...")
             else:
                 log.stp("Sending slim copy of output to view archive...")
