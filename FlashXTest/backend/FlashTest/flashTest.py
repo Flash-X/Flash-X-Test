@@ -1187,30 +1187,32 @@ def main():
                 # only be present in the copy of the output sent to the view archive
                 __deleteFiles(pathToInvocationDir)
                 archiveLog.stp("Local files deleted.")
+            log = archiveLog    # below this point, appending to log means appending to archive.log,
+                                # if we have started using that.
 
     if ("-vv" in flashTestOpts or "-t" not in flashTestOpts):
         if pathToViewArchive:
             if "-vv" in flashTestOpts and "-t" not in flashTestOpts:
-                archiveLog.stp("Finishing output to view archive...")
+                log.stp("Finishing output to view archive...")
             elif not pathToMainArchive or errorCreatingTarFile:
-                archiveLog.stp("Sending fat copy of output to view archive...")
+                log.stp("Sending fat copy of output to view archive...")
             else:
-                archiveLog.stp("Sending slim copy of output to view archive...")
+                log.stp("Sending slim copy of output to view archive...")
 
             try:
                 open(os.path.join(pathToInvocationDir, ".lock"), "w").write("")
                 arch.sendToViewArchive("-vv" in flashTestOpts and "-t" not in flashTestOpts)
             except Exception as e:
-                archiveLog.err("%s\n" % e + "No copy of output sent to view archive.")
+                log.err("%s\n" % e + "No copy of output sent to view archive.")
             else:
                 if "-t" in flashTestOpts or not pathToMainArchive or errorCreatingTarFile:
-                    archiveLog.stp("Fat copy of output sent to view archive.")
+                    log.stp("Fat copy of output sent to view archive.")
                 else:
-                    archiveLog.stp("Slim copy of output sent to view archive.")
+                    log.stp("Slim copy of output sent to view archive.")
 
             os.remove(os.path.join(pathToInvocationDir, ".lock"))
 
-        archiveLog.stp("FlashTest complete.")
+        log.stp("FlashTest complete.")
 
     pidFile.unregisterPid(pathToPidFile)
 
