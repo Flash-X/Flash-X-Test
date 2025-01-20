@@ -395,7 +395,6 @@ class Archive:
     viewArchiveHost     = self.viewArchiveHost
     pathToViewArchive   = self.pathToViewArchive
     pathToInvocationDir = self.pathToInvocationDir
-    pathToTarFile       = pathToInvocationDir + ".tar.gz"
     invocationDir       = os.path.basename(pathToInvocationDir)
 
     if not pathToViewArchive:
@@ -495,13 +494,13 @@ class Archive:
 
       if err:
         raise ArchiveError("Error copying \"%s\" to \"%s\"\n%s" %
-                           (pathToTarFile,
+                           (pathToInvocationDir,
                             pathToViewArchiveSiteDir,
                             err))
       # else
       if exitStatus != 0:
         raise ArchiveError("Exit status %s indicates error copying \"%s\" to \"%s\"" %
-                           (exitStatus, pathToTarFile, pathToViewArchiveSiteDir))
+                           (exitStatus, pathToInvocationDir, pathToViewArchiveSiteDir))
 
       # else we assume archive was successfully copied.
 
@@ -536,7 +535,6 @@ class Archive:
     logArchiveHost     = self.logArchiveHost
     pathToLogArchive   = self.pathToLogArchive
     pathToInvocationDir = self.pathToInvocationDir
-    pathToTarFile       = pathToInvocationDir + ".tar.gz"
 
     if not pathToLogArchive:
       raise ArchiveError("No path to log archive provided.\n" +
