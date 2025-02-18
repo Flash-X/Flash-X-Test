@@ -240,8 +240,9 @@ def show_specs(setupname):
 @click.argument("setupname", type=str, required=True)
 @click.option("--test", "-t", type=str, required=True)
 @click.option("--nprocs", "-np", type=str, required=True)
+@click.option("--site", "-s", type=str, required=True)
 @click.option("--objdir", "-ob", type=str, default="object")
-def dry_run(setupname, test, nprocs, objdir):
+def dry_run(setupname, test, nprocs, site, objdir):
     """
     \b
     Compile and run a test defined for a specific setup
@@ -257,6 +258,7 @@ def dry_run(setupname, test, nprocs, objdir):
         setupName=setupname,
         nodeName=test,
         numProcs=nprocs,
+        flashSite=site,
         objDir=os.path.join(os.getcwd(), objdir),
         runTest=True,
     )

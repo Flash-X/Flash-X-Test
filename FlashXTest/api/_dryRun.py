@@ -21,12 +21,13 @@ def show_specs(setupName):
     # testDir in apiDict
     apiDict["testDir"] = os.getcwd()
 
-    # Cache the value of user Config file and store it as
-    # pathToConfig in apiDict
-    apiDict["pathToConfig"] = apiDict["testDir"] + "/config"
+    # Cache the value of user Config file and store it as pathToConfig in apiDict
+    apiDict["pathToConfig"] = None
 
-    # Get mainDict
-    mainDict = lib.config.getMainDict(apiDict)
+    # Set mainDict
+    mainDict = apiDict
+    mainDict["pathToFlash"] = os.getcwd()
+    mainDict["flashSite"] = None
 
     # Get setup information from yaml file
     testDict = lib.yml.parseYaml(mainDict, mainDict["setupName"])
@@ -43,6 +44,7 @@ def dry_run(
     setupName,
     nodeName,
     numProcs,
+    flashSite,
     objDir=os.path.join(os.getcwd(), "objdir"),
     runTest=True,
 ):
@@ -64,12 +66,13 @@ def dry_run(
     # testDir in apiDict
     apiDict["testDir"] = os.getcwd()
 
-    # Cache the value of user Config file and store it as
-    # pathToConfig in apiDict
-    apiDict["pathToConfig"] = apiDict["testDir"] + "/config"
+    # Cache the value of user Config file and store it as pathToConfig in apiDict
+    apiDict["pathToConfig"] = None
 
-    # Get mainDict
-    mainDict = lib.config.getMainDict(apiDict)
+    # Set mainDict
+    mainDict = apiDict
+    mainDict["pathToFlash"] = os.getcwd()
+    mainDict["flashSite"] = flashSite
 
     # Get setup information from yaml file
     setupInfo = lib.yml.parseYaml(mainDict, mainDict["setupName"])[mainDict["nodeName"]]
@@ -121,7 +124,7 @@ def dry_run(
                 )
 
         subprocess.run(
-            f'cd {mainDict["pathToFlash"]}/{mainDict["objDir"]} && '
+            f'cd {mainDict["objDir"]} && '
             + f"cp {parfile_path} . && "
             + f'mpirun -n {mainDict["numProcs"]} ./flashx -par_file {parfile}',
             shell=True,
