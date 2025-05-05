@@ -1,0 +1,1 @@
+from .modern_static import generate_flashx_testview

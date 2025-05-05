@@ -1,0 +1,72 @@
+/* Hovering tooltip for index.html */
+.stats-window {
+  font-size: 0.8rem;
+  visibility: hidden;
+  position: absolute;
+  z-index: 1000;
+  border: 1px solid #ccc;
+  background: #fff;
+  padding: 2px;
+}
+.stats-header {
+  font-weight: bold;
+  color: #fff;
+  margin-bottom: 4px;
+  background: #006699;
+}
+.stats-body {
+}
+
+body {
+  font-family: sans-serif;
+  margin: 2rem;
+}
+h1 {
+  color: #006699;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+th, td {
+  border: 1px solid #ccc;
+  padding: 4px 8px;
+  text-align: center;
+}
+th {
+  background: #006699;
+  color: #fff;
+}
+
+/* for alternating row color */
+.row-alt {
+  background: #f7f7f7;
+}
+/* make link anchor fill entire cell */
+.cell-link {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.green { background: #c4f0c4; }
+.yellow { background: #fff8c4; }
+.red { background: #f7c4c4; }
+
+/* left frame in build detail */
+.left-frame h1 {
+  font-size: 1.2em;
+  margin: 0.5em 0;
+}
+.left-frame h2 {
+  font-size: 1.1em;
+  margin: 0.4em 0;
+}
+.left-frame h3 {
+  font-size: 1em;
+  margin: 0.3em 0;
+}
+/* right frame in build detail */
+.right-frame {
+}
