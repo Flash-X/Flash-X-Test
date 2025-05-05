@@ -1,12 +1,14 @@
 """
 Status parsing utilities for FlashTest static generator.
 """
+
 from pathlib import Path
 from typing import List
 
 
-class InvocationStatus():
+class InvocationStatus:
     """Minimal representation of one invocation’s status on a single site."""
+
     def __init__(self, colour: str):
         self.colour = colour
         if colour == "green":
@@ -28,7 +30,9 @@ def classify_invocation(inv_dir: Path) -> InvocationStatus:
     error_lines: List[str] = []
     if errors_file.exists():
         try:
-            error_lines = [ln.strip() for ln in errors_file.read_text().splitlines() if ln.strip()]
+            error_lines = [
+                ln.strip() for ln in errors_file.read_text().splitlines() if ln.strip()
+            ]
         except Exception:
             error_lines = ["<unable to read errors file>"]
 
@@ -50,7 +54,10 @@ def classify_invocation(inv_dir: Path) -> InvocationStatus:
     else:
         red_errors = 0
         for ln in error_lines:
-            if " failed in testing as before" in ln and " failed in execution" not in ln:
+            if (
+                " failed in testing as before" in ln
+                and " failed in execution" not in ln
+            ):
                 continue
             red_errors += 1
         if log_errors + red_errors == 0:
@@ -67,7 +74,9 @@ def parse_build_status(build_dir: Path) -> tuple[InvocationStatus, str]:
     if not errors_file.exists():
         return ("yellow", "'errors' file not found")
     try:
-        raw_lines = [ln.strip() for ln in errors_file.read_text().splitlines() if ln.strip()]
+        raw_lines = [
+            ln.strip() for ln in errors_file.read_text().splitlines() if ln.strip()
+        ]
     except Exception:
         return ("red", "unable to read 'errors' file")
     changed = False

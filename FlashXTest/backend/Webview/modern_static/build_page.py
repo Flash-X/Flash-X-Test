@@ -1,6 +1,7 @@
 """
 Generate build detail frameset, left frame, and right frame HTML.
 """
+
 import html
 import re
 from pathlib import Path
@@ -13,9 +14,9 @@ def generate_build_page_frameset(site_name: str, inv_name: str, build_name: str)
     """Return a frameset HTML page."""
     title = f"{site_name} – {inv_name} – {build_name}"
     lines: List[str] = page_header_nobody(title, css_href="../../../style.css")
-    lines.append("<frameset cols=\"40%,*\">")
-    lines.append("  <frame src=\"leftframe.html\" name=\"leftframe\">")
-    lines.append("  <frame src=\"rightframe.html\" name=\"rightframe\">")
+    lines.append('<frameset cols="40%,*">')
+    lines.append('  <frame src="leftframe.html" name="leftframe">')
+    lines.append('  <frame src="rightframe.html" name="rightframe">')
     lines.append("</frameset>")
     lines.append("</html>")
     return "\n".join(lines)
@@ -34,18 +35,18 @@ def generate_left_frame_html(
     )
     lines.append(f"<h1>{html.escape(build_name)}</h1>")
     lines.append(
-        f"<h2><a href='../../../invocations/{html.escape(inv_name)}.html' target='_top'>" +
-        f"{html.escape(inv_name)}</a></h2>"
+        f"<h2><a href='../../../invocations/{html.escape(inv_name)}.html' target='_top'>"
+        + f"{html.escape(inv_name)}</a></h2>"
     )
 
     # invocation files
     lines.append("<ul>")
     ti = build_dir / "test.info"
     if ti.is_file():
-        lines.append(f"  <li><a href=\"{ti.resolve().as_uri()}\">test.info</a></li>")
+        lines.append(f'  <li><a href="{ti.resolve().as_uri()}">test.info</a></li>')
     df = build_dir / "deleted_files"
     if df.is_file():
-        lines.append(f"  <li><a href=\"{df.resolve().as_uri()}\">deleted_files</a></li>")
+        lines.append(f'  <li><a href="{df.resolve().as_uri()}">deleted_files</a></li>')
     lines.append("</ul>")
 
     # Setup
@@ -56,7 +57,9 @@ def generate_left_frame_html(
         lines.append("<ul>")
         call_text = sc.read_text().strip()
         if so.is_file():
-            lines.append(f"  <li><a href=\"{so.resolve().as_uri()}\">{html.escape(call_text)}</a></li>")
+            lines.append(
+                f'  <li><a href="{so.resolve().as_uri()}">{html.escape(call_text)}</a></li>'
+            )
         else:
             lines.append(f"  <li>{html.escape(call_text)}</li>")
         lines.append("</ul>")
@@ -70,14 +73,20 @@ def generate_left_frame_html(
         lines.append("<h3>Compilation</h3>")
         lines.append("<ul>")
         if gc.is_file():
-            lines.append(f"  <li><a href=\"{gc.resolve().as_uri()}\">gmake_call</a></li>")
+            lines.append(f'  <li><a href="{gc.resolve().as_uri()}">gmake_call</a></li>')
         if go.is_file():
-            lines.append(f"  <li><a href=\"{go.resolve().as_uri()}\">gmake_output</a></li>")
+            lines.append(
+                f'  <li><a href="{go.resolve().as_uri()}">gmake_output</a></li>'
+            )
         if ge.is_file():
-            lines.append(f"  <li><a href=\"{ge.resolve().as_uri()}\">gmake_error</a></li>")
+            lines.append(
+                f'  <li><a href="{ge.resolve().as_uri()}">gmake_error</a></li>'
+            )
         lines.append("</ul>")
         if ct.is_file():
-            lines.append(f"<p>Compilation time: {html.escape(ct.read_text().strip())}</p>")
+            lines.append(
+                f"<p>Compilation time: {html.escape(ct.read_text().strip())}</p>"
+            )
 
     # Execution section
     runs = sorted([d for d in build_dir.iterdir() if d.is_dir()], key=lambda x: x.name)
@@ -114,8 +123,8 @@ def generate_left_frame_html(
             lines.append("<pre>")
             if "numProcs" in props:
                 lines.append(
-                    f"  Used {html.escape(props['numProcs'])} processor" +
-                    f"{'s' if props['numProcs']!='1' else ''}"
+                    f"  Used {html.escape(props['numProcs'])} processor"
+                    + f"{'s' if props['numProcs']!='1' else ''}"
                 )
             if "wallClockTime" in props:
                 lines.append(
@@ -123,19 +132,23 @@ def generate_left_frame_html(
                 )
             if "numCheckfiles" in props:
                 lines.append(
-                    f"  produced {html.escape(props['numCheckfiles'])} checkfile" +
-                    f"{'s' if props['numCheckfiles']!='1' else ''}"
+                    f"  produced {html.escape(props['numCheckfiles'])} checkfile"
+                    + f"{'s' if props['numCheckfiles']!='1' else ''}"
                 )
             lines.append("</pre>")
 
             def _process_li_line(file: Path) -> str:
                 """A Helper function to build string for a list item."""
-                return(f"  <li><a href=\"{file.resolve().as_uri()}\">{html.escape(file.name)}</a></li>")
+                return f'  <li><a href="{file.resolve().as_uri()}">{html.escape(file.name)}</a></li>'
 
             lines.append("<ul>")
             # checkpoint files
             chk_files = sorted(
-                [f for f in run_dir.iterdir() if f.is_file() and re.match(r".*?_chk_\d+", f.name)],
+                [
+                    f
+                    for f in run_dir.iterdir()
+                    if f.is_file() and re.match(r".*?_chk_\d+", f.name)
+                ],
                 key=lambda x: x.name,
             )
             for cf in chk_files:
@@ -143,7 +156,7 @@ def generate_left_frame_html(
 
             # .dat files
             dat_files = sorted(
-                [f for f in run_dir.iterdir() if f.is_file() and f.suffix==".dat"],
+                [f for f in run_dir.iterdir() if f.is_file() and f.suffix == ".dat"],
                 key=lambda x: x.name,
             )
             for df in dat_files:
@@ -187,7 +200,7 @@ def generate_left_frame_html(
             # Test Results (sfocu)
             lines.append("<h3>Test Results</h3>")
             to = run_dir / "test_output"
-            if to.is_file() and to.stat().st_size>0:
+            if to.is_file() and to.stat().st_size > 0:
                 lines.append("<pre>")
                 # NOTE: `test_output` has <b> tag, so don't escape it.
                 lines.append(to.read_text())

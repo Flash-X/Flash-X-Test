@@ -1,6 +1,7 @@
 """
 Generate site-combined invocation pages that list builds.
 """
+
 import html
 from pathlib import Path
 from typing import Dict, List
@@ -30,8 +31,8 @@ def generate_combined_invocation_page(
             rel_link = f"../{html.escape(site)}/{html.escape(inv_name)}/{html.escape(b.name)}/frameset.html"
             sections.extend(
                 [
-                    f"  <tr class=\"{zebra_row_class(idx)}\">",
-                    f'    <td><a class=\"cell-link\" href="{rel_link}">{html.escape(b.name)}</a></td>',
+                    f'  <tr class="{zebra_row_class(idx)}">',
+                    f'    <td><a class="cell-link" href="{rel_link}">{html.escape(b.name)}</a></td>',
                     f'    <td class="{status.colour}">{status.emoji}</td>',
                     f"    <td>{html.escape(exit_msg)}</td>",
                     "  </tr>",

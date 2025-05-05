@@ -19,7 +19,9 @@ from .build_page import (
 )
 
 
-def generate_flashx_testview(target_dir: Path, output_dir: Path, *, force_rewrite=False) -> None:
+def generate_flashx_testview(
+    target_dir: Path, output_dir: Path, *, force_rewrite=False
+) -> None:
     """Generate the static FlashTest site into output_dir from target_dir."""
     target_dir = target_dir.expanduser().resolve()
     output_dir = output_dir.expanduser().resolve()
@@ -53,9 +55,11 @@ def generate_flashx_testview(target_dir: Path, output_dir: Path, *, force_rewrit
                 f"Output directory '{output_dir}' exists but is not a directory."
             )
         if not force_rewrite:
-            reply = input(
-                f"'{output_dir}' is not empty. Delete everything inside? [y/N] "
-            ).strip().lower()
+            reply = (
+                input(f"'{output_dir}' is not empty. Delete everything inside? [y/N] ")
+                .strip()
+                .lower()
+            )
             if reply not in {"y", "yes"}:
                 raise RuntimeError("Aborted by user.")
         # Either force=True or user said yes → wipe it
@@ -120,27 +124,29 @@ def generate_flashx_testview(target_dir: Path, output_dir: Path, *, force_rewrit
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(
-        description="Generate static FlashTest dashboard."
+    parser = argparse.ArgumentParser(description="Generate static FlashTest dashboard.")
+    parser.add_argument(
+        "--target-dir",
+        required=True,
+        type=Path,
+        help="Path to a FlashTest out directory (contains site sub-dirs)",
     )
     parser.add_argument(
-        "--target-dir", required=True, type=Path,
-        help="Path to a FlashTest out directory (contains site sub-dirs)"
+        "--output-dir",
+        default=Path("site"),
+        type=Path,
+        help="Where to place generated HTML (default: ./site)",
     )
     parser.add_argument(
-        "--output-dir", default=Path("site"), type=Path,
-        help="Where to place generated HTML (default: ./site)"
-    )
-    parser.add_argument(
-        "--force-rewrite", action="store_true", default=False,
-        help="Force overwrite of existing output directory"
+        "--force-rewrite",
+        action="store_true",
+        default=False,
+        help="Force overwrite of existing output directory",
     )
     args = parser.parse_args()
     try:
         generate_flashx_testview(
-            args.target_dir,
-            args.output_dir,
-            force_rewrite=args.force_rewrite
+            args.target_dir, args.output_dir, force_rewrite=args.force_rewrite
         )
     except Exception as e:
         sys.exit(str(e))

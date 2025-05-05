@@ -1,4 +1,5 @@
 """Utility functions for generating HTML pages."""
+
 import html
 from typing import List, Optional
 
@@ -36,7 +37,7 @@ def page_header(
     lines.append(body_tag)
     # optional base target for frames
     if base_target:
-        lines.append(f"<base target=\"{base_target}\">")
+        lines.append(f'<base target="{base_target}">')
     return lines
 
 
@@ -44,11 +45,11 @@ def page_header_nobody(title: str, css_href: str) -> List[str]:
     """Return HTML header lines without opening body (e.g., for frameset pages)."""
     return [
         "<!DOCTYPE html>",
-        "<html lang=\"en\">",
+        '<html lang="en">',
         "<head>",
-        "  <meta charset=\"utf-8\">",
+        '  <meta charset="utf-8">',
         f"  <title>{html.escape(title)}</title>",
-        f"  <link rel=\"stylesheet\" href=\"{css_href}\">",
+        f'  <link rel="stylesheet" href="{css_href}">',
         "</head>",
     ]
 
