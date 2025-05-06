@@ -54,6 +54,49 @@ th {
 .yellow { background: #fff8c4; }
 .red { background: #f7c4c4; }
 
+/* Index page */
+.index-table {
+  table-layout: fixed;
+  width: 100%;
+}
+
+.index-table .col-invocation {
+  width: 80%;
+}
+
+/* Invocation page */
+.filters {
+  margin-left: auto;
+}
+
+.site-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.5em;
+}
+
+.site-header h2 {
+  margin: 0;
+  padding: 0;
+}
+
+.inv-table {
+  table-layout: fixed;
+  width: 100%;
+}
+.inv-table .col-build {
+  width: 50%;
+}
+.inv-table .col-status {
+  width: 5%;
+}
+.inv-table .col-summary {
+  width: 45%;
+}
+
+/* Build page */
+
 /* left frame in build detail */
 .left-frame h1 {
   font-size: 1.2em;

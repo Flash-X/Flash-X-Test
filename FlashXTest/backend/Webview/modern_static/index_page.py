@@ -32,11 +32,11 @@ def generate_html(
 
     lines.append(f"<h1>{html.escape(title)}</h1>")
 
-    # Start the table
-    lines.append("<table>")
+    # Start the table with fixed layout
+    lines.append('<table class="index-table">')
     # header row
     lines.append("  <tr>")
-    lines.append("    <th>Invocation</th>")
+    lines.append('    <th class="col-invocation">Invocation</th>')
     for site in sites:
         lines.append(f"    <th>{html.escape(site)}</th>")
     lines.append("  </tr>")
@@ -71,7 +71,7 @@ def generate_html(
         body_lines = [f"{name} - {msg}" for _, name, msg in failing]
         body_js = json.dumps("<br>".join(body_lines))
         lines.append(
-            f'    <td><a class="cell-link" href="{inv_href}" '
+            f'    <td class="col-invocation"><a class="cell-link" href="{inv_href}" '
             + f"onMouseOver='appear({header_js},{body_js})' onMouseOut='disappear()'>"
             + f"{html.escape(inv_name)}</a></td>"
         )
