@@ -265,15 +265,28 @@ def dry_run(setupname, test, nprocs, site, objdir):
 
 
 @flashxtest.command(name="webview")
-def webview():
+@click.option("--outdir", "-o", type=str, default="./html", help="Output directory")
+@click.option(
+    "--force-rewrite",
+    "-f",
+    is_flag=True,
+    default=False,
+    help="Force rewrite on output directory",
+)
+def webview(outdir, force_rewrite):
     """
     \b
     Launch FlashTestView
 
     \b
-    This command will launch FlashTestView web interface
+    This command will generate FlashXTestView web interface
+    in "outdir" directory. The default value is "./html".
+    "--view-archive" option must be set during "init" phase.
     """
-    api.webview()
+    api.webview(
+        outdir=outdir,
+        force_rewrite=force_rewrite,
+    )
 
 
 @flashxtest.command(name="remove-benchmarks")

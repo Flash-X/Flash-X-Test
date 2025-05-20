@@ -16,7 +16,7 @@ with open("FlashXTest/__meta__.py", mode="r") as source:
     }
 
 # core dependencies - click, docker, singularity
-DEPENDENCIES = ["click", "six", "argparse", "pyyaml", "toml"]
+DEPENDENCIES = ["setuptools", "click", "six", "argparse", "pyyaml", "toml"]
 
 setup(
     name=metadata["__pkgname__"],
