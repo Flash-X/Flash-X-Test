@@ -36,7 +36,7 @@ def _generate_site_table_header(site: str) -> List[str]:
 
 
 def generate_combined_invocation_page(
-    inv_name: str, site_dirs: Dict[str, Path], site_order: List[str]
+    inv_name: str, site_dirs: Dict[str, Path], site_order: List[str], css_content: str
 ) -> str:
     """Produce a page that lists all sites for one invocation with build tables."""
     sections: List[str] = []
@@ -91,7 +91,7 @@ def generate_combined_invocation_page(
         sections.append("</div>")
 
     title = f"Invocation {inv_name}"
-    header = page_header(title, css_href="../style.css")
+    header = page_header(title, css_content)
     # Page content: heading, back link, filters, site tables, and init script
     content = [
         f"<h1>{html.escape(title)}</h1>",

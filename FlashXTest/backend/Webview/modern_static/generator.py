@@ -68,8 +68,19 @@ def generate_flashx_testview(
 
     output_dir.mkdir(parents=True, exist_ok=False)
 
+    # Read CSS once; embed inline in every page so files are self-contained
+    pkg_dir = Path(__file__).parent
+    style_src = pkg_dir / "style.css"
+    css_content = style_src.read_text(encoding="utf-8") if style_src.is_file() else ""
+
+    # Copy JS assets (still needed as external files)
+    js_src = pkg_dir / "js"
+    if js_src.is_dir():
+        dst_js = output_dir / "js"
+        shutil.copytree(js_src, dst_js, dirs_exist_ok=True)
+
     # Write overview index.html
-    index_html = generate_html(board, sites, invocations_sorted, inv_dir_lookup)
+    index_html = generate_html(board, sites, invocations_sorted, inv_dir_lookup, css_content)
     (output_dir / "index.html").write_text(index_html, encoding="utf-8")
 
     # Write site-combined invocation pages
@@ -77,21 +88,9 @@ def generate_flashx_testview(
     inv_index_dir.mkdir(parents=True, exist_ok=True)
     for inv_name in invocations_sorted:
         combined = generate_combined_invocation_page(
-            inv_name, inv_dir_lookup.get(inv_name, {}), sites
+            inv_name, inv_dir_lookup.get(inv_name, {}), sites, css_content
         )
         (inv_index_dir / f"{inv_name}.html").write_text(combined, encoding="utf-8")
-
-    # Copy shared CSS and JS assets
-    pkg_dir = Path(__file__).parent
-    # style.css
-    style_src = pkg_dir / "style.css"
-    if style_src.is_file():
-        shutil.copy(style_src, output_dir / "style.css")
-    # js assets
-    js_src = pkg_dir / "js"
-    if js_src.is_dir():
-        dst_js = output_dir / "js"
-        shutil.copytree(js_src, dst_js, dirs_exist_ok=True)
 
     # Generate build pages (frameset, left/right)
     for site_path in site_paths:
@@ -105,17 +104,17 @@ def generate_flashx_testview(
                 build_output_dir.mkdir(parents=True, exist_ok=True)
                 # Frameset
                 (build_output_dir / "frameset.html").write_text(
-                    generate_build_page_frameset(site_path.name, inv_dir.name, b.name),
+                    generate_build_page_frameset(site_path.name, inv_dir.name, b.name, css_content),
                     encoding="utf-8",
                 )
                 # Left frame
                 (build_output_dir / "leftframe.html").write_text(
-                    generate_left_frame_html(site_path.name, inv_dir.name, b.name, b, build_output_dir),
+                    generate_left_frame_html(site_path.name, inv_dir.name, b.name, b, build_output_dir, css_content),
                     encoding="utf-8",
                 )
                 # Right frame
                 (build_output_dir / "rightframe.html").write_text(
-                    generate_right_frame_html(site_path.name, inv_dir.name, b.name),
+                    generate_right_frame_html(site_path.name, inv_dir.name, b.name, css_content),
                     encoding="utf-8",
                 )
 

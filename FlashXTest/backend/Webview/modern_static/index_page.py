@@ -16,11 +16,12 @@ def generate_html(
     sites: List[str],
     invocations: List[str],
     inv_dir_lookup: Dict[str, Dict[str, Path]],
+    css_content: str,
     title: str = "FlashXTest Invocations",
 ) -> str:
     """Return *index.html* as a single string."""
 
-    lines: List[str] = page_header(title, css_href="style.css")
+    lines: List[str] = page_header(title, css_content)
 
     # dynamic tooltip support: include tooltip script and container
     lines.append('<script src="js/statsWindow.js"></script>')

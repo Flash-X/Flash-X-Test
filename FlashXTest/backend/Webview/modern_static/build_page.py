@@ -12,10 +12,10 @@ from urllib.parse import quote as url_quote
 from .html_utils import page_header, page_header_nobody, page_footer
 
 
-def generate_build_page_frameset(site_name: str, inv_name: str, build_name: str) -> str:
+def generate_build_page_frameset(site_name: str, inv_name: str, build_name: str, css_content: str) -> str:
     """Return a frameset HTML page."""
     title = f"{site_name} – {inv_name} – {build_name}"
-    lines: List[str] = page_header_nobody(title, css_href="../../../style.css")
+    lines: List[str] = page_header_nobody(title, css_content)
     lines.append('<frameset cols="40%,*">')
     lines.append('  <frame src="leftframe.html" name="leftframe">')
     lines.append('  <frame src="rightframe.html" name="rightframe">')
@@ -25,13 +25,13 @@ def generate_build_page_frameset(site_name: str, inv_name: str, build_name: str)
 
 
 def generate_left_frame_html(
-    site_name: str, inv_name: str, build_name: str, build_dir: Path, build_output_dir: Path
+    site_name: str, inv_name: str, build_name: str, build_dir: Path, build_output_dir: Path, css_content: str
 ) -> str:
     """Return HTML for the left frame listing structured sections for a build."""
     title = f"{site_name} – {inv_name} – {build_name}"
     lines: List[str] = page_header(
         title,
-        css_href="../../../style.css",
+        css_content,
         base_target="rightframe",
         body_class="left-frame",
     )
@@ -211,12 +211,12 @@ def generate_left_frame_html(
     return "\n".join(lines)
 
 
-def generate_right_frame_html(site_name: str, inv_name: str, build_name: str) -> str:
+def generate_right_frame_html(site_name: str, inv_name: str, build_name: str, css_content: str) -> str:
     """Return HTML for the right frame initial content."""
     title = f"{site_name} – {inv_name} – {build_name}"
     lines: List[str] = page_header(
         title,
-        css_href="../../../style.css",
+        css_content,
         body_class="right-frame",
     )
     lines.append("<p>Select a file from the left to view its contents.</p>")
