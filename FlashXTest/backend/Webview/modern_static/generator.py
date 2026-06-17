@@ -110,7 +110,7 @@ def generate_flashx_testview(
                 )
                 # Left frame
                 (build_output_dir / "leftframe.html").write_text(
-                    generate_left_frame_html(site_path.name, inv_dir.name, b.name, b),
+                    generate_left_frame_html(site_path.name, inv_dir.name, b.name, b, build_output_dir),
                     encoding="utf-8",
                 )
                 # Right frame
