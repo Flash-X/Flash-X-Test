@@ -3,17 +3,19 @@ Generate build detail frameset, left frame, and right frame HTML.
 """
 
 import html
+import os
 import re
 from pathlib import Path
 from typing import List, Dict
+from urllib.parse import quote as url_quote
 
 from .html_utils import page_header, page_header_nobody, page_footer
 
 
-def generate_build_page_frameset(site_name: str, inv_name: str, build_name: str) -> str:
+def generate_build_page_frameset(site_name: str, inv_name: str, build_name: str, css_content: str) -> str:
     """Return a frameset HTML page."""
     title = f"{site_name} – {inv_name} – {build_name}"
-    lines: List[str] = page_header_nobody(title, css_href="../../../style.css")
+    lines: List[str] = page_header_nobody(title, css_content)
     lines.append('<frameset cols="40%,*">')
     lines.append('  <frame src="leftframe.html" name="leftframe">')
     lines.append('  <frame src="rightframe.html" name="rightframe">')
@@ -23,13 +25,13 @@ def generate_build_page_frameset(site_name: str, inv_name: str, build_name: str)
 
 
 def generate_left_frame_html(
-    site_name: str, inv_name: str, build_name: str, build_dir: Path
+    site_name: str, inv_name: str, build_name: str, build_dir: Path, build_output_dir: Path, css_content: str
 ) -> str:
     """Return HTML for the left frame listing structured sections for a build."""
     title = f"{site_name} – {inv_name} – {build_name}"
     lines: List[str] = page_header(
         title,
-        css_href="../../../style.css",
+        css_content,
         base_target="rightframe",
         body_class="left-frame",
     )
@@ -39,14 +41,17 @@ def generate_left_frame_html(
         + f"{html.escape(inv_name)}</a></h2>"
     )
 
+    def _rel_href(file: Path) -> str:
+        return url_quote(os.path.relpath(file, build_output_dir), safe="/")
+
     # invocation files
     lines.append("<ul>")
     ti = build_dir / "test.info"
     if ti.is_file():
-        lines.append(f'  <li><a href="{ti.resolve().as_uri()}">test.info</a></li>')
+        lines.append(f'  <li><a href="{_rel_href(ti)}">test.info</a></li>')
     df = build_dir / "deleted_files"
     if df.is_file():
-        lines.append(f'  <li><a href="{df.resolve().as_uri()}">deleted_files</a></li>')
+        lines.append(f'  <li><a href="{_rel_href(df)}">deleted_files</a></li>')
     lines.append("</ul>")
 
     # Setup
@@ -58,7 +63,7 @@ def generate_left_frame_html(
         call_text = sc.read_text().strip()
         if so.is_file():
             lines.append(
-                f'  <li><a href="{so.resolve().as_uri()}">{html.escape(call_text)}</a></li>'
+                f'  <li><a href="{_rel_href(so)}">{html.escape(call_text)}</a></li>'
             )
         else:
             lines.append(f"  <li>{html.escape(call_text)}</li>")
@@ -73,15 +78,11 @@ def generate_left_frame_html(
         lines.append("<h3>Compilation</h3>")
         lines.append("<ul>")
         if gc.is_file():
-            lines.append(f'  <li><a href="{gc.resolve().as_uri()}">gmake_call</a></li>')
+            lines.append(f'  <li><a href="{_rel_href(gc)}">gmake_call</a></li>')
         if go.is_file():
-            lines.append(
-                f'  <li><a href="{go.resolve().as_uri()}">gmake_output</a></li>'
-            )
+            lines.append(f'  <li><a href="{_rel_href(go)}">gmake_output</a></li>')
         if ge.is_file():
-            lines.append(
-                f'  <li><a href="{ge.resolve().as_uri()}">gmake_error</a></li>'
-            )
+            lines.append(f'  <li><a href="{_rel_href(ge)}">gmake_error</a></li>')
         lines.append("</ul>")
         if ct.is_file():
             lines.append(
@@ -138,8 +139,7 @@ def generate_left_frame_html(
             lines.append("</pre>")
 
             def _process_li_line(file: Path) -> str:
-                """A Helper function to build string for a list item."""
-                return f'  <li><a href="{file.resolve().as_uri()}">{html.escape(file.name)}</a></li>'
+                return f'  <li><a href="{_rel_href(file)}">{html.escape(file.name)}</a></li>'
 
             lines.append("<ul>")
             # checkpoint files
@@ -211,12 +211,12 @@ def generate_left_frame_html(
     return "\n".join(lines)
 
 
-def generate_right_frame_html(site_name: str, inv_name: str, build_name: str) -> str:
+def generate_right_frame_html(site_name: str, inv_name: str, build_name: str, css_content: str) -> str:
     """Return HTML for the right frame initial content."""
     title = f"{site_name} – {inv_name} – {build_name}"
     lines: List[str] = page_header(
         title,
-        css_href="../../../style.css",
+        css_content,
         body_class="right-frame",
     )
     lines.append("<p>Select a file from the left to view its contents.</p>")
