@@ -45,6 +45,33 @@ a:hover { text-decoration: underline; color: var(--primary-dark); }
 
 p { margin: 0.5rem 0; }
 
+/* -- Toolbar (search bar row) ----------------- */
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.search-bar {
+  font-size: 0.875rem;
+  font-family: inherit;
+  color: var(--text);
+  padding: 6px 10px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--surface);
+  width: 280px;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.search-bar::placeholder { color: var(--text-muted); }
+.search-bar:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(21, 101, 160, .15);
+}
+
 /* -- Tables ----------------------------------- */
 table {
   width: 100%;
@@ -68,12 +95,23 @@ th {
   font-weight: 600;
   letter-spacing: 0.02em;
   border-color: var(--primary-dark);
+  white-space: nowrap;
+  position: sticky;
+  top: 0;
+  z-index: 2;
 }
 
 /* zebra rows */
 .row-alt { background: #f6f9fc; }
 
-/* link cells – remove td padding so the anchor fills the full cell */
+/* subtle row hover */
+tr.row:hover td,
+tr.row-alt:hover td {
+  background: var(--primary-light);
+  transition: background 0.1s;
+}
+
+/* link cells – anchor fills the full cell */
 .col-invocation,
 .col-build {
   text-align: left;
@@ -95,9 +133,9 @@ th {
 }
 
 /* -- Status colours --------------------------- */
-.green  { background: var(--green-bg);  color: var(--green-text); }
-.yellow { background: var(--yellow-bg); color: var(--yellow-text); }
-.red    { background: var(--red-bg);    color: var(--red-text); }
+.green  { background: var(--green-bg);  color: var(--green-text); font-weight: 600; }
+.yellow { background: var(--yellow-bg); color: var(--yellow-text); font-weight: 600; }
+.red    { background: var(--red-bg);    color: var(--red-text); font-weight: 600; }
 
 /* -- Index page ------------------------------- */
 .index-table { table-layout: fixed; }
@@ -148,30 +186,58 @@ th {
   white-space: nowrap;
 }
 
-/* Styled select/dropdown */
-.filters select {
+/* -- Select wrapper: CSS-only custom arrow ---- */
+.select-wrap {
+  position: relative;
+  display: inline-block;
+}
+
+/* The CSS triangle arrow */
+.select-wrap::after {
+  content: '';
+  position: absolute;
+  right: 9px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 6px solid var(--text-muted);
+  pointer-events: none;
+}
+
+.select-wrap select {
   font-size: 0.85rem;
   font-family: inherit;
   color: var(--text);
-  padding: 4px 28px 4px 8px;
+  padding: 5px 30px 5px 9px;
   border: 1px solid var(--border);
   border-radius: 4px;
-  background-color: var(--surface);
-  /* custom caret arrow */
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%2357606a'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 8px center;
+  background: var(--surface);
+  /* Remove native arrow so only our CSS one is visible */
   -webkit-appearance: none;
+  -moz-appearance: none;
   appearance: none;
   cursor: pointer;
-  transition: border-color 0.12s;
+  transition: border-color 0.12s, box-shadow 0.12s;
+  min-width: 110px;
 }
 
-.filters select:hover { border-color: var(--primary); }
-.filters select:focus {
-  outline: 2px solid var(--primary);
-  outline-offset: 1px;
+.select-wrap select:hover { border-color: var(--primary); }
+.select-wrap select:focus {
+  outline: none;
   border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(21, 101, 160, .15);
+}
+
+/* -- "No results" banner ---------------------- */
+.no-results-msg {
+  display: none;
+  padding: 0.6rem 1rem;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  font-style: italic;
 }
 
 /* -- Invocation table ------------------------- */
@@ -232,7 +298,7 @@ th {
   padding: 4px 6px;
 }
 
-/* -- Build page – right frame (placeholder) -- */
+/* -- Build page – right frame ----------------- */
 .right-frame {
   padding: 1.5rem 2rem;
   font-size: 0.9rem;

@@ -3,7 +3,7 @@ Status parsing utilities for FlashTest static generator.
 """
 
 from pathlib import Path
-from typing import List
+from typing import List, Tuple
 
 
 class InvocationStatus:
@@ -68,7 +68,7 @@ def classify_invocation(inv_dir: Path) -> InvocationStatus:
     return InvocationStatus(colour=colour)
 
 
-def parse_build_status(build_dir: Path) -> tuple[InvocationStatus, str]:
+def parse_build_status(build_dir: Path) -> Tuple[InvocationStatus, str]:
     """Return (InvocationStatus, exit_msg) for a single build directory."""
     errors_file = build_dir / "errors"
     if not errors_file.exists():
