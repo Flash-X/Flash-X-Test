@@ -3,7 +3,7 @@
 import os
 import subprocess
 import click
-import pkg_resources
+from importlib import metadata
 import warnings
 
 from .. import api
@@ -27,7 +27,7 @@ def flashxtest(ctx, version):
         )
 
     if version:
-        click.echo(pkg_resources.require("FlashXTest")[0].version)
+        click.echo(metadata.version("FlashXTest"))
 
 
 @flashxtest.command(name="init")
