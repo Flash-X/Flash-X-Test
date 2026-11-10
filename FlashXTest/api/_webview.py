@@ -7,7 +7,23 @@ from .. import lib
 from .. import backend
 
 
-def webview(outdir, force_rewrite):
+def webview(outdir, force_rewrite, results=None):
+    """
+    Generate a static, read-only webview.
+
+    Arguments
+    ---------
+    outdir        : Output directory
+    force_rewrite : Do not prompt before replacing outdir (view archive mode)
+    results       : Optional dict {label: path to results directory}. If given,
+                    each is published into the website at outdir (see
+                    backend.Webview.publish_results) and no "config" is
+                    required. Otherwise the view archive from "config" is used.
+    """
+    if results:
+        for label, path in results.items():
+            backend.Webview.publish_results(Path(outdir), label, Path(path))
+        return
 
     # Retrive pathToViewArchive
     apiDict = locals()

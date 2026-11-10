@@ -5,8 +5,9 @@ Generate build detail frameset, left frame, and right frame HTML.
 import html
 import os
 import re
+import shutil
 from pathlib import Path
-from typing import List, Dict
+from typing import Dict, List, Optional
 from urllib.parse import quote as url_quote
 
 from .html_utils import page_header, page_header_nobody, page_footer
@@ -24,10 +25,27 @@ def generate_build_page_frameset(site_name: str, inv_name: str, build_name: str,
     return "\n".join(lines)
 
 
+# Files above this size, and checkpoint files, are not copied when publishing.
+MAX_PUBLISH_BYTES = 2 * 1024 * 1024
+_CHK_RE = re.compile(r".*?_chk_\d+")
+
+
 def generate_left_frame_html(
-    site_name: str, inv_name: str, build_name: str, build_dir: Path, build_output_dir: Path, css_content: str
+    site_name: str,
+    inv_name: str,
+    build_name: str,
+    build_dir: Path,
+    build_output_dir: Path,
+    css_content: str,
+    copy_files: bool = False,
 ) -> str:
-    """Return HTML for the left frame listing structured sections for a build."""
+    """Return HTML for the left frame listing structured sections for a build.
+
+    If *copy_files* is True the linked files are copied into
+    ``build_output_dir/files`` so the output is self-contained (large files and
+    checkpoints are listed but not linked). Otherwise links point back into
+    the original results directory.
+    """
     title = f"{site_name} – {inv_name} – {build_name}"
     lines: List[str] = page_header(
         title,
@@ -41,17 +59,31 @@ def generate_left_frame_html(
         + f"{html.escape(inv_name)}</a></h2>"
     )
 
-    def _rel_href(file: Path) -> str:
-        return url_quote(os.path.relpath(file, build_output_dir), safe="/")
+    def _rel_href(file: Path) -> Optional[str]:
+        if not copy_files:
+            return url_quote(os.path.relpath(file, build_output_dir), safe="/")
+        if _CHK_RE.match(file.name) or file.stat().st_size > MAX_PUBLISH_BYTES:
+            return None
+        rel = os.path.relpath(file, build_dir)
+        dst = build_output_dir / "files" / rel
+        dst.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(file, dst)
+        return url_quote("files/" + rel, safe="/")
+
+    def _link(file: Path, text: str) -> str:
+        href = _rel_href(file)
+        if href is None:
+            return f"{html.escape(text)} (not published: too large)"
+        return f'<a href="{href}">{html.escape(text)}</a>'
 
     # invocation files
     lines.append("<ul>")
     ti = build_dir / "test.info"
     if ti.is_file():
-        lines.append(f'  <li><a href="{_rel_href(ti)}">test.info</a></li>')
+        lines.append(f"  <li>{_link(ti, 'test.info')}</li>")
     df = build_dir / "deleted_files"
     if df.is_file():
-        lines.append(f'  <li><a href="{_rel_href(df)}">deleted_files</a></li>')
+        lines.append(f"  <li>{_link(df, 'deleted_files')}</li>")
     lines.append("</ul>")
 
     # Setup
@@ -62,9 +94,7 @@ def generate_left_frame_html(
         lines.append("<ul>")
         call_text = sc.read_text().strip()
         if so.is_file():
-            lines.append(
-                f'  <li><a href="{_rel_href(so)}">{html.escape(call_text)}</a></li>'
-            )
+            lines.append(f"  <li>{_link(so, call_text)}</li>")
         else:
             lines.append(f"  <li>{html.escape(call_text)}</li>")
         lines.append("</ul>")
@@ -78,11 +108,11 @@ def generate_left_frame_html(
         lines.append("<h3>Compilation</h3>")
         lines.append("<ul>")
         if gc.is_file():
-            lines.append(f'  <li><a href="{_rel_href(gc)}">gmake_call</a></li>')
+            lines.append(f"  <li>{_link(gc, 'gmake_call')}</li>")
         if go.is_file():
-            lines.append(f'  <li><a href="{_rel_href(go)}">gmake_output</a></li>')
+            lines.append(f"  <li>{_link(go, 'gmake_output')}</li>")
         if ge.is_file():
-            lines.append(f'  <li><a href="{_rel_href(ge)}">gmake_error</a></li>')
+            lines.append(f"  <li>{_link(ge, 'gmake_error')}</li>")
         lines.append("</ul>")
         if ct.is_file():
             lines.append(
@@ -139,7 +169,7 @@ def generate_left_frame_html(
             lines.append("</pre>")
 
             def _process_li_line(file: Path) -> str:
-                return f'  <li><a href="{_rel_href(file)}">{html.escape(file.name)}</a></li>'
+                return f"  <li>{_link(file, file.name)}</li>"
 
             lines.append("<ul>")
             # checkpoint files

@@ -178,6 +178,31 @@ def setup_suite(suitelist, overwrite, add_setup_opts, seed_from_info):
 
 
 @flashxtest.command(name="run-suite")
+@click.argument("suitelist", type=click.Path(exists=True), nargs=-1)
+@click.option(
+    "--setup",
+    is_flag=True,
+    help='Regenerate "test.info" from suite files even if it exists',
+)
+@click.option(
+    "--add-setup-opts",
+    "-as",
+    default=None,
+    help="Add common setup options to all tests (when test.info is created)",
+)
+@click.option(
+    "--webview-dir",
+    "-w",
+    default=None,
+    type=click.Path(),
+    help="Publish results to the static website in this directory after the run",
+)
+@click.option(
+    "--webview-label",
+    "-l",
+    default=None,
+    help="Label for published results, e.g. main or staged (required with --webview-dir)",
+)
 @click.option("--archive", is_flag=True, show_default=True, help="Archive test results")
 @click.option(
     "--skip-viewarchive",
@@ -191,16 +216,41 @@ def setup_suite(suitelist, overwrite, add_setup_opts, seed_from_info):
     show_default=True,
     help="Skip saving results to main archive",
 )
-def run_suite(archive, skip_viewarchive, skip_mainarchive):
+def run_suite(
+    suitelist,
+    setup,
+    add_setup_opts,
+    webview_dir,
+    webview_label,
+    archive,
+    skip_viewarchive,
+    skip_mainarchive,
+):
     """
     \b
     Run the test suite using "test.info".
 
     \b
     This command runs all the tests defined in
-    "test.info", and conveys errors.
+    "test.info", and conveys errors. If "test.info"
+    is not present it is first created from SUITELIST
+    (default: all "*.suite" files in the working
+    directory), so "setup-suite" is not required. Use
+    --setup to regenerate an existing "test.info".
+
+    \b
+    With --webview-dir and --webview-label, the results
+    are published to a static read-only website in that
+    directory when the run finishes (see "webview").
     """
+    if webview_dir and not webview_label:
+        raise click.UsageError("--webview-dir requires --webview-label")
     api.run_suite(
+        webviewDir=webview_dir,
+        webviewLabel=webview_label,
+        pathToSuites=suitelist,
+        setup=setup,
+        addSetupOptions=add_setup_opts,
         saveToArchive=archive,
         skipViewArchive=skip_viewarchive,
         skipMainArchive=skip_mainarchive,
@@ -267,25 +317,51 @@ def dry_run(setupname, test, nprocs, site, objdir):
 @flashxtest.command(name="webview")
 @click.option("--outdir", "-o", type=str, default="./html", help="Output directory")
 @click.option(
+    "--results",
+    "-r",
+    multiple=True,
+    metavar="LABEL=PATH",
+    help="Publish an existing results directory under LABEL into the website "
+    "at --outdir (repeatable). Without this, the view archive is used.",
+)
+@click.option(
     "--force-rewrite",
     "-f",
     is_flag=True,
     default=False,
     help="Force rewrite on output directory",
 )
-def webview(outdir, force_rewrite):
+def webview(outdir, results, force_rewrite):
     """
     \b
-    Launch FlashTestView
+    Generate the read-only FlashXTestView website
 
     \b
-    This command will generate FlashXTestView web interface
-    in "outdir" directory. The default value is "./html".
-    "--view-archive" option must be set during "init" phase.
+    This command generates a static FlashXTestView web
+    interface in "outdir" (default "./html") from the view
+    archive set by "init -vv".
+
+    \b
+    With --results LABEL=PATH it instead publishes an
+    existing results directory into a website (landing
+    page plus "Test Results" tab) in "outdir", replacing
+    only that label and keeping everything else, including
+    ".git". This is what "run-suite --webview-dir" does
+    automatically.
     """
+    resultsDict = {}
+    for entry in results:
+        label, sep, path = entry.partition("=")
+        if not sep or not label or not path:
+            raise click.BadParameter(
+                f"{entry!r} must be LABEL=PATH", param_hint="--results"
+            )
+        resultsDict[label] = path
+
     api.webview(
         outdir=outdir,
         force_rewrite=force_rewrite,
+        results=resultsDict,
     )
 
 

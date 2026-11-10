@@ -1,3 +1,4 @@
 include README.rst
 include LICENSE
 recursive-include FlashXTest/backend/FlashTest *
+recursive-include FlashXTest/backend/Webview/modern_static *.css *.js

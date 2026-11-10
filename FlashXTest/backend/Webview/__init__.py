@@ -1,1 +1,1 @@
-from .modern_static import generate_flashx_testview
+from .modern_static import generate_flashx_testview, publish_results

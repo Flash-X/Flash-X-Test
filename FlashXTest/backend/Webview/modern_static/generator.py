@@ -6,10 +6,11 @@ import argparse
 import sys
 import shutil
 from pathlib import Path
-from typing import Dict, Set
+from typing import Dict, Optional, Set
 
-from .fs_utils import list_site_dirs, list_invocation_dirs
+from .fs_utils import list_site_dirs, list_invocation_dirs as _list_invocation_dirs
 from .status import classify_invocation, InvocationStatus
+from .html_utils import page_nav
 from .index_page import generate_html
 from .invocation_page import generate_combined_invocation_page
 from .build_page import (
@@ -20,9 +21,26 @@ from .build_page import (
 
 
 def generate_flashx_testview(
-    target_dir: Path, output_dir: Path, *, force_rewrite=False
+    target_dir: Path,
+    output_dir: Path,
+    *,
+    force_rewrite=False,
+    root_prefix: Optional[str] = None,
+    title: str = "FlashXTest Invocations",
+    copy_files: bool = False,
+    latest_only: bool = False,
 ) -> None:
-    """Generate the static FlashTest site into output_dir from target_dir."""
+    """Generate the static FlashTest site into output_dir from target_dir.
+
+    If *root_prefix* is given (relative path from output_dir to the top of an
+    enclosing website, e.g. ``"../.."``), a site navigation bar is added to
+    the index and invocation pages. If *latest_only* is True only the newest
+    invocation of each site is included (history is purged from the output).
+    """
+    def list_invocation_dirs(site_path: Path):
+        invs = _list_invocation_dirs(site_path)  # newest first
+        return invs[:1] if latest_only else invs
+
     target_dir = target_dir.expanduser().resolve()
     output_dir = output_dir.expanduser().resolve()
     if not target_dir.is_dir():
@@ -80,7 +98,12 @@ def generate_flashx_testview(
         shutil.copytree(js_src, dst_js, dirs_exist_ok=True)
 
     # Write overview index.html
-    index_html = generate_html(board, sites, invocations_sorted, inv_dir_lookup, css_content)
+    index_nav = page_nav(root_prefix, "dev") if root_prefix else None
+    inv_nav = page_nav(root_prefix + "/..", "dev") if root_prefix else None
+    index_html = generate_html(
+        board, sites, invocations_sorted, inv_dir_lookup, css_content,
+        title=title, nav_lines=index_nav,
+    )
     (output_dir / "index.html").write_text(index_html, encoding="utf-8")
 
     # Write site-combined invocation pages
@@ -88,7 +111,7 @@ def generate_flashx_testview(
     inv_index_dir.mkdir(parents=True, exist_ok=True)
     for inv_name in invocations_sorted:
         combined = generate_combined_invocation_page(
-            inv_name, inv_dir_lookup.get(inv_name, {}), sites, css_content
+            inv_name, inv_dir_lookup.get(inv_name, {}), sites, css_content, nav_lines=inv_nav
         )
         (inv_index_dir / f"{inv_name}.html").write_text(combined, encoding="utf-8")
 
@@ -109,7 +132,7 @@ def generate_flashx_testview(
                 )
                 # Left frame
                 (build_output_dir / "leftframe.html").write_text(
-                    generate_left_frame_html(site_path.name, inv_dir.name, b.name, b, build_output_dir, css_content),
+                    generate_left_frame_html(site_path.name, inv_dir.name, b.name, b, build_output_dir, css_content, copy_files),
                     encoding="utf-8",
                 )
                 # Right frame

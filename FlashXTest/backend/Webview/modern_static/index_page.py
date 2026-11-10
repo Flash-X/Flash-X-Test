@@ -5,7 +5,7 @@ Generate the overview index HTML page.
 import html
 import json
 from pathlib import Path
-from typing import Dict, List
+from typing import Dict, List, Optional
 
 from .html_utils import zebra_row_class, page_header, page_footer
 from .status import InvocationStatus, parse_build_status
@@ -20,10 +20,13 @@ def generate_html(
     inv_dir_lookup: Dict[str, Dict[str, Path]],
     css_content: str,
     title: str = "FlashXTest Invocations",
+    nav_lines: Optional[List[str]] = None,
 ) -> str:
     """Return *index.html* as a single string."""
 
     lines: List[str] = page_header(title, css_content)
+    if nav_lines:
+        lines.extend(nav_lines)
 
     # Tooltip support
     lines.append('<script src="js/statsWindow.js"></script>')
