@@ -30,6 +30,30 @@ MAX_PUBLISH_BYTES = 2 * 1024 * 1024
 _CHK_RE = re.compile(r".*?_chk_\d+")
 
 
+def _read_text(file: Path) -> Optional[str]:
+    """Return the file's contents if it is text (plain text, code or a log),
+    or None if it looks binary (no NUL bytes and valid UTF-8 means text)."""
+    data = file.read_bytes()
+    if b"\0" in data[:8192]:
+        return None
+    try:
+        return data.decode("utf-8")
+    except UnicodeDecodeError:
+        return None
+
+
+def _write_text_view(text: str, name: str, dst: Path, css_content: str) -> None:
+    """Write an HTML page showing *text*, with a link to download the raw file."""
+    lines = page_header(name, css_content, body_class="file-view")
+    lines.append(
+        f'<div class="file-view-header"><span>{html.escape(name)}</span>'
+        f'<a href="{url_quote(name)}" download="{html.escape(name)}">Download</a></div>'
+    )
+    lines.append(f"<pre>{html.escape(text)}</pre>")
+    lines.extend(page_footer())
+    dst.write_text("\n".join(lines), encoding="utf-8")
+
+
 def generate_left_frame_html(
     site_name: str,
     inv_name: str,
@@ -37,14 +61,13 @@ def generate_left_frame_html(
     build_dir: Path,
     build_output_dir: Path,
     css_content: str,
-    copy_files: bool = False,
 ) -> str:
     """Return HTML for the left frame listing structured sections for a build.
 
-    If *copy_files* is True the linked files are copied into
-    ``build_output_dir/files`` so the output is self-contained (large files and
-    checkpoints are listed but not linked). Otherwise links point back into
-    the original results directory.
+    Linked files are copied into ``build_output_dir/files`` so the output is
+    self-contained (large files and checkpoints are listed but not linked).
+    Text files (plain text, code, logs) open as a page in the right frame,
+    with a download link; other files are downloaded when clicked.
     """
     title = f"{site_name} – {inv_name} – {build_name}"
     lines: List[str] = page_header(
@@ -59,22 +82,27 @@ def generate_left_frame_html(
         + f"{html.escape(inv_name)}</a></h2>"
     )
 
-    def _rel_href(file: Path) -> Optional[str]:
-        if not copy_files:
-            return url_quote(os.path.relpath(file, build_output_dir), safe="/")
-        if _CHK_RE.match(file.name) or file.stat().st_size > MAX_PUBLISH_BYTES:
-            return None
+    def _link(file: Path, text: str) -> str:
+        if _CHK_RE.match(file.name):
+            return f"{html.escape(text)} (not published: checkpoint)"
+        if file.stat().st_size > MAX_PUBLISH_BYTES:
+            return f"{html.escape(text)} (not published: too large)"
         rel = os.path.relpath(file, build_dir)
         dst = build_output_dir / "files" / rel
         dst.parent.mkdir(parents=True, exist_ok=True)
         shutil.copyfile(file, dst)
-        return url_quote("files/" + rel, safe="/")
+        href = url_quote("files/" + rel, safe="/")
 
-    def _link(file: Path, text: str) -> str:
-        href = _rel_href(file)
-        if href is None:
-            return f"{html.escape(text)} (not published: too large)"
-        return f'<a href="{href}">{html.escape(text)}</a>'
+        content = _read_text(file)
+        if content is not None:
+            # Shown in the right frame (<base target="rightframe">)
+            _write_text_view(content, file.name, Path(f"{dst}.view.html"), css_content)
+            return f'<a href="{href}.view.html">{html.escape(text)}</a>'
+        # Binary: "download" saves the file instead of navigating to it
+        return (
+            f'<a href="{href}" download="{html.escape(file.name)}">'
+            f"{html.escape(text)}</a>"
+        )
 
     # invocation files
     lines.append("<ul>")
@@ -249,6 +277,6 @@ def generate_right_frame_html(site_name: str, inv_name: str, build_name: str, cs
         css_content,
         body_class="right-frame",
     )
-    lines.append("<p>Select a file from the left to view its contents.</p>")
+    lines.append("<p>Select a file on the left. Text files are shown here; other files are downloaded.</p>")
     lines.extend(page_footer())
     return "\n".join(lines)

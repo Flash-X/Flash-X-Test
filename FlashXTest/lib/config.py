@@ -109,6 +109,12 @@ def setConfig(apiDict):
                 str("pathToViewArchive:  " + str(apiDict["pathToViewArchive"])),
             )
 
+            # Set 'pathToWebview' if defined in apiDict
+            line = line.replace(
+                "pathToWebview:",
+                str("pathToWebview:      " + str(apiDict["pathToWebview"])),
+            )
+
             # Set default pathToGmake
             line = line.replace(
                 "pathToGmake:",

@@ -1,10 +1,10 @@
 """Python API for FlashXTest"""
 
 import os
-from pathlib import Path
 from .. import lib
 from .. import backend
 from ._setupSuite import setup_suite
+from ._webview import webview
 
 
 def run_suite(
@@ -12,9 +12,6 @@ def run_suite(
     skipViewArchive=False,
     skipMainArchive=False,
     pathToSuites=(),
-    setup=False,
-    addSetupOptions=None,
-    webviewDir=None,
 ):
     """
     Run a list of tests from test.info in current working directory
@@ -24,21 +21,12 @@ def run_suite(
     saveToArchive	: True/False
     skipViewArchive	: True/False
     skipMainArchive	: True/False
-    pathToSuites	: List of suite files used if test.info has to be created
-    setup		: True to regenerate test.info from suite files even if present
-    addSetupOptions	: Additional setup options used if test.info is created
-    webviewDir		: If set, package a webview of the results into this directory
-
-    If test.info is not present in the working directory (or setup is True),
-    it is created from the suite files first, as "setup-suite" would.
+    pathToSuites	: Suite files. If given, test.info is first (re)created
+			  from them, as "setup-suite --overwrite" would. If empty,
+			  the existing test.info is used.
     """
-    # Create test.info if needed before anything else
-    if setup or not os.path.exists(os.path.join(os.getcwd(), "test.info")):
-        setup_suite(
-            pathToSuites=pathToSuites,
-            overwriteCurrInfo=True,
-            addSetupOptions=addSetupOptions,
-        )
+    if pathToSuites:
+        setup_suite(pathToSuites=pathToSuites, overwriteCurrInfo=True)
 
     apiDict = {
         "saveToArchive": saveToArchive,
@@ -78,16 +66,15 @@ def run_suite(
     # for Composite and Comparison tests
     lib.run.buildSFOCU(mainDict)
 
-    # Run flashTest - actually call the backend flashTest.py here. Results
-    # are packaged even if the run reports failures, since failures are
-    # exactly what the webview should show.
+    # Run flashTest - actually call the backend flashTest.py here. The
+    # webview is rebuilt even if the run reports failures, since failures are
+    # exactly what it should show.
     try:
         lib.run.flashTest(mainDict)
     finally:
-        if webviewDir:
-            backend.Webview.generate_flashx_testview(
-                target_dir=Path(mainDict["pathToOutdir"]),
-                output_dir=Path(webviewDir),
-                force_rewrite=False,  # prompts before replacing webviewDir
-                copy_files=True,
-            )
+        if mainDict.get("pathToWebview"):
+            try:
+                webview(outdir=mainDict["pathToWebview"])
+            except Exception as err:
+                # Do not hide the result of the run itself
+                apiDict["log"].warn(f"Webview not generated: {err}")

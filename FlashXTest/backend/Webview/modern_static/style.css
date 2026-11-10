@@ -306,6 +306,31 @@ tr.row-alt:hover td {
   font-style: italic;
 }
 
+/* -- Build page – text file view ------------- */
+.file-view { margin: 0; }
+
+.file-view-header {
+  position: sticky;
+  top: 0;
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.5rem 1rem;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  font-weight: 600;
+}
+
+.file-view-header a { color: var(--primary); font-weight: normal; }
+
+.file-view pre {
+  margin: 0;
+  padding: 0.75rem 1rem;
+  font-size: 0.8rem;
+  white-space: pre;
+  overflow-x: auto;
+}
+
 /* -- Hover tooltip (index page) --------------- */
 .stats-window {
   font-size: 0.8rem;
