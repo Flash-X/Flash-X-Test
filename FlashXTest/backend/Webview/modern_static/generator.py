@@ -6,11 +6,11 @@ import argparse
 import sys
 import shutil
 from pathlib import Path
-from typing import Dict, Optional, Set
+import json
+from typing import Dict, Set
 
-from .fs_utils import list_site_dirs, list_invocation_dirs as _list_invocation_dirs
-from .status import classify_invocation, InvocationStatus
-from .html_utils import page_nav
+from .fs_utils import list_site_dirs, list_invocation_dirs
+from .status import classify_invocation, parse_build_status, InvocationStatus
 from .index_page import generate_html
 from .invocation_page import generate_combined_invocation_page
 from .build_page import (
@@ -25,22 +25,17 @@ def generate_flashx_testview(
     output_dir: Path,
     *,
     force_rewrite=False,
-    root_prefix: Optional[str] = None,
     title: str = "FlashXTest Invocations",
     copy_files: bool = False,
-    latest_only: bool = False,
 ) -> None:
     """Generate the static FlashTest site into output_dir from target_dir.
 
-    If *root_prefix* is given (relative path from output_dir to the top of an
-    enclosing website, e.g. ``"../.."``), a site navigation bar is added to
-    the index and invocation pages. If *latest_only* is True only the newest
-    invocation of each site is included (history is purged from the output).
+    Every invocation found in target_dir is included. If *copy_files* is True,
+    the files linked from the build pages are copied into output_dir so the
+    result is self-contained and can be moved or published anywhere (large
+    files and checkpoints are listed but not copied). A machine-readable
+    ``summary.json`` describing every invocation is written to output_dir.
     """
-    def list_invocation_dirs(site_path: Path):
-        invs = _list_invocation_dirs(site_path)  # newest first
-        return invs[:1] if latest_only else invs
-
     target_dir = target_dir.expanduser().resolve()
     output_dir = output_dir.expanduser().resolve()
     if not target_dir.is_dir():
@@ -72,6 +67,11 @@ def generate_flashx_testview(
             raise FileExistsError(
                 f"Output directory '{output_dir}' exists but is not a directory."
             )
+        if (output_dir / ".git").exists():
+            raise RuntimeError(
+                f"Refusing to delete '{output_dir}': it contains a .git directory. "
+                "Choose an empty or generated-output directory."
+            )
         if not force_rewrite:
             reply = (
                 input(f"'{output_dir}' is not empty. Delete everything inside? [y/N] ")
@@ -98,11 +98,8 @@ def generate_flashx_testview(
         shutil.copytree(js_src, dst_js, dirs_exist_ok=True)
 
     # Write overview index.html
-    index_nav = page_nav(root_prefix, "dev") if root_prefix else None
-    inv_nav = page_nav(root_prefix + "/..", "dev") if root_prefix else None
     index_html = generate_html(
-        board, sites, invocations_sorted, inv_dir_lookup, css_content,
-        title=title, nav_lines=index_nav,
+        board, sites, invocations_sorted, inv_dir_lookup, css_content, title=title
     )
     (output_dir / "index.html").write_text(index_html, encoding="utf-8")
 
@@ -111,7 +108,7 @@ def generate_flashx_testview(
     inv_index_dir.mkdir(parents=True, exist_ok=True)
     for inv_name in invocations_sorted:
         combined = generate_combined_invocation_page(
-            inv_name, inv_dir_lookup.get(inv_name, {}), sites, css_content, nav_lines=inv_nav
+            inv_name, inv_dir_lookup.get(inv_name, {}), sites, css_content
         )
         (inv_index_dir / f"{inv_name}.html").write_text(combined, encoding="utf-8")
 
@@ -141,8 +138,38 @@ def generate_flashx_testview(
                     encoding="utf-8",
                 )
 
+    _write_summary(output_dir, sites, invocations_sorted, inv_dir_lookup)
+
     print(f"✅  Static FlashXTestView generated in {output_dir}")
     print(f"    Open {output_dir}/index.html in your browser")
+
+
+def _write_summary(output_dir, sites, invocations, inv_dir_lookup) -> None:
+    """Write summary.json: one entry per (site, invocation), newest first.
+
+    "colour" is green/yellow/red for the invocation as shown on the index page;
+    "counts" is the number of builds in each colour.
+    """
+    entries = []
+    for inv_name in invocations:
+        for site in sites:
+            inv_dir = inv_dir_lookup.get(inv_name, {}).get(site)
+            if inv_dir is None:
+                continue
+            counts = {"green": 0, "yellow": 0, "red": 0}
+            for b in (d for d in inv_dir.iterdir() if d.is_dir()):
+                counts[parse_build_status(b)[0].colour] += 1
+            entries.append(
+                {
+                    "site": site,
+                    "invocation": inv_name,
+                    "colour": classify_invocation(inv_dir).colour,
+                    "counts": counts,
+                }
+            )
+    (output_dir / "summary.json").write_text(
+        json.dumps(entries, indent=2), encoding="utf-8"
+    )
 
 
 def main() -> None:

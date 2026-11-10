@@ -60,23 +60,3 @@ def page_header_nobody(title: str, css_content: str) -> List[str]:
 def page_footer() -> List[str]:
     """Return closing body and html tags."""
     return ["</body>", "</html>"]
-
-
-def page_nav(root: str, active: str) -> List[str]:
-    """Return a top navigation bar for site mode.
-
-    *root* is the relative path from the current page to the site root
-    (e.g. ``"../.."``); *active* is ``"home"``, ``"about"`` or ``"dev"``.
-    """
-    def link(key: str, href: str, label: str) -> str:
-        cls = ' class="active"' if key == active else ""
-        return f'<a{cls} href="{root}/{href}">{label}</a>'
-
-    return [
-        '<nav class="site-nav">',
-        '  <span class="brand">Flash-MX</span>',
-        "  " + link("home", "index.html", "Home"),
-        "  " + link("about", "about/index.html", "About"),
-        "  " + link("dev", "dev/index.html", "Dev"),
-        "</nav>",
-    ]

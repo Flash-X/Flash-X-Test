@@ -14,15 +14,19 @@ def webview(outdir, force_rewrite, results=None):
     Arguments
     ---------
     outdir        : Output directory
-    force_rewrite : Do not prompt before replacing outdir (view archive mode)
-    results       : Optional dict {label: path to results directory}. If given,
-                    each is published into the website at outdir (see
-                    backend.Webview.publish_results) and no "config" is
-                    required. Otherwise the view archive from "config" is used.
+    force_rewrite : Do not prompt before replacing outdir
+    results       : Optional path to a results directory. If given, a
+                    self-contained webview of it is packaged into outdir
+                    and no "config" is required. Otherwise the view archive
+                    from "config" is used.
     """
     if results:
-        for label, path in results.items():
-            backend.Webview.publish_results(Path(outdir), label, Path(path))
+        backend.Webview.generate_flashx_testview(
+            target_dir=Path(results),
+            output_dir=Path(outdir),
+            force_rewrite=force_rewrite,
+            copy_files=True,
+        )
         return
 
     # Retrive pathToViewArchive

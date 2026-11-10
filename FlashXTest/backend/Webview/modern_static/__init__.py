@@ -19,4 +19,3 @@ The resulting `output` folder will contain:
 """
 
 from .generator import generate_flashx_testview
-from .site import publish_results

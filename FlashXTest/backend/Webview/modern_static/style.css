@@ -334,38 +334,3 @@ tr.row-alt:hover td {
   color: var(--text);
   line-height: 1.6;
 }
-
-/* -- Site navigation (site mode) --------------- */
-.site-nav {
-  display: flex;
-  align-items: center;
-  gap: 1.25rem;
-  margin: -1.5rem -2rem 1.25rem;
-  padding: 0.75rem 2rem;
-  background: var(--primary-dark);
-}
-.site-nav .brand { color: #fff; font-weight: 700; font-size: 1.1rem; margin-right: auto; }
-.site-nav a { color: #cfe3f5; font-weight: 500; }
-.site-nav a:hover, .site-nav a.active { color: #fff; text-decoration: none; border-bottom: 2px solid #fff; }
-
-/* -- Landing / results summary ---------------- */
-.hero { max-width: 52rem; }
-.hero p { font-size: 1.05rem; }
-.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(22rem, 1fr)); gap: 1rem; margin: 1rem 0; }
-.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 1rem 1.25rem; }
-.card h2 { margin-bottom: 0.25rem; }
-.card .meta { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 0.5rem; }
-.summary-table td, .summary-table th { text-align: left; }
-.empty-note { color: var(--text-muted); font-style: italic; }
-
-/* -- Home / about pages ----------------------- */
-.hero-lg { padding: 2rem 0 1rem; }
-.hero-lg h1 { font-size: 2.4rem; margin-bottom: 0.25rem; }
-.tagline { font-size: 1.3rem; color: var(--text-muted); margin-top: 0; }
-.actions { display: flex; flex-wrap: wrap; gap: 0.75rem; margin: 1.25rem 0; }
-.button { display: inline-block; padding: 0.55rem 1.1rem; border-radius: var(--radius); background: var(--primary); color: #fff; font-weight: 600; }
-.button:hover { background: var(--primary-dark); color: #fff; text-decoration: none; }
-.button.secondary { background: var(--surface); color: var(--primary); border: 1px solid var(--border); }
-.button.secondary:hover { background: var(--primary-light); }
-.prose h2 { margin-top: 1.5rem; }
-.prose p { max-width: 46rem; }

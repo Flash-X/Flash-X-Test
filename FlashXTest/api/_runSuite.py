@@ -15,7 +15,6 @@ def run_suite(
     setup=False,
     addSetupOptions=None,
     webviewDir=None,
-    webviewLabel=None,
 ):
     """
     Run a list of tests from test.info in current working directory
@@ -28,8 +27,7 @@ def run_suite(
     pathToSuites	: List of suite files used if test.info has to be created
     setup		: True to regenerate test.info from suite files even if present
     addSetupOptions	: Additional setup options used if test.info is created
-    webviewDir		: If set, publish results to the website in this directory
-    webviewLabel	: Label for the published results (e.g. main, staged)
+    webviewDir		: If set, package a webview of the results into this directory
 
     If test.info is not present in the working directory (or setup is True),
     it is created from the suite files first, as "setup-suite" would.
@@ -81,12 +79,15 @@ def run_suite(
     lib.run.buildSFOCU(mainDict)
 
     # Run flashTest - actually call the backend flashTest.py here. Results
-    # are published even if the run reports failures, since failures are
+    # are packaged even if the run reports failures, since failures are
     # exactly what the webview should show.
     try:
         lib.run.flashTest(mainDict)
     finally:
         if webviewDir:
-            backend.Webview.publish_results(
-                Path(webviewDir), webviewLabel, Path(mainDict["pathToOutdir"])
+            backend.Webview.generate_flashx_testview(
+                target_dir=Path(mainDict["pathToOutdir"]),
+                output_dir=Path(webviewDir),
+                force_rewrite=False,  # prompts before replacing webviewDir
+                copy_files=True,
             )

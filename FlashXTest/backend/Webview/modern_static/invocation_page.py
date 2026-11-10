@@ -4,7 +4,7 @@ Generate site-combined invocation pages that list builds.
 
 import html
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import Dict, List
 
 from .html_utils import zebra_row_class, page_header, page_footer
 from .status import parse_build_status
@@ -47,11 +47,7 @@ def _generate_site_table_header(site: str) -> List[str]:
 
 
 def generate_combined_invocation_page(
-    inv_name: str,
-    site_dirs: Dict[str, Path],
-    site_order: List[str],
-    css_content: str,
-    nav_lines: Optional[List[str]] = None,
+    inv_name: str, site_dirs: Dict[str, Path], site_order: List[str], css_content: str
 ) -> str:
     """Produce a page listing all sites for one invocation with filterable build tables."""
     sections: List[str] = []
@@ -116,7 +112,6 @@ def generate_combined_invocation_page(
     title = f"Invocation {inv_name}"
     header = page_header(title, css_content)
     content = [
-        *(nav_lines or []),
         f"<h1>{html.escape(title)}</h1>",
         '<p><a href="../index.html">&larr; Back to overview</a></p>',
         *sections,

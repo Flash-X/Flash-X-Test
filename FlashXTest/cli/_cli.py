@@ -195,13 +195,7 @@ def setup_suite(suitelist, overwrite, add_setup_opts, seed_from_info):
     "-w",
     default=None,
     type=click.Path(),
-    help="Publish results to the static website in this directory after the run",
-)
-@click.option(
-    "--webview-label",
-    "-l",
-    default=None,
-    help="Label for published results, e.g. main or staged (required with --webview-dir)",
+    help="Package a self-contained webview of the results in this directory after the run",
 )
 @click.option("--archive", is_flag=True, show_default=True, help="Archive test results")
 @click.option(
@@ -221,7 +215,6 @@ def run_suite(
     setup,
     add_setup_opts,
     webview_dir,
-    webview_label,
     archive,
     skip_viewarchive,
     skip_mainarchive,
@@ -239,15 +232,12 @@ def run_suite(
     --setup to regenerate an existing "test.info".
 
     \b
-    With --webview-dir and --webview-label, the results
-    are published to a static read-only website in that
-    directory when the run finishes (see "webview").
+    With --webview-dir, a self-contained read-only webview
+    of the results is packaged in that directory when the
+    run finishes (see "webview").
     """
-    if webview_dir and not webview_label:
-        raise click.UsageError("--webview-dir requires --webview-label")
     api.run_suite(
         webviewDir=webview_dir,
-        webviewLabel=webview_label,
         pathToSuites=suitelist,
         setup=setup,
         addSetupOptions=add_setup_opts,
@@ -319,10 +309,9 @@ def dry_run(setupname, test, nprocs, site, objdir):
 @click.option(
     "--results",
     "-r",
-    multiple=True,
-    metavar="LABEL=PATH",
-    help="Publish an existing results directory under LABEL into the website "
-    "at --outdir (repeatable). Without this, the view archive is used.",
+    default=None,
+    type=click.Path(exists=True, file_okay=False),
+    help="Existing results directory to package. Without this, the view archive is used.",
 )
 @click.option(
     "--force-rewrite",
@@ -342,26 +331,18 @@ def webview(outdir, results, force_rewrite):
     archive set by "init -vv".
 
     \b
-    With --results LABEL=PATH it instead publishes an
-    existing results directory into a website (landing
-    page plus "Test Results" tab) in "outdir", replacing
-    only that label and keeping everything else, including
-    ".git". This is what "run-suite --webview-dir" does
-    automatically.
+    With --results PATH it instead packages the results
+    directory at PATH into a self-contained webview in
+    "outdir". No "config" is needed. Files linked from the
+    pages are copied in (checkpoints and files over 2 MB
+    are not), and "summary.json" records the status of
+    each invocation. Everything else, such as where the
+    output is published, is left to the caller.
     """
-    resultsDict = {}
-    for entry in results:
-        label, sep, path = entry.partition("=")
-        if not sep or not label or not path:
-            raise click.BadParameter(
-                f"{entry!r} must be LABEL=PATH", param_hint="--results"
-            )
-        resultsDict[label] = path
-
     api.webview(
         outdir=outdir,
         force_rewrite=force_rewrite,
-        results=resultsDict,
+        results=results,
     )
 
 
