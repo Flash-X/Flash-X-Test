@@ -301,7 +301,7 @@ def dry_run(setupname, test, nprocs, site, objdir):
     "-r",
     default=None,
     type=click.Path(exists=True, file_okay=False),
-    help='Results directory. Defaults to "pathToViewArchive", then "pathToOutdir" from "config"',
+    help='Results directory. Defaults to "pathToOutdir", then "pathToViewArchive" from "config"',
 )
 @click.option(
     "--force-rewrite",
@@ -321,7 +321,7 @@ def webview(outdir, results, force_rewrite):
     "config" where present:
 
     \b
-        results : "pathToViewArchive", then "pathToOutdir"
+        results : "pathToOutdir", then "pathToViewArchive"
         outdir  : "pathToWebview" (init -w), then "./html"
 
     \b
