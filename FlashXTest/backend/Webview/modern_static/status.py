@@ -3,7 +3,7 @@ Status parsing utilities for FlashTest static generator.
 """
 
 from pathlib import Path
-from typing import List
+from typing import List, Tuple
 
 
 class InvocationStatus:
@@ -68,17 +68,17 @@ def classify_invocation(inv_dir: Path) -> InvocationStatus:
     return InvocationStatus(colour=colour)
 
 
-def parse_build_status(build_dir: Path) -> tuple[InvocationStatus, str]:
+def parse_build_status(build_dir: Path) -> Tuple[InvocationStatus, str]:
     """Return (InvocationStatus, exit_msg) for a single build directory."""
     errors_file = build_dir / "errors"
     if not errors_file.exists():
-        return ("yellow", "'errors' file not found")
+        return (InvocationStatus("yellow"), "'errors' file not found")
     try:
         raw_lines = [
             ln.strip() for ln in errors_file.read_text().splitlines() if ln.strip()
         ]
     except Exception:
-        return ("red", "unable to read 'errors' file")
+        return (InvocationStatus("red"), "unable to read 'errors' file")
     changed = False
     if raw_lines and raw_lines[-1] == "!":
         changed = True
@@ -88,9 +88,9 @@ def parse_build_status(build_dir: Path) -> tuple[InvocationStatus, str]:
         try:
             ints.append(int(s))
         except ValueError:
-            return ("red", "non-numeric content in 'errors' file")
+            return (InvocationStatus("red"), "non-numeric content in 'errors' file")
     if len(ints) < 5:
-        return ("red", "unrecognised 'errors' format")
+        return (InvocationStatus("red"), "unrecognised 'errors' format")
     setup_err, comp_err, exec_err, test_err, total_runs = ints[:5]
     same_test_err = ints[5] if len(ints) > 5 else 0
     colour = "green"

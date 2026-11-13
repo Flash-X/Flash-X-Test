@@ -34,6 +34,8 @@ setup(
             "backend/FlashTest/configTemplate",
             "backend/FlashTest/scripts/changeInfoFiles",
             "backend/FlashTest/scripts/restarttest/restarttest.sh",
+            "backend/Webview/modern_static/style.css",
+            "backend/Webview/modern_static/js/*.js",
         ]
     },
     scripts=["FlashXTest/flashxtest"],

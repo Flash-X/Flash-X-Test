@@ -3,17 +3,20 @@ Generate build detail frameset, left frame, and right frame HTML.
 """
 
 import html
+import os
 import re
+import shutil
 from pathlib import Path
-from typing import List, Dict
+from typing import Dict, List, Optional
+from urllib.parse import quote as url_quote
 
 from .html_utils import page_header, page_header_nobody, page_footer
 
 
-def generate_build_page_frameset(site_name: str, inv_name: str, build_name: str) -> str:
+def generate_build_page_frameset(site_name: str, inv_name: str, build_name: str, css_content: str) -> str:
     """Return a frameset HTML page."""
     title = f"{site_name} – {inv_name} – {build_name}"
-    lines: List[str] = page_header_nobody(title, css_href="../../../style.css")
+    lines: List[str] = page_header_nobody(title, css_content)
     lines.append('<frameset cols="40%,*">')
     lines.append('  <frame src="leftframe.html" name="leftframe">')
     lines.append('  <frame src="rightframe.html" name="rightframe">')
@@ -22,14 +25,54 @@ def generate_build_page_frameset(site_name: str, inv_name: str, build_name: str)
     return "\n".join(lines)
 
 
+# Files above this size, and checkpoint files, are not copied when publishing.
+MAX_PUBLISH_BYTES = 2 * 1024 * 1024
+_CHK_RE = re.compile(r".*?_chk_\d+")
+
+
+def _read_text(file: Path) -> Optional[str]:
+    """Return the file's contents if it is text (plain text, code or a log),
+    or None if it looks binary (no NUL bytes and valid UTF-8 means text)."""
+    data = file.read_bytes()
+    if b"\0" in data[:8192]:
+        return None
+    try:
+        return data.decode("utf-8")
+    except UnicodeDecodeError:
+        return None
+
+
+def _write_text_view(text: str, name: str, dst: Path, css_content: str) -> None:
+    """Write an HTML page showing *text*, with a link to download the raw file."""
+    lines = page_header(name, css_content, body_class="file-view")
+    lines.append(
+        f'<div class="file-view-header"><span>{html.escape(name)}</span>'
+        f'<a href="{url_quote(name)}" download="{html.escape(name)}">Download</a></div>'
+    )
+    lines.append(f"<pre>{html.escape(text)}</pre>")
+    lines.extend(page_footer())
+    dst.write_text("\n".join(lines), encoding="utf-8")
+
+
 def generate_left_frame_html(
-    site_name: str, inv_name: str, build_name: str, build_dir: Path
+    site_name: str,
+    inv_name: str,
+    build_name: str,
+    build_dir: Path,
+    build_output_dir: Path,
+    css_content: str,
 ) -> str:
-    """Return HTML for the left frame listing structured sections for a build."""
+    """Return HTML for the left frame listing structured sections for a build.
+
+    Linked files are copied into ``build_output_dir/files`` so the output is
+    self-contained (large files and checkpoints are listed but not linked).
+    Text files (plain text, code, logs) open as a page in the right frame,
+    with a download link; other files are downloaded when clicked.
+    """
     title = f"{site_name} – {inv_name} – {build_name}"
     lines: List[str] = page_header(
         title,
-        css_href="../../../style.css",
+        css_content,
         base_target="rightframe",
         body_class="left-frame",
     )
@@ -39,14 +82,36 @@ def generate_left_frame_html(
         + f"{html.escape(inv_name)}</a></h2>"
     )
 
+    def _link(file: Path, text: str) -> str:
+        if _CHK_RE.match(file.name):
+            return f"{html.escape(text)} (not published: checkpoint)"
+        if file.stat().st_size > MAX_PUBLISH_BYTES:
+            return f"{html.escape(text)} (not published: too large)"
+        rel = os.path.relpath(file, build_dir)
+        dst = build_output_dir / "files" / rel
+        dst.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(file, dst)
+        href = url_quote("files/" + rel, safe="/")
+
+        content = _read_text(file)
+        if content is not None:
+            # Shown in the right frame (<base target="rightframe">)
+            _write_text_view(content, file.name, Path(f"{dst}.view.html"), css_content)
+            return f'<a href="{href}.view.html">{html.escape(text)}</a>'
+        # Binary: "download" saves the file instead of navigating to it
+        return (
+            f'<a href="{href}" download="{html.escape(file.name)}">'
+            f"{html.escape(text)}</a>"
+        )
+
     # invocation files
     lines.append("<ul>")
     ti = build_dir / "test.info"
     if ti.is_file():
-        lines.append(f'  <li><a href="{ti.resolve().as_uri()}">test.info</a></li>')
+        lines.append(f"  <li>{_link(ti, 'test.info')}</li>")
     df = build_dir / "deleted_files"
     if df.is_file():
-        lines.append(f'  <li><a href="{df.resolve().as_uri()}">deleted_files</a></li>')
+        lines.append(f"  <li>{_link(df, 'deleted_files')}</li>")
     lines.append("</ul>")
 
     # Setup
@@ -57,9 +122,7 @@ def generate_left_frame_html(
         lines.append("<ul>")
         call_text = sc.read_text().strip()
         if so.is_file():
-            lines.append(
-                f'  <li><a href="{so.resolve().as_uri()}">{html.escape(call_text)}</a></li>'
-            )
+            lines.append(f"  <li>{_link(so, call_text)}</li>")
         else:
             lines.append(f"  <li>{html.escape(call_text)}</li>")
         lines.append("</ul>")
@@ -73,15 +136,11 @@ def generate_left_frame_html(
         lines.append("<h3>Compilation</h3>")
         lines.append("<ul>")
         if gc.is_file():
-            lines.append(f'  <li><a href="{gc.resolve().as_uri()}">gmake_call</a></li>')
+            lines.append(f"  <li>{_link(gc, 'gmake_call')}</li>")
         if go.is_file():
-            lines.append(
-                f'  <li><a href="{go.resolve().as_uri()}">gmake_output</a></li>'
-            )
+            lines.append(f"  <li>{_link(go, 'gmake_output')}</li>")
         if ge.is_file():
-            lines.append(
-                f'  <li><a href="{ge.resolve().as_uri()}">gmake_error</a></li>'
-            )
+            lines.append(f"  <li>{_link(ge, 'gmake_error')}</li>")
         lines.append("</ul>")
         if ct.is_file():
             lines.append(
@@ -138,8 +197,7 @@ def generate_left_frame_html(
             lines.append("</pre>")
 
             def _process_li_line(file: Path) -> str:
-                """A Helper function to build string for a list item."""
-                return f'  <li><a href="{file.resolve().as_uri()}">{html.escape(file.name)}</a></li>'
+                return f"  <li>{_link(file, file.name)}</li>"
 
             lines.append("<ul>")
             # checkpoint files
@@ -211,14 +269,14 @@ def generate_left_frame_html(
     return "\n".join(lines)
 
 
-def generate_right_frame_html(site_name: str, inv_name: str, build_name: str) -> str:
+def generate_right_frame_html(site_name: str, inv_name: str, build_name: str, css_content: str) -> str:
     """Return HTML for the right frame initial content."""
     title = f"{site_name} – {inv_name} – {build_name}"
     lines: List[str] = page_header(
         title,
-        css_href="../../../style.css",
+        css_content,
         body_class="right-frame",
     )
-    lines.append("<p>Select a file from the left to view its contents.</p>")
+    lines.append("<p>Select a file on the left. Text files are shown here; other files are downloaded.</p>")
     lines.extend(page_footer())
     return "\n".join(lines)

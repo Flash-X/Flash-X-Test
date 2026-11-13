@@ -12,6 +12,7 @@ def init(
     pathToLocalArchive=None,
     pathToMainArchive=None,
     pathToViewArchive=None,
+    pathToWebview=None,
     pathToOutdir=None,
     pathToMPI="mpiexec",
     pathToGmake="make",
@@ -26,6 +27,7 @@ def init(
     pathToLocalArchive	: Path to local archive
     pathToMainArchive	: Path to main archive
     pathToViewArchive	: Path to view archive
+    pathToWebview	: Directory rebuilt with a webview of the results after each run
     pathToOutdir	: Output directory
     pathToMPI		: Name of mpi executable
     pathToGmake		: Name of make utility along with options
@@ -47,6 +49,9 @@ def init(
 
     if not apiDict["pathToViewArchive"]:
         apiDict["pathToViewArchive"] = ""
+
+    if not apiDict["pathToWebview"]:
+        apiDict["pathToWebview"] = ""
 
     # Cache the value to current directory and set it as
     # testDir in apiDict
